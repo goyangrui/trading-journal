@@ -57,9 +57,11 @@ html {
   /* named colors */
   --backgroundColor: var(--gray-100);
   --textColor: var(--gray-900);
+  --navColor-1: var(--gray-800);
 
   /* other variables */
-  --borderRadius: 0.25rem;
+  --borderRadius-1: 0.25rem;
+  --borderRadius-2: 0.4rem;
   --letterSpacing: 1px;
   --transition: 0.3s ease-in-out all;
   --max-width: 1120px;
@@ -145,7 +147,7 @@ ul {
   width: 100%;
   display: block;
   object-fit: cover;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-1);
 }
 
 /* button styles */
@@ -155,7 +157,7 @@ ul {
   color: var(--white);
   background: var(--primary-500);
   border: transparent;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-1);
   letter-spacing: var(--letterSpacing);
   padding: 0.375rem 0.75rem;
   box-shadow: var(--shadow-2);
@@ -188,7 +190,7 @@ ul {
   padding: 0.375rem 0.75rem;
   margin-bottom: 1rem;
   border-color: transparent;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-1);
 }
 
 .alert-danger {
@@ -207,7 +209,7 @@ ul {
   width: 90vw;
   max-width: var(--fixed-width);
   background: var(--white);
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-1);
   box-shadow: var(--shadow-4);
   padding: 2rem 2.5rem;
   margin: 3rem auto;
@@ -225,7 +227,7 @@ ul {
 .form-textarea {
   width: 100%;
   padding: 0.375rem 0.75rem;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-1);
   background: var(--backgroundColor);
   border: 1px solid var(--gray-200);
 }
