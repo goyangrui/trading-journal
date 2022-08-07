@@ -1,5 +1,13 @@
+import Wrapper from "../assets/wrappers/Features";
+
 function Features() {
-  return <h1>Features Page</h1>;
+  return (
+    <Wrapper>
+      <div className="container">
+        <h1>Features Page</h1>
+      </div>
+    </Wrapper>
+  );
 }
 
 export default Features;

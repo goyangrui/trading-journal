@@ -1,15 +1,17 @@
 import styled from "styled-components";
 
-const Wrapper = styled.nav`
+const Wrapper = styled.header`
   /* General navigation bar styles */
-  background: var(--navColor-1);
-  height: 100px;
-  display: flex;
-  /* justify-content: space-between; */
-  justify-content: start;
-  padding: 0.5rem calc((100vw - 1350px) / 2);
-  z-index: 10;
-  align-items: center;
+
+  nav {
+    background: var(--navColor-1);
+    height: var(--nav-height);
+    display: flex;
+    justify-content: start;
+    padding: 0.5rem calc((100vw - 1350px) / 2);
+    z-index: 10;
+    align-items: center;
+  }
 
   /* Logo styles */
   .logo {
@@ -30,7 +32,7 @@ const Wrapper = styled.nav`
     display: flex;
     align-items: center;
 
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 960px) {
       display: none;
     }
   }
@@ -56,7 +58,7 @@ const Wrapper = styled.nav`
   .toggle-btn {
     display: none;
 
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 960px) {
       color: var(--white);
       background: var(--navColor-1);
       border: transparent;
@@ -71,26 +73,15 @@ const Wrapper = styled.nav`
 
   /* Login button */
 
-  .btn {
-    border-radius: var(--borderRadius-2);
-    padding: 0.5rem 1.15rem;
-    border: 2px solid var(--primary-500);
-  }
-
-  .btn:hover {
-    color: var(--primary-500);
-    background: var(--white);
-  }
-
   .btn-container {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     width: 100vw;
     margin-right: 24px;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
 
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 960px) {
       display: none;
     }
   }

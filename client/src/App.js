@@ -1,8 +1,13 @@
-// react router dom
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// pages
-import { Landing, Features, Pricing, SharedLanding } from "./pages";
+import {
+  Landing,
+  Features,
+  Pricing,
+  SharedLanding,
+  Login,
+  Register,
+} from "./pages";
 
 function App() {
   return (
@@ -14,6 +19,8 @@ function App() {
             <Route index element={<Landing />} />
             <Route path="features" element={<Features />} />
             <Route path="pricing" element={<Pricing />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
           </Route>
         </Routes>
       </BrowserRouter>

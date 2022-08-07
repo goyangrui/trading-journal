@@ -1,7 +1,5 @@
-// react router dom
 import { Outlet } from "react-router-dom";
 
-// components
 import { Navbar } from "../components";
 
 function SharedLanding() {
@@ -9,6 +7,7 @@ function SharedLanding() {
     <>
       <Navbar />
       <Outlet />
+      {/* Add footer later on */}
     </>
   );
 }
