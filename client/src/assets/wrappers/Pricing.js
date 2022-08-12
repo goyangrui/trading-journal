@@ -14,7 +14,7 @@ const Pricing = styled.div`
     margin-bottom: 1rem;
   }
   .title h2 {
-    font-weight: 500;
+    /* font-weight: 500; */
     margin-bottom: 0.25rem;
   }
 

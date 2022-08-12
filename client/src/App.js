@@ -7,6 +7,7 @@ import {
   SharedLanding,
   Login,
   Register,
+  Error,
 } from "./pages";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path="pricing" element={<Pricing />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="*" element={<Error />} />
           </Route>
         </Routes>
       </BrowserRouter>

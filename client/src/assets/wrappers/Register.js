@@ -7,6 +7,7 @@ const Register = styled.div`
   /* form heading */
   .form h2 {
     text-align: center;
+    /* font-weight: 500; */
   }
 
   /* submit button */

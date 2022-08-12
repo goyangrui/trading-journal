@@ -10,17 +10,12 @@ function Login() {
         <form className="form">
           {/* title */}
           <h2>login form</h2>
-          {/* username */}
+          {/* email */}
           <div className="form-row">
-            <label htmlFor="username" className="form-label">
-              username
+            <label htmlFor="email" className="form-label">
+              email
             </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              className="form-input"
-            />
+            <input type="text" id="email" name="email" className="form-input" />
           </div>
           {/* password */}
           <div className="form-row">

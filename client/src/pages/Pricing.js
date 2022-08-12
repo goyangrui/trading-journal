@@ -40,11 +40,11 @@ function Pricing() {
           <div>More detailed performance statistics</div>
           <div>Extract more insights from your journaling</div>
           <div>
-            Unlock more advanced features for your trade refletion process
+            Unlock more advanced features for your trade reflection process
           </div>
           <div>
-            Advanced "find your edge" to help you discover what works for you,
-            and what doesn't
+            Advanced "find your edge" feature to help you discover what works
+            for you, and what doesn't
           </div>
           <div>
             <Link to="/register" className="btn btn-block">
