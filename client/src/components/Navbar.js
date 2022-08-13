@@ -1,27 +1,35 @@
-// react router dom
 import { NavLink, Link } from "react-router-dom";
+import { useState } from "react";
 
-// styles for Navbar component (nav tag)
-import Wrapper from "../assets/wrappers/Navbar";
-
-// react icons
 import { FaBars } from "react-icons/fa";
 
-// components
-import { Logo } from "../components";
+import Wrapper from "../assets/wrappers/Navbar";
+
+import { Logo } from ".";
+import { MainToggleMenu } from ".";
 
 function Navbar() {
+  // local state variable for toggling nav menu
+  const [toggle, setToggle] = useState(false);
+
+  // toggle function
+  const toggleMenu = () => {
+    setToggle(!toggle);
+  };
+
   return (
     <Wrapper>
       <nav>
         {/* Logo */}
-        <Logo />
+        <Logo toggle={toggle} toggleMenu={toggleMenu} />
 
         {/* IF SCREEN IS SMALL */}
         {/* toggle button to show nav menu */}
-        <button className="toggle-btn" type="button">
-          <FaBars />
-        </button>
+        <div className="toggle-btn-container">
+          <button className="toggle-btn" type="button" onClick={toggleMenu}>
+            <FaBars />
+          </button>
+        </div>
 
         {/* IF SCREEN IS BIG */}
         {/* nav menu */}
@@ -49,6 +57,9 @@ function Navbar() {
           </Link>
         </div>
       </nav>
+
+      {/* toggle menu */}
+      <MainToggleMenu toggle={toggle} toggleMenu={toggleMenu} />
     </Wrapper>
   );
 }

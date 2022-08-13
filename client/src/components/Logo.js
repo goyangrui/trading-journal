@@ -4,9 +4,17 @@ import { NavLink } from "react-router-dom";
 // images
 import logo from "../assets/images/logo-no-bg.png";
 
-function Logo() {
+function Logo({ toggle, toggleMenu }) {
   return (
-    <NavLink className="logo" to="/">
+    <NavLink
+      className="logo"
+      to="/"
+      onClick={() => {
+        if (toggle) {
+          toggleMenu();
+        }
+      }}
+    >
       <img src={logo} alt="stonk" />
     </NavLink>
   );

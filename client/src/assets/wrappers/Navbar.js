@@ -4,6 +4,10 @@ const Wrapper = styled.header`
   /* General navigation bar styles */
 
   nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
     background: var(--navColor-1);
     height: var(--nav-height);
     display: flex;
@@ -56,18 +60,21 @@ const Wrapper = styled.header`
 
   /* Toggle button styles */
   .toggle-btn {
+    color: var(--white);
+    background: var(--navColor-1);
+    border: transparent;
+    font-size: 1.8rem;
+    cursor: pointer;
+  }
+
+  .toggle-btn-container {
     display: none;
 
     @media screen and (max-width: 960px) {
-      color: var(--white);
-      background: var(--navColor-1);
-      border: transparent;
       display: flex;
-      width: 100vw;
       justify-content: flex-end;
+      width: 100%;
       margin-right: 24px;
-      font-size: 1.8rem;
-      cursor: pointer;
     }
   }
 
@@ -84,6 +91,46 @@ const Wrapper = styled.header`
     @media screen and (max-width: 960px) {
       display: none;
     }
+  }
+
+  /* Toggle menu */
+  .toggle-menu {
+    display: none;
+
+    @media screen and (max-width: 960px) {
+      position: fixed;
+      top: -100%;
+
+      display: flex;
+      flex-direction: column;
+
+      width: 100%;
+      background: var(--navColor-1);
+
+      transition: var(--transition);
+    }
+  }
+  // Move menu down to nav height when toggled on (active)
+  .toggle-menu.active {
+    top: var(--nav-height);
+  }
+
+  // Login button in toggle menu
+  .toggle-menu .btn:hover {
+    color: var(--primary-500);
+  }
+
+  // Toggle menu links
+  .toggle-menu a {
+    margin: 0.5rem auto;
+    padding: 0.5rem 1rem;
+
+    color: var(--white);
+    transition: var(--transition);
+  }
+
+  .toggle-menu a:hover {
+    color: var(--primary-500);
   }
 `;
 

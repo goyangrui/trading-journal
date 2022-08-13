@@ -5,7 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "server": "nodemon server --ignore client",
+    "client": "cd client && npm start"
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,7 @@
   },
   "homepage": "https://github.com/goyangrui/trading-journal#readme",
   "devDependencies": {
+    "concurrently": "^7.3.0",
     "nodemon": "^2.0.19"
   },
   "dependencies": {

@@ -3,6 +3,7 @@ import styled from "styled-components";
 const Landing = styled.div`
   /* outer div styles */
   margin: 5rem 0;
+  margin-top: calc(var(--nav-height) + 5rem);
 
   /* Hero layout styles */
   .hero {
