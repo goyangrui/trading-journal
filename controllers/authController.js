@@ -1,5 +1,4 @@
 import { StatusCodes } from "http-status-codes";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import { BadRequestError, UnauthenticatedError } from "../errors/index.js";

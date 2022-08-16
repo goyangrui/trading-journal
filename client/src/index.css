@@ -49,7 +49,7 @@ html {
   --white: #fff;
 
   /* alerts */
-  --red-light: #f8d7da;
+  --red-light: #ebced0;
   --red-dark: #842029;
   --green-light: #d1e7dd;
   --green-dark: #0f5132;
@@ -200,6 +200,8 @@ ul {
   margin-bottom: 1rem;
   border-color: transparent;
   border-radius: var(--borderRadius-1);
+  text-align: center;
+  text-transform: capitalize;
 }
 
 .alert-danger {

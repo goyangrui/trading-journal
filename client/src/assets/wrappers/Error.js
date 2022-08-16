@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const Error = styled.div`
-  margin: 5rem 0;
+  margin: calc(var(--nav-height) + 5rem) 0;
   display: flex;
   flex-direction: column;
   align-items: center;

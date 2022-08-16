@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 import Wrapper from "../assets/wrappers/Register";
 
@@ -13,11 +13,40 @@ const initialState = {
 };
 
 function Login() {
+  // -- STATES AND HOOKS --
+
   // local state
   const [values, setValues] = useState(initialState);
 
   // get state and functions from global context
-  const { loginUser } = useAppContext();
+  const {
+    user,
+    isLoading,
+    showAlert,
+    alertText,
+    alertType,
+    loginUser,
+    clearAlert,
+  } = useAppContext();
+
+  // useNavigate router-dom hook
+  const navigate = useNavigate();
+
+  // useEffect
+  useEffect(() => {
+    // on initial render of login page, clear any alerts
+    clearAlert();
+  }, []);
+
+  useEffect(() => {
+    // whenever user changes or user navigates to login/register, if user exists, redirect user to dashboard
+    // replace login/register route with the current route, so hitting the back button will re-route the user to the page before the login/register route
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate, user]);
+
+  // -- FUNCTIONS --
 
   // handle on change event for updating state values
   const handleChange = (e) => {
@@ -40,6 +69,26 @@ function Login() {
           {/* title */}
           <h2>login form</h2>
 
+          {/* alert */}
+          {showAlert && (
+            <div className={`alert alert-${alertType}`}>
+              {/* if user doesn't exist (failed to authenticate), show heading 5 */}
+              {!user && (
+                <h5>
+                  {`The form contains ${alertText.split(",").length} error${
+                    alertText.split(",").length > 1 ? "s" : ""
+                  }`}
+                </h5>
+              )}
+              {/* return unordered list of alert text message(s) */}
+              <ul>
+                {alertText.split(",").map((item, index) => {
+                  return <li key={index}>{item}</li>;
+                })}
+              </ul>
+            </div>
+          )}
+
           {/* email */}
           <FormRow
             name="email"
@@ -57,7 +106,7 @@ function Login() {
           />
 
           {/* submit button */}
-          <button type="submit" className="btn btn-block">
+          <button type="submit" className="btn btn-block" disabled={isLoading}>
             Login
           </button>
           <p>

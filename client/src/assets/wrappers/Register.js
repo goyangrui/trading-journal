@@ -34,6 +34,11 @@ const Register = styled.div`
   .redirect-btn:hover {
     color: var(--primary-600);
   }
+
+  button:disabled {
+    cursor: not-allowed;
+    pointer-events: all !important;
+  }
 `;
 
 export default Register;

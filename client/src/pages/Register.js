@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 import Wrapper from "../assets/wrappers/Register";
 
@@ -14,11 +14,40 @@ const initialState = {
 };
 
 function Register() {
-  // local state
+  // -- STATES AND HOOKS --
+
+  // local states
   const [values, setValues] = useState(initialState);
 
   // get state and functions from global context
-  const { registerUser } = useAppContext();
+  const {
+    user,
+    isLoading,
+    showAlert,
+    alertText,
+    alertType,
+    registerUser,
+    clearAlert,
+  } = useAppContext();
+
+  // useNavigate router-dom hook
+  const navigate = useNavigate();
+
+  // useEffect
+  useEffect(() => {
+    // on initial render of register page, clear any alerts
+    clearAlert();
+  }, []);
+
+  useEffect(() => {
+    // whenever user changes or user navigates to login/register, if user exists, redirect user to dashboard
+    // replace login/register route with the current route, so hitting the back button will re-route the user to the page before the login/register route
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate, user]);
+
+  // -- FUNCTIONS --
 
   // handle on change event for updating state values
   const handleChange = (e) => {
@@ -31,6 +60,13 @@ function Register() {
     // call register user global context function passing in user inputed information
     const { username, email, password } = values;
     registerUser({ username, email, password });
+
+    console.log(user);
+
+    // if user exists
+    if (user) {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -40,6 +76,26 @@ function Register() {
         <form className="form" onSubmit={handleSubmit}>
           {/* title */}
           <h2>sign-up form</h2>
+
+          {/* alert */}
+          {showAlert && (
+            <div className={`alert alert-${alertType}`}>
+              {/* if user doesn't exist (failed to authenticate), show heading 5 */}
+              {!user && (
+                <h5>
+                  {`The form contains ${alertText.split(",").length} error${
+                    alertText.split(",").length > 1 ? "s" : ""
+                  }`}
+                </h5>
+              )}
+              {/* return unordered list of alert text message(s) */}
+              <ul>
+                {alertText.split(",").map((item, index) => {
+                  return <li key={index}>{item}</li>;
+                })}
+              </ul>
+            </div>
+          )}
 
           {/* username */}
           <FormRow
@@ -66,7 +122,7 @@ function Register() {
           />
 
           {/* submit button */}
-          <button type="submit" className="btn btn-block">
+          <button type="submit" className="btn btn-block" disabled={isLoading}>
             Create Account
           </button>
           <p>

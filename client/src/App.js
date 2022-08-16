@@ -8,6 +8,8 @@ import {
   Login,
   Register,
   Error,
+  ProtectedRoute,
+  Dashboard,
 } from "./pages";
 
 import { ScrollToTop } from "./components";
@@ -26,6 +28,10 @@ function App() {
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
               <Route path="*" element={<Error />} />
+            </Route>
+            {/* Protected routes */}
+            <Route path="/" element={<ProtectedRoute />}>
+              <Route path="dashboard" element={<Dashboard />} />
             </Route>
           </Routes>
         </ScrollToTop>
