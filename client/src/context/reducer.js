@@ -17,9 +17,6 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
-      showAlert: true,
-      alertText: action.payload.text,
-      alertType: action.payload.type,
       user: action.payload.user,
       token: action.payload.token,
     };
@@ -42,9 +39,6 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
-      showAlert: true,
-      alertText: action.payload.text,
-      alertType: action.payload.type,
       user: action.payload.user,
       token: action.payload.token,
     };

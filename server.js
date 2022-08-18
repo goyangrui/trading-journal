@@ -11,9 +11,13 @@ import "express-async-errors";
 
 // import routers
 import authRouter from "./routes/authRoutes.js";
+import tradesRouter from "./routes/tradesRoutes.js";
 
 // import custom middleware
 import errorHandlerMiddleware from "./middleware/error-handler.js";
+
+// authentication middleware
+import authMiddleware from "./middleware/auth.js";
 
 // -- INITIALIZE APPLICATION --
 const app = express();
@@ -32,6 +36,10 @@ app.use(express.json());
 
 // authentication route
 app.use("/api/v1/auth", authRouter);
+
+// -- protected routes --
+// trades routes
+app.use("/api/v1/trades", authMiddleware, tradesRouter);
 
 // -- ERROR HANDLING MIDDLEWARE --
 app.use(errorHandlerMiddleware);

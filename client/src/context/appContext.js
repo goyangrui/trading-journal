@@ -14,6 +14,7 @@ import {
 } from "./actions";
 
 // initial global state (used for keeping track of existence of user)
+// on each re-render, get the user data and token from local storage
 const initialState = {
   user: localStorage.getItem("user"),
   token: localStorage.getItem("token"),
@@ -49,8 +50,6 @@ function AppContextProvider({ children }) {
         payload: {
           user,
           token,
-          text: "Registration successful!",
-          type: "success",
         },
       });
       // add token and user info to local storage
@@ -82,8 +81,6 @@ function AppContextProvider({ children }) {
         payload: {
           user,
           token,
-          text: "Login successful!",
-          type: "success",
         },
       });
       // add token and user info to local storage
