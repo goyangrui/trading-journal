@@ -19,7 +19,7 @@ const authenticateUser = async (req, res, next) => {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
     // add jwt payload into response object
-    res.user = payload;
+    req.user = payload;
   } catch (error) {
     throw new UnauthenticatedError("Unauthorized");
   }

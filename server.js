@@ -12,6 +12,7 @@ import "express-async-errors";
 // import routers
 import authRouter from "./routes/authRoutes.js";
 import tradesRouter from "./routes/tradesRoutes.js";
+import userInfoRouter from "./routes/userInfoRoutes.js";
 
 // import custom middleware
 import errorHandlerMiddleware from "./middleware/error-handler.js";
@@ -38,6 +39,10 @@ app.use(express.json());
 app.use("/api/v1/auth", authRouter);
 
 // -- protected routes --
+
+// get user info route
+app.use("/api/v1/me", authMiddleware, userInfoRouter);
+
 // trades routes
 app.use("/api/v1/trades", authMiddleware, tradesRouter);
 

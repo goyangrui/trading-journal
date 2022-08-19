@@ -9,8 +9,16 @@ import {
   Register,
   Error,
   ProtectedRoute,
-  Dashboard,
 } from "./pages";
+
+import {
+  SharedMain,
+  Dashboard,
+  Trades,
+  Journal,
+  Rules,
+  Profile,
+} from "./pages/protected-routes";
 
 import { ScrollToTop } from "./components";
 
@@ -29,9 +37,21 @@ function App() {
               <Route path="register" element={<Register />} />
               <Route path="*" element={<Error />} />
             </Route>
+
             {/* Protected routes */}
-            <Route path="/" element={<ProtectedRoute />}>
-              <Route path="dashboard" element={<Dashboard />} />
+            <Route
+              path="/app"
+              element={
+                <ProtectedRoute>
+                  <SharedMain />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="trades" element={<Trades />} />
+              <Route path="journal" element={<Journal />} />
+              <Route path="rules" element={<Rules />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
         </ScrollToTop>

@@ -30,6 +30,7 @@ const register = async (req, res, next) => {
 
   res.status(StatusCodes.CREATED).json({
     user: {
+      userId: user._id,
       username: user.username,
       email: user.email,
     },
@@ -65,9 +66,10 @@ const login = async (req, res) => {
   // create a JWT token to send back in response
   const token = user.createJWT();
 
-  res
-    .status(StatusCodes.CREATED)
-    .json({ user: { username: user.username, email: user.email }, token });
+  res.status(StatusCodes.CREATED).json({
+    user: { userId: user._id, username: user.username, email: user.email },
+    token,
+  });
 };
 
 export { register, login };
