@@ -31,7 +31,13 @@ const UserSchema = new mongoose.Schema({
 
 // (this prehook hashes the password property and fires when create() is called)
 UserSchema.pre("save", async function () {
-  // generate salt, and hash password
+  // if the password was not modified, then don't hash the password (for updateUser)
+  if (!this.isModified("password")) {
+    console.log("password not modified");
+    return;
+  }
+
+  // otherwise if the password was changed, or a new user was created, generate salt, and hash password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(this.password, salt);
 

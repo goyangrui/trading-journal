@@ -226,7 +226,7 @@ ul {
   background: var(--gray-200);
   border-radius: var(--borderRadius-2);
   border: var(--border-1);
-  box-shadow: var(--shadow-4);
+  box-shadow: var(--shadow-3);
   padding: 2rem 2.5rem;
   margin: 0 auto;
 }

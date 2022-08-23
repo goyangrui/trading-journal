@@ -16,6 +16,7 @@ import userInfoRouter from "./routes/userInfoRoutes.js";
 
 // import custom middleware
 import errorHandlerMiddleware from "./middleware/error-handler.js";
+import notFoundMiddleware from "./middleware/not-found.js";
 
 // authentication middleware
 import authMiddleware from "./middleware/auth.js";
@@ -40,11 +41,14 @@ app.use("/api/v1/auth", authRouter);
 
 // -- protected routes --
 
-// get user info route
+// get user info route (gets fetched everytime a protected resource/route is accessed on frontend)
 app.use("/api/v1/me", authMiddleware, userInfoRouter);
 
 // trades routes
 app.use("/api/v1/trades", authMiddleware, tradesRouter);
+
+// -- ROUTE NOT FOUND MIDDLEWARE --
+app.use(notFoundMiddleware);
 
 // -- ERROR HANDLING MIDDLEWARE --
 app.use(errorHandlerMiddleware);

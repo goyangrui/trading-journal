@@ -72,4 +72,62 @@ const login = async (req, res) => {
   });
 };
 
-export { register, login };
+// UPDATE USER CONTROLLER
+const updateUser = async (req, res) => {
+  // get user information from request
+  const { username, email } = req.body;
+
+  // check if user failed to provide all necessary information
+  if (!username || !email) {
+    throw new BadRequestError("Please provide all values");
+  }
+
+  // find the user document via the userId from the token
+  const user = await User.findById(req.user.userId);
+
+  // update the user document's information based on user's inputs
+  user.username = username;
+  user.email = email;
+
+  // save the document data
+  await user.save();
+
+  // create a new token (with updated user information in payload)
+  const token = user.createJWT();
+
+  // send response with updated user information and new token
+  res
+    .status(StatusCodes.OK)
+    .json({ user, token, msg: "User information successfully updated" });
+};
+
+// CHANGE PASSWORD CONTROLLER
+const changePassword = async (req, res) => {
+  // get user's new password from the request body
+  const { newPassword, confirmation } = req.body;
+
+  // check if the user provided both the new password and the confirmation
+  if (!newPassword || !confirmation) {
+    throw new BadRequestError("Please provide all values");
+  }
+
+  // check if both the new password and confirmation are the same
+  if (newPassword !== confirmation) {
+    throw new BadRequestError("Passwords do not match");
+  }
+
+  // find the user document via the userId from the token
+  const user = await User.findById(req.user.userId);
+
+  // change the user's password to the new password
+  user.password = newPassword;
+
+  // save the document data (pre-save hook will hash the password)
+  await user.save();
+
+  res
+    .status(StatusCodes.OK)
+    .json({ user, msg: "Password successfully changed" });
+};
+
+export { register, login, updateUser, changePassword };

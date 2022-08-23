@@ -7,6 +7,7 @@ const Sidebar = styled.nav`
   height: 100%;
   width: var(--sidebar-width-1);
   transition: var(--transition);
+  box-shadow: var(--shadow-4);
 
   background: var(--navmenuColor-1);
 
@@ -14,6 +15,7 @@ const Sidebar = styled.nav`
   .sidebar-item {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 0.2rem;
     color: var(--white);
     font-size: 1.1rem;
