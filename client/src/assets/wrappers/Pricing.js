@@ -1,10 +1,6 @@
 import styled from "styled-components";
 
 const Pricing = styled.div`
-  /* outer div styles */
-  margin: 2rem 0;
-  margin-top: calc(var(--nav-height) + 2rem);
-
   /* Section header styles */
   .section-header {
     text-align: center;

@@ -42,7 +42,7 @@ function Login() {
     // whenever user changes or user navigates to login/register, if user exists, redirect user to dashboard/app page
     // replace login/register route with the current route, so hitting the back button will re-route the user to the page before the login/register route
     if (user) {
-      navigate("/app", { replace: true });
+      navigate("/app/dashboard", { replace: true });
     }
   }, [navigate, user]);
 

@@ -6,7 +6,9 @@ import { FaBars } from "react-icons/fa";
 import Wrapper from "../assets/wrappers/Navbar";
 
 import { Logo } from ".";
-import { MainToggleMenu } from ".";
+import { ToggleMenu } from ".";
+
+import links from "../utils/links";
 
 function Navbar() {
   // local state variable for toggling nav menu
@@ -34,20 +36,14 @@ function Navbar() {
         {/* IF SCREEN IS BIG */}
         {/* nav menu */}
         <div className="nav-menu">
-          {/* route to landing page */}
-          <NavLink to="/" className="nav-link">
-            Home
-          </NavLink>
-
-          {/* route to features page*/}
-          <NavLink to="/features" className="nav-link">
-            Features
-          </NavLink>
-
-          {/* route to pricing page */}
-          <NavLink to="/pricing" className="nav-link">
-            Pricing
-          </NavLink>
+          {/* render every link object in the links array */}
+          {links.map((link) => {
+            return (
+              <NavLink to={link.path} key={link.id} className="nav-link">
+                {link.text}
+              </NavLink>
+            );
+          })}
         </div>
 
         {/* login button */}
@@ -59,7 +55,7 @@ function Navbar() {
       </nav>
 
       {/* toggle menu */}
-      <MainToggleMenu toggle={toggle} toggleMenu={toggleMenu} />
+      <ToggleMenu toggle={toggle} toggleMenu={toggleMenu} />
     </Wrapper>
   );
 }

@@ -5,8 +5,14 @@ import { Navbar } from "../components";
 function SharedLanding() {
   return (
     <>
+      {/* fixed navbar */}
       <Navbar />
-      <Outlet />
+
+      {/* main landing page content */}
+      <div className="landing-page">
+        <Outlet />
+      </div>
+
       {/* Add footer later on */}
     </>
   );

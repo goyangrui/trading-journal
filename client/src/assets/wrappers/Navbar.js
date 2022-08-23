@@ -9,12 +9,13 @@ const Wrapper = styled.header`
     right: 0;
     left: 0;
     background: var(--navColor-1);
-    height: var(--nav-height);
+    height: var(--nav-height-1);
     display: flex;
     justify-content: start;
     padding: 0.5rem calc((100vw - 1350px) / 2);
-    z-index: 10;
     align-items: center;
+    box-shadow: var(--shadow-3);
+    z-index: 10;
   }
 
   /* Logo styles */
@@ -103,16 +104,17 @@ const Wrapper = styled.header`
 
       display: flex;
       flex-direction: column;
+      box-shadow: var(--shadow-3);
 
       width: 100%;
-      background: var(--navColor-1);
+      background: var(--navmenuColor-1);
 
       transition: var(--transition);
     }
   }
   // Move menu down to nav height when toggled on (active)
   .toggle-menu.active {
-    top: var(--nav-height);
+    top: var(--nav-height-1);
   }
 
   // Login button in toggle menu

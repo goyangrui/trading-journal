@@ -2,6 +2,8 @@ import Navbar from "./Navbar";
 import Logo from "./Logo";
 import FormRow from "./FormRow";
 import ScrollToTop from "./ScrollToTop";
-import MainToggleMenu from "./MainToggleMenu";
+import ToggleMenu from "./ToggleMenu";
+import Sidebar from "./Sidebar";
+import MainNavbar from "./MainNavbar";
 
-export { Navbar, Logo, FormRow, ScrollToTop, MainToggleMenu };
+export { Navbar, Logo, FormRow, ScrollToTop, ToggleMenu, Sidebar, MainNavbar };

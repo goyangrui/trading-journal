@@ -166,6 +166,12 @@ function AppContextProvider({ children }) {
     dispatch({ type: CLEAR_ALERT });
   };
 
+  // logout user
+  const logoutUser = () => {
+    removeUserFromLocalStorage();
+    dispatch({ type: LOGOUT_USER });
+  };
+
   // add user information to local storage
   const addUserToLocalStorage = (userInfo) => {
     localStorage.setItem("token", userInfo.token);
@@ -178,16 +184,17 @@ function AppContextProvider({ children }) {
     localStorage.removeItem("user");
   };
 
-  // logout user
-  const logoutUser = () => {
-    removeUserFromLocalStorage();
-    dispatch({ type: LOGOUT_USER });
-  };
-
   // return app context provider component, passing in functions and state values to all child components in application
   return (
     <AppContext.Provider
-      value={{ ...state, registerUser, loginUser, clearAlert, fetchUser }}
+      value={{
+        ...state,
+        registerUser,
+        loginUser,
+        fetchUser,
+        clearAlert,
+        logoutUser,
+      }}
     >
       {children}
     </AppContext.Provider>

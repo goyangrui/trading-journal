@@ -58,6 +58,8 @@ html {
   --backgroundColor: var(--gray-100);
   --textColor: var(--gray-900);
   --navColor-1: var(--gray-800);
+  --navmenuColor-1: var(--gray-700);
+  --navmenuColor-hover: var(--gray-600);
 
   /* other variables */
   --borderRadius-1: 0.25rem;
@@ -68,7 +70,9 @@ html {
   --max-width: 1120px;
   --fixed-width: 600px;
   --fluid-width: 90vw;
-  --nav-height: 100px;
+  --nav-height-1: 100px;
+  --nav-height-2: 60px;
+  --sidebar-width-1: 150px;
 
   /* box shadows */
   --shadow-1: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -290,4 +294,10 @@ ul {
   background: var(--primary-500);
   width: 5rem;
   height: 0.25rem;
+}
+
+/* main landing page with fixed navbar */
+.landing-page {
+  margin: 5rem auto;
+  margin-top: calc(var(--nav-height-1) + 3rem);
 }

@@ -31,7 +31,7 @@ function ProtectedRoute({ children }) {
     return children;
   }
 
-  // otherwise if the user doesn't exist, return the user to the landing page
+  // otherwise if the token doesn't exist, return the user to the landing page
   return <Navigate to="/" />;
 }
 

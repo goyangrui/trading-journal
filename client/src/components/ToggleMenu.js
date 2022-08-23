@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 
-import mainLinks from "../utils/main-links";
+import mainLinks from "../utils/links";
 
-function MainToggleMenu({ toggle, toggleMenu }) {
+function ToggleMenu({ toggle, toggleMenu }) {
   return (
     <div className={toggle ? "toggle-menu active" : "toggle-menu"}>
       {/* Get links from mainLinks array */}
@@ -22,4 +22,4 @@ function MainToggleMenu({ toggle, toggleMenu }) {
   );
 }
 
-export default MainToggleMenu;
+export default ToggleMenu;

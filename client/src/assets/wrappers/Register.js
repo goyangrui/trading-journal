@@ -2,8 +2,6 @@ import styled from "styled-components";
 
 const Register = styled.div`
   /* outer div styles */
-  margin: 3rem auto;
-  margin-top: calc(var(--nav-height) + 3rem);
 
   /* form heading */
   .form h2 {

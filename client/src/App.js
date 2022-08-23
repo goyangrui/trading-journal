@@ -47,11 +47,18 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<Dashboard />} />
+              {/* /app route with no other path will render an error component */}
+              <Route index element={<Error />} />
+
+              {/* valid protected paths */}
+              <Route path="dashboard" element={<Dashboard />} />
               <Route path="trades" element={<Trades />} />
               <Route path="journal" element={<Journal />} />
               <Route path="rules" element={<Rules />} />
               <Route path="profile" element={<Profile />} />
+
+              {/* /app route containing any other path than the ones above will also render error component */}
+              <Route path="*" element={<Error />} />
             </Route>
           </Routes>
         </ScrollToTop>
