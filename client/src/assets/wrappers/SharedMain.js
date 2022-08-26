@@ -7,6 +7,7 @@ const SharedMain = styled.div`
   /* sidebar and main content flex */
   .main-content {
     display: flex;
+    width: 100%;
     margin-top: var(--nav-height-2);
   }
 

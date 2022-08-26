@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const Alert = styled.div`
   /* General styles for alert */
+  margin-bottom: 3rem;
 
   /* list container styles */
   .list-container {

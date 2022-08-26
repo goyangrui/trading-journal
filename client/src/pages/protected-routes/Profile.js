@@ -21,7 +21,7 @@ const initialState = {
 
 function Profile() {
   // global state variables and functions
-  const { user, isLoading, showAlert, updateUser, changePassword } =
+  const { user, isLoading, showAlert, clearAlert, updateUser, changePassword } =
     useAppContext();
 
   // local state variables for form fields
@@ -31,6 +31,12 @@ function Profile() {
     email: user?.email,
     image: user?.image || defaultImage,
   });
+
+  // useEffect
+  useEffect(() => {
+    // on initial render of profile page, clear any alerts
+    clearAlert();
+  }, []);
 
   // handle change of form input fields
   const handleChange = (e) => {
@@ -57,19 +63,31 @@ function Profile() {
         },
         values.file
       );
+
+      // clear the file state value after submission
+      setValues({ ...values, file: null });
     }
 
     // otherwise if it is the user password form that was submitted
+    if (e.target.name === "password") {
+      // only update user password
+      changePassword({
+        newPassword: values.newPassword,
+        confirmation: values.confirmation,
+      });
+
+      // clear the password state values after submission
+      setValues({ ...values, newPassword: "", confirmation: "" });
+    }
   };
 
   return (
     <Wrapper>
       <div className="container">
+        {/* Alert */}
+        {showAlert && <Alert />}
         {/* Change user information form*/}
         <form className="form" name="info" onSubmit={handleSubmit}>
-          {/* Alert */}
-          {showAlert && <Alert />}
-
           {/* form title */}
           <h3>Profile</h3>
 
@@ -98,7 +116,36 @@ function Profile() {
             handleChange={handleChange}
           />
 
-          {/* buttons container */}
+          {/* submit button */}
+          <button className="btn btn-block" type="submit" disabled={isLoading}>
+            Update
+          </button>
+        </form>
+
+        {/* Change password form */}
+        <form className="form" name="password" onSubmit={handleSubmit}>
+          {/* form title */}
+          <h3>change password</h3>
+
+          {/* new password */}
+          <FormRow
+            name="newPassword"
+            labelText="new password"
+            type="password"
+            value={values.newPassword}
+            handleChange={handleChange}
+          />
+
+          {/* confirmation */}
+          <FormRow
+            name="confirmation"
+            labelText="confirm password"
+            type="password"
+            value={values.confirmation}
+            handleChange={handleChange}
+          />
+
+          {/* submit button */}
           <button className="btn btn-block" type="submit" disabled={isLoading}>
             Update
           </button>

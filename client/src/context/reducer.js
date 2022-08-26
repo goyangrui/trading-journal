@@ -142,18 +142,27 @@ const reducer = (state, action) => {
     console.log("change password begin");
     return {
       ...state,
+      isLoading: true,
     };
   }
   if (action.type === CHANGE_PASSWORD_SUCCESS) {
     console.log("change password success");
     return {
       ...state,
+      isLoading: false,
+      showAlert: true,
+      alertText: action.payload.text,
+      alertType: action.payload.type,
     };
   }
   if (action.type === CHANGE_PASSWORD_ERROR) {
     console.log("change password error");
     return {
       ...state,
+      isLoading: false,
+      showAlert: true,
+      alertText: action.payload.text,
+      alertType: action.payload.type,
     };
   }
 

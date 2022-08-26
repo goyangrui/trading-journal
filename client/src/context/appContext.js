@@ -249,8 +249,26 @@ function AppContextProvider({ children }) {
   };
 
   // change password function
-  const changePassword = async () => {
+  const changePassword = async (passwordInfo) => {
     dispatch({ type: CHANGE_PASSWORD_BEGIN });
+
+    try {
+      const response = await authFetch.patch(
+        "/auth/changePassword",
+        passwordInfo
+      );
+
+      dispatch({
+        type: CHANGE_PASSWORD_SUCCESS,
+        payload: { text: response.data.msg, type: "success" },
+      });
+      console.log(response);
+    } catch (error) {
+      dispatch({
+        type: CHANGE_PASSWORD_ERROR,
+        payload: { text: error.response.data.msg, type: "danger" },
+      });
+    }
   };
 
   // -- MISC FUNCTIONS --
