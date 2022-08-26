@@ -12,7 +12,6 @@ import {
 import authenticateUser from "../middleware/auth.js";
 
 // set up routes
-
 router.route("/register").post(register);
 router.route("/login").post(login);
 

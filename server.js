@@ -21,6 +21,12 @@ import notFoundMiddleware from "./middleware/not-found.js";
 // authentication middleware
 import authMiddleware from "./middleware/auth.js";
 
+import bodyParser from "body-parser";
+
+// multipart form bodyparser for file uploading
+import multer from "multer";
+const upload = multer();
+
 // -- INITIALIZE APPLICATION --
 const app = express();
 
@@ -31,8 +37,14 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 
-// request body parser middleware
-app.use(express.json());
+// request body parser middleware for json data
+app.use(bodyParser.json());
+
+// request body parser for url encoded requests
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// request body parser for multipart/form-data
+app.use(upload.any());
 
 // -- ROUTING --
 

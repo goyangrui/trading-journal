@@ -73,32 +73,43 @@ const login = async (req, res) => {
 };
 
 // UPDATE USER CONTROLLER
-const updateUser = async (req, res) => {
-  // get user information from request
-  const { username, email } = req.body;
+const updateUser = async (req, res, next) => {
+  // unpack send userInfo data (as string) and profile picture (file)
+  const [profilePictureFile] = req.files;
+  const userInfoJsonString = req.body.userInfo;
 
-  // check if user failed to provide all necessary information
-  if (!username || !email) {
-    throw new BadRequestError("Please provide all values");
+  try {
+    // try and parse userInfo json string
+    const userInfo = JSON.parse(userInfoJsonString);
+
+    // unpack userInfo object
+    const { username, email } = userInfo;
+
+    // check if user failed to provide all necessary information
+    if (!username || !email) {
+      throw new BadRequestError("Please provide all values");
+    }
+
+    // find the user document via the userId from the token payload
+    const user = await User.findById(req.user.userId);
+
+    // update the user document's information based on user's inputs
+    user.username = username;
+    user.email = email;
+
+    // save the document data
+    await user.save();
+
+    // create a new token (with updated user information in payload)
+    const token = user.createJWT();
+
+    // send response with updated user information and new token
+    res
+      .status(StatusCodes.OK)
+      .json({ user, token, msg: "User information successfully updated" });
+  } catch (error) {
+    next(error);
   }
-
-  // find the user document via the userId from the token
-  const user = await User.findById(req.user.userId);
-
-  // update the user document's information based on user's inputs
-  user.username = username;
-  user.email = email;
-
-  // save the document data
-  await user.save();
-
-  // create a new token (with updated user information in payload)
-  const token = user.createJWT();
-
-  // send response with updated user information and new token
-  res
-    .status(StatusCodes.OK)
-    .json({ user, token, msg: "User information successfully updated" });
 };
 
 // CHANGE PASSWORD CONTROLLER

@@ -5,11 +5,17 @@ import {
   LOGIN_USER_BEGIN,
   LOGIN_USER_SUCCESS,
   LOGIN_USER_ERROR,
-  CLEAR_ALERT,
   FETCH_USER_BEGIN,
   FETCH_USER_SUCCESS,
   FETCH_USER_ERROR,
   LOGOUT_USER,
+  UPDATE_USER_BEGIN,
+  UPDATE_USER_SUCCESS,
+  UPDATE_USER_ERROR,
+  CHANGE_PASSWORD_BEGIN,
+  CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PASSWORD_ERROR,
+  CLEAR_ALERT,
 } from "./actions";
 
 import { initialState } from "./appContext";
@@ -63,17 +69,6 @@ const reducer = (state, action) => {
     };
   }
 
-  // -- CLEAR ALERT --
-  if (action.type === CLEAR_ALERT) {
-    console.log("clear alert");
-    return {
-      ...state,
-      showAlert: false,
-      alertText: "",
-      alertType: "",
-    };
-  }
-
   // -- FETCH USER --
   if (action.type === FETCH_USER_BEGIN) {
     console.log("fetch user begin");
@@ -88,8 +83,8 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
-      user: action.payload.userInfo.user,
-      token: action.payload.userInfo.token,
+      user: action.payload.user,
+      token: action.payload.token,
     };
   }
 
@@ -110,6 +105,69 @@ const reducer = (state, action) => {
       token: null,
     };
   }
+
+  // -- UPDATE USER --
+  if (action.type === UPDATE_USER_BEGIN) {
+    console.log("update user begin");
+    return {
+      ...state,
+      isLoading: true,
+    };
+  }
+  if (action.type === UPDATE_USER_SUCCESS) {
+    console.log("update user success");
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertText: action.payload.text,
+      alertType: action.payload.type,
+      user: action.payload.user,
+      token: action.payload.token,
+    };
+  }
+  if (action.type === UPDATE_USER_ERROR) {
+    console.log("update user error");
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertText: action.payload.text,
+      alertType: action.payload.type,
+    };
+  }
+
+  // -- CHANGE PASSWORD --
+  if (action.type === CHANGE_PASSWORD_BEGIN) {
+    console.log("change password begin");
+    return {
+      ...state,
+    };
+  }
+  if (action.type === CHANGE_PASSWORD_SUCCESS) {
+    console.log("change password success");
+    return {
+      ...state,
+    };
+  }
+  if (action.type === CHANGE_PASSWORD_ERROR) {
+    console.log("change password error");
+    return {
+      ...state,
+    };
+  }
+
+  // -- CLEAR ALERT --
+  if (action.type === CLEAR_ALERT) {
+    console.log("clear alert");
+    return {
+      ...state,
+      showAlert: false,
+      alertText: "",
+      alertType: "",
+    };
+  }
+
   throw new Error(`no such action : ${action.type}`);
 };
 

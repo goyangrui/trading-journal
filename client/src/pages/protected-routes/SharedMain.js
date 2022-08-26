@@ -7,6 +7,8 @@ import Wrapper from "../../assets/wrappers/SharedMain";
 import { Sidebar, MainNavbar } from "../../components";
 
 function SharedMain() {
+  // global state variables and functions
+
   // Set local state to toggle dropdown
   const [toggleDropdown, setToggleDropdown] = useState(false);
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Wrapper from "../assets/wrappers/Register";
 
 import { useAppContext } from "../context/appContext";
-import { FormRow } from "../components";
+import { FormRow, Alert } from "../components";
 
 // initial local state
 const initialState = {
@@ -78,24 +78,7 @@ function Register() {
           <h2>sign-up form</h2>
 
           {/* alert */}
-          {showAlert && (
-            <div className={`alert alert-${alertType}`}>
-              {/* if user doesn't exist (failed to authenticate), show heading 5 */}
-              {!user && (
-                <h5>
-                  {`The form contains ${alertText.split(",").length} error${
-                    alertText.split(",").length > 1 ? "s" : ""
-                  }`}
-                </h5>
-              )}
-              {/* return unordered list of alert text message(s) */}
-              <ul>
-                {alertText.split(",").map((item, index) => {
-                  return <li key={index}>{item}</li>;
-                })}
-              </ul>
-            </div>
-          )}
+          {showAlert && <Alert />}
 
           {/* username */}
           <FormRow

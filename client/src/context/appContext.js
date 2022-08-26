@@ -10,23 +10,35 @@ import {
   LOGIN_USER_BEGIN,
   LOGIN_USER_SUCCESS,
   LOGIN_USER_ERROR,
-  CLEAR_ALERT,
   FETCH_USER_BEGIN,
   FETCH_USER_SUCCESS,
   FETCH_USER_ERROR,
   LOGOUT_USER,
+  UPDATE_USER_BEGIN,
+  UPDATE_USER_SUCCESS,
+  UPDATE_USER_ERROR,
+  CHANGE_PASSWORD_BEGIN,
+  CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PASSWORD_ERROR,
+  CLEAR_ALERT,
 } from "./actions";
 
 // initial global state (used for keeping track of existence of user)
 // on each re-render, get the user data and token from local storage
 const initialState = {
-  user: localStorage.getItem("user"),
+  user: "",
   token: localStorage.getItem("token"),
   isLoading: false,
   showAlert: false,
   alertText: "",
   alertType: "",
 };
+
+// try and parse the user object in the local storage and set the initial state user object to the user object in local storage
+try {
+  const user = JSON.parse(localStorage.getItem("user"));
+  initialState.user = user;
+} catch (error) {}
 
 // create a context
 const AppContext = createContext();
@@ -37,6 +49,7 @@ function AppContextProvider({ children }) {
   // use reducer to manage state changes
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // -- CUSTOM AUTHENTICATION AXIOS --
   // create instance of axios with custom config for accessing protected routes
   const authFetch = axios.create({
     baseURL: "/api/v1",
@@ -47,7 +60,7 @@ function AppContextProvider({ children }) {
   authFetch.interceptors.request.use(
     (config) => {
       // add request authorization header to the request config
-      config.headers.common["Authorization"] = `Bearer ${state.token}`;
+      config.headers["Authorization"] = `Bearer ${state.token}`;
       return config;
     },
     (error) => {
@@ -67,6 +80,8 @@ function AppContextProvider({ children }) {
   );
 
   // -- GLOBAL FUNCTIONS --
+
+  // -- USER FUNCTIONS --
   // function for registering the user
   const registerUser = async (userInfo) => {
     // set isLoading state to true, which disable's submit button
@@ -85,8 +100,11 @@ function AppContextProvider({ children }) {
           token,
         },
       });
-      // add token and user info to local storage
-      addUserToLocalStorage({ user, token });
+      // add token and user info (stringified) to local storage
+      addUserToLocalStorage({ user: JSON.stringify(user), token });
+
+      // clear any alerts
+      clearAlert();
     } catch (error) {
       // set alert state to true, danger, and display message from response
       dispatch({
@@ -114,8 +132,11 @@ function AppContextProvider({ children }) {
           token,
         },
       });
-      // add token and user info to local storage
-      addUserToLocalStorage({ user, token });
+      // add token and user info (stringified) to local storage
+      addUserToLocalStorage({ user: JSON.stringify(user), token });
+
+      // clear any alerts
+      clearAlert();
     } catch (error) {
       // set alert state to true, danger, and display message from response
       dispatch({
@@ -126,6 +147,7 @@ function AppContextProvider({ children }) {
   };
 
   // function for fetching the user from the server (for authentication of protected routes)
+  // this function is only executed on the first render of any protected route
 
   const fetchUser = async () => {
     // Set is loading to true
@@ -137,19 +159,22 @@ function AppContextProvider({ children }) {
 
       // extract relevant user information from response
       const userInfo = {
-        user: {
-          userId: data._id,
-          username: data.username,
-          email: data.email,
-        },
-        token: state.token,
+        userId: data._id,
+        username: data.username,
+        email: data.email,
       };
 
-      // set user global state variable to the data received from the response
-      dispatch({ type: FETCH_USER_SUCCESS, payload: { userInfo } });
+      // stringify the user info data (to be stored as a string in local storage)
+      const userInfoJsonString = JSON.stringify(userInfo);
 
-      // store user information in local storage
-      addUserToLocalStorage(userInfo);
+      // set user global state variable to the data received from the response
+      dispatch({
+        type: FETCH_USER_SUCCESS,
+        payload: { user: userInfo, token: state.token },
+      });
+
+      // store user information (stringified) in local storage
+      addUserToLocalStorage({ user: userInfoJsonString, token: state.token });
     } catch (error) {
       // if fetching the user with the token in the state (from local storage on renders) fails
 
@@ -161,15 +186,78 @@ function AppContextProvider({ children }) {
     }
   };
 
-  // clear alert function
-  const clearAlert = () => {
-    dispatch({ type: CLEAR_ALERT });
-  };
-
   // logout user
   const logoutUser = () => {
     removeUserFromLocalStorage();
     dispatch({ type: LOGOUT_USER });
+  };
+
+  // update user function
+  const updateUser = async (userInfoInput, profilePictureFile) => {
+    // set isLoading to true
+    dispatch({ type: UPDATE_USER_BEGIN });
+
+    try {
+      // try and stringify userInfo
+      const userInfoJsonStringInput = JSON.stringify(userInfoInput);
+
+      // create multipart form data
+      const formData = new FormData();
+
+      // append stringified userInfo json and profile picture file to multipart form data
+      formData.append("userInfo", userInfoJsonStringInput);
+      formData.append("file", profilePictureFile);
+
+      // send patch request to /updateUser endpoint with multipart form data
+      const response = await authFetch.patch("/auth/updateUser", formData);
+
+      // get user object and token from response
+      const { user, token, msg } = response.data;
+
+      // extract relevant user information from user object
+      const userInfo = {
+        userId: user._id,
+        username: user.username,
+        email: user.email,
+      };
+
+      // // stringify the user info data (to be stored as a string in local storage)
+      const userInfoJsonString = JSON.stringify(userInfo);
+
+      // update global state variables to be the new user information, and new token
+      dispatch({
+        type: UPDATE_USER_SUCCESS,
+        payload: { user, token, text: msg, type: "success" },
+      });
+
+      // add new user (stringified) and token to local storage
+      addUserToLocalStorage({ user: userInfoJsonString, token });
+    } catch (error) {
+      // if there is an internal server error, log the user out
+      if (error.response.status === 500) {
+        logoutUser();
+        return;
+      }
+
+      // otherwise
+      // set is Loading to false, set show alert to true, and set alert text and type to danger
+      dispatch({
+        type: UPDATE_USER_ERROR,
+        payload: { text: error.response.data.msg, type: "danger" },
+      });
+    }
+  };
+
+  // change password function
+  const changePassword = async () => {
+    dispatch({ type: CHANGE_PASSWORD_BEGIN });
+  };
+
+  // -- MISC FUNCTIONS --
+
+  // clear alert function
+  const clearAlert = () => {
+    dispatch({ type: CLEAR_ALERT });
   };
 
   // add user information to local storage
@@ -192,8 +280,10 @@ function AppContextProvider({ children }) {
         registerUser,
         loginUser,
         fetchUser,
-        clearAlert,
         logoutUser,
+        updateUser,
+        changePassword,
+        clearAlert,
       }}
     >
       {children}
