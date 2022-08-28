@@ -5,6 +5,9 @@ import { BadRequestError, UnauthenticatedError } from "../errors/index.js";
 
 import User from "../models/User.js";
 
+// import custom aws s3 functions for uploading and deleting files
+import { s3Upload, s3Delete } from "../aws/s3Service.js";
+
 // REGISTER CONTROLLER
 const register = async (req, res, next) => {
   // get request body
@@ -67,16 +70,21 @@ const login = async (req, res) => {
   const token = user.createJWT();
 
   res.status(StatusCodes.CREATED).json({
-    user: { userId: user._id, username: user.username, email: user.email },
+    user: {
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+      image: user.profile,
+    },
     token,
   });
 };
 
 // UPDATE USER CONTROLLER
 const updateUser = async (req, res, next) => {
-  // unpack send userInfo data (as string) and profile picture (file)
-  const [profilePictureFile] = req.files;
+  // unpack send userInfo data (as string) and profile picture (file) from multer middleware
   const userInfoJsonString = req.body.userInfo;
+  const profilePictureFile = req.file;
 
   try {
     // try and parse userInfo json string
@@ -97,16 +105,43 @@ const updateUser = async (req, res, next) => {
     user.username = username;
     user.email = email;
 
-    // save the document data
+    // -- HANDLE PROFILE PICTURE UPDATING --
+    // if user sent profile picture file, upload the profile picture
+    if (profilePictureFile) {
+      // get the user _id, convert it to string, and pass it into s3Upload function (userId used a key for image)
+      const userId = user._id.toString();
+
+      // delete the old image from s3 with the userId if it exists
+      if (user.profile) {
+        // create the key of the image from the user.profile image url
+        const key = user.profile.split(process.env.AWS_PROFILE_URL)[1];
+        await s3Delete(key);
+      }
+
+      // upload the new file to S3 and retrieve the image location
+      const imageLocation = await s3Upload(profilePictureFile, userId);
+
+      // attach imageLocation to the profile property of user
+      user.profile = imageLocation;
+    }
+
+    // save the user document data
     await user.save();
 
     // create a new token (with updated user information in payload)
     const token = user.createJWT();
 
     // send response with updated user information and new token
-    res
-      .status(StatusCodes.OK)
-      .json({ user, token, msg: "User information successfully updated" });
+    res.status(StatusCodes.OK).json({
+      user: {
+        userId: user._id,
+        username: user.username,
+        email: user.email,
+        image: user.profile,
+      },
+      token,
+      msg: "User information successfully updated",
+    });
   } catch (error) {
     next(error);
   }

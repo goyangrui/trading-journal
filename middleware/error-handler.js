@@ -22,6 +22,23 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     defaultError.msg = `${Object.keys(err.keyValue)} field has to be unique`;
   }
 
+  // multer (file uploading middleware) error handling
+  if (err.code === "LIMIT_FILE_SIZE") {
+    defaultError.statusCode = StatusCodes.BAD_REQUEST;
+    defaultError.msg = "Profile picture file too large";
+  }
+
+  if (err.code === "LIMIT_FILE_COUNT") {
+    defaultError.statusCode = StatusCodes.BAD_REQUEST;
+    defaultError.msg = "Too many files";
+  }
+
+  if (err.code === "LIMIT_UNEXPECTED_FILE") {
+    defaultError.statusCode = StatusCodes.BAD_REQUEST;
+    defaultError.msg = "File must be an image";
+  }
+  // return res.json({ err });
+
   return res.status(defaultError.statusCode).json({ msg: defaultError.msg });
 };
 

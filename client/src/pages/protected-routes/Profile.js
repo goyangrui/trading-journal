@@ -24,7 +24,7 @@ function Profile() {
   const { user, isLoading, showAlert, clearAlert, updateUser, changePassword } =
     useAppContext();
 
-  // local state variables for form fields
+  // local state variables for form fields on initial render
   const [values, setValues] = useState({
     ...initialState,
     username: user?.username,
@@ -37,6 +37,18 @@ function Profile() {
     // on initial render of profile page, clear any alerts
     clearAlert();
   }, []);
+
+  // anytime the user global state variable changes, update the local state username, email, and image property
+  useEffect(() => {
+    console.log("user state variable initially set or changed");
+
+    setValues({
+      ...values,
+      username: user?.username,
+      email: user?.email,
+      image: user?.image || defaultImage,
+    });
+  }, [user]);
 
   // handle change of form input fields
   const handleChange = (e) => {

@@ -155,26 +155,16 @@ function AppContextProvider({ children }) {
 
     // try and fetch user from protected route with the token from the state (provided in request interceptor)
     try {
-      const { data } = await authFetch.get("/me");
-
-      // extract relevant user information from response
-      const userInfo = {
-        userId: data._id,
-        username: data.username,
-        email: data.email,
-      };
-
-      // stringify the user info data (to be stored as a string in local storage)
-      const userInfoJsonString = JSON.stringify(userInfo);
+      const { data: user } = await authFetch.get("/me");
 
       // set user global state variable to the data received from the response
       dispatch({
         type: FETCH_USER_SUCCESS,
-        payload: { user: userInfo, token: state.token },
+        payload: { user, token: state.token },
       });
 
       // store user information (stringified) in local storage
-      addUserToLocalStorage({ user: userInfoJsonString, token: state.token });
+      addUserToLocalStorage({ user: JSON.stringify(user), token: state.token });
     } catch (error) {
       // if fetching the user with the token in the state (from local storage on renders) fails
 
@@ -193,19 +183,19 @@ function AppContextProvider({ children }) {
   };
 
   // update user function
-  const updateUser = async (userInfoInput, profilePictureFile) => {
+  const updateUser = async (userInfo, profilePictureFile) => {
     // set isLoading to true
     dispatch({ type: UPDATE_USER_BEGIN });
 
     try {
       // try and stringify userInfo
-      const userInfoJsonStringInput = JSON.stringify(userInfoInput);
+      const userInfoJsonString = JSON.stringify(userInfo);
 
       // create multipart form data
       const formData = new FormData();
 
       // append stringified userInfo json and profile picture file to multipart form data
-      formData.append("userInfo", userInfoJsonStringInput);
+      formData.append("userInfo", userInfoJsonString);
       formData.append("file", profilePictureFile);
 
       // send patch request to /updateUser endpoint with multipart form data
@@ -214,16 +204,6 @@ function AppContextProvider({ children }) {
       // get user object and token from response
       const { user, token, msg } = response.data;
 
-      // extract relevant user information from user object
-      const userInfo = {
-        userId: user._id,
-        username: user.username,
-        email: user.email,
-      };
-
-      // // stringify the user info data (to be stored as a string in local storage)
-      const userInfoJsonString = JSON.stringify(userInfo);
-
       // update global state variables to be the new user information, and new token
       dispatch({
         type: UPDATE_USER_SUCCESS,
@@ -231,7 +211,7 @@ function AppContextProvider({ children }) {
       });
 
       // add new user (stringified) and token to local storage
-      addUserToLocalStorage({ user: userInfoJsonString, token });
+      addUserToLocalStorage({ user: JSON.stringify(user), token });
     } catch (error) {
       // if there is an internal server error, log the user out
       if (error.response.status === 500) {

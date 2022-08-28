@@ -25,6 +25,10 @@ const UserSchema = new mongoose.Schema({
     minlength: [8, "Password must be at least 8 characters long"],
     select: false,
   },
+  profile: {
+    type: String,
+    default: "",
+  },
 });
 
 // Middleware
@@ -50,7 +54,12 @@ UserSchema.pre("save", async function () {
 // create JWT token
 UserSchema.methods.createJWT = function () {
   return jwt.sign(
-    { userId: this._id, username: this.username, email: this.email },
+    {
+      userId: this._id,
+      username: this.username,
+      email: this.email,
+      image: this.profile,
+    },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
