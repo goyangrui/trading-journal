@@ -18,6 +18,7 @@ import {
   Journal,
   Rules,
   Profile,
+  Subscription,
 } from "./pages/protected-routes";
 
 import { ScrollToTop } from "./components";
@@ -56,6 +57,7 @@ function App() {
               <Route path="journal" element={<Journal />} />
               <Route path="rules" element={<Rules />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="sub" element={<Subscription />} />
 
               {/* /app route containing any other path than the ones above will also render error component */}
               <Route path="*" element={<Error />} />

@@ -1,4 +1,4 @@
-import { MdDashboard } from "react-icons/md";
+import { MdDashboard, MdOutlineUnsubscribe } from "react-icons/md";
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaBook } from "react-icons/fa";
 import { BsFillFileRuledFill } from "react-icons/bs";
@@ -24,6 +24,12 @@ const links = [
     text: "Profile",
     path: "/app/profile",
     icon: <FaUserCircle />,
+  },
+  {
+    id: 6,
+    text: "Subscription",
+    path: "/app/sub",
+    icon: <MdOutlineUnsubscribe />,
   },
 ];
 

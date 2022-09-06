@@ -7,6 +7,9 @@ import Sidebar from "./Sidebar";
 import MainNavbar from "./MainNavbar";
 import Alert from "./Alert";
 import Avatar from "./Avatar";
+import PricingCard from "./PricingCard";
+import Locked from "./Locked";
+import Loading from "./Loading";
 
 export {
   Navbar,
@@ -18,4 +21,7 @@ export {
   MainNavbar,
   Alert,
   Avatar,
+  PricingCard,
+  Locked,
+  Loading,
 };

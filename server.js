@@ -13,6 +13,7 @@ import "express-async-errors";
 import authRouter from "./routes/authRoutes.js";
 import tradesRouter from "./routes/tradesRoutes.js";
 import userInfoRouter from "./routes/userInfoRoutes.js";
+import stripeRouter from "./routes/stripeRoutes.js";
 
 // import custom middleware
 import errorHandlerMiddleware from "./middleware/error-handler.js";
@@ -43,6 +44,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // authentication route
 app.use("/api/v1/auth", authRouter);
+
+// stripe routes
+app.use("/api/v1/stripe", stripeRouter);
 
 // -- protected routes --
 

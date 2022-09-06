@@ -15,6 +15,15 @@ import {
   CHANGE_PASSWORD_BEGIN,
   CHANGE_PASSWORD_SUCCESS,
   CHANGE_PASSWORD_ERROR,
+  FETCH_PRODUCTS_BEGIN,
+  FETCH_PRODUCTS_SUCCESS,
+  FETCH_PRODUCTS_ERROR,
+  CREATE_SESSION_BEGIN,
+  CREATE_SESSION_SUCCESS,
+  CREATE_SESSION_ERROR,
+  SET_SUBSCRIPTION_BEGIN,
+  SET_SUBSCRIPTION_SUCCESS,
+  SET_SUBSCRIPTION_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -32,6 +41,7 @@ const reducer = (state, action) => {
       isLoading: false,
       user: action.payload.user,
       token: action.payload.token,
+      hasSubscription: true,
     };
   }
   if (action.type === REGISTER_USER_ERROR) {
@@ -84,7 +94,6 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       user: action.payload.user,
-      token: action.payload.token,
     };
   }
 
@@ -166,6 +175,32 @@ const reducer = (state, action) => {
     };
   }
 
+  // -- FETCH PRODUCTS --
+  if (action.type === FETCH_PRODUCTS_BEGIN) {
+    console.log("fetch products begin");
+    return {
+      ...state,
+      isLoading: true,
+    };
+  }
+
+  if (action.type === FETCH_PRODUCTS_SUCCESS) {
+    console.log("fetch products success");
+    return {
+      ...state,
+      isLoading: false,
+      products: action.payload.products,
+    };
+  }
+
+  if (action.type === FETCH_PRODUCTS_ERROR) {
+    console.log("fetch products error");
+    return {
+      ...state,
+      isLoading: false,
+    };
+  }
+
   // -- CLEAR ALERT --
   if (action.type === CLEAR_ALERT) {
     console.log("clear alert");
@@ -174,6 +209,63 @@ const reducer = (state, action) => {
       showAlert: false,
       alertText: "",
       alertType: "",
+    };
+  }
+
+  // -- CREATE SESSION --
+  if (action.type === CREATE_SESSION_BEGIN) {
+    console.log("create session begin");
+    return {
+      ...state,
+      isLoading: true,
+    };
+  }
+
+  if (action.type === CREATE_SESSION_SUCCESS) {
+    console.log("create session success");
+    return {
+      ...state,
+      isLoading: false,
+    };
+  }
+
+  if (action.type === CREATE_SESSION_ERROR) {
+    console.log("create session error");
+    return {
+      ...state,
+      showAlert: true,
+      alertType: "success",
+      alertText: action.payload.text,
+      isLoading: false,
+    };
+  }
+
+  // -- SET SUBSCRIPTION STATUS --
+  if (action.type === SET_SUBSCRIPTION_BEGIN) {
+    console.log("fetch user and set subscription begin");
+    return {
+      ...state,
+      isLoading: true,
+    };
+  }
+
+  if (action.type === SET_SUBSCRIPTION_SUCCESS) {
+    console.log("fetch user and set subscription success");
+    return {
+      ...state,
+      isLoading: false,
+      hasSubscription: true,
+      user: action.payload.user,
+    };
+  }
+
+  if (action.type === SET_SUBSCRIPTION_ERROR) {
+    console.log("fetch user and set subscription error");
+    return {
+      ...state,
+      isLoading: false,
+      hasSubscription: false,
+      user: action.payload.user,
     };
   }
 

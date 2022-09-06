@@ -97,6 +97,7 @@ const Wrapper = styled.header`
   /* Toggle menu */
   .toggle-menu {
     display: none;
+    z-index: 9;
 
     @media screen and (max-width: 960px) {
       position: fixed;

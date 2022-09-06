@@ -21,6 +21,7 @@ const userInfoController = async (req, res, next) => {
     username: user.username,
     email: user.email,
     image: user.profile,
+    customerId: user.customerId,
   });
 };
 

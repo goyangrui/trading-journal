@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, useEffect } from "react";
 import axios from "axios";
 
 import reducer from "./reducer";
@@ -20,6 +20,15 @@ import {
   CHANGE_PASSWORD_BEGIN,
   CHANGE_PASSWORD_SUCCESS,
   CHANGE_PASSWORD_ERROR,
+  FETCH_PRODUCTS_BEGIN,
+  FETCH_PRODUCTS_SUCCESS,
+  FETCH_PRODUCTS_ERROR,
+  CREATE_SESSION_BEGIN,
+  CREATE_SESSION_SUCCESS,
+  CREATE_SESSION_ERROR,
+  SET_SUBSCRIPTION_BEGIN,
+  SET_SUBSCRIPTION_SUCCESS,
+  SET_SUBSCRIPTION_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -32,6 +41,8 @@ const initialState = {
   showAlert: false,
   alertText: "",
   alertType: "",
+  products: [],
+  hasSubscription: false,
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -88,9 +99,21 @@ function AppContextProvider({ children }) {
     dispatch({ type: REGISTER_USER_BEGIN });
     try {
       // try and get response from register request
-      const response = await axios.post("/api/v1/auth/register", userInfo);
+      const registerResponse = await axios.post(
+        "/api/v1/auth/register",
+        userInfo
+      );
 
-      const { user, token } = response.data;
+      const { user, token } = registerResponse.data;
+
+      // get the priceId from the first product in global state products array
+      const { priceId } = state.products[0];
+
+      // get the customerId from the user object
+      const { customerId } = user;
+
+      // try and create a trial subscription for this user
+      await axios.post("/api/v1/stripe/subscription", { priceId, customerId });
 
       // update alert state to success, store user info in global state, and set isLoading to false
       dispatch({
@@ -123,6 +146,8 @@ function AppContextProvider({ children }) {
       const response = await axios.post("/api/v1/auth/login", userInfo);
 
       const { user, token } = response.data;
+
+      console.log(user);
 
       // update alert state to success, store user info in global state, and set isLoading to false
       dispatch({
@@ -160,7 +185,7 @@ function AppContextProvider({ children }) {
       // set user global state variable to the data received from the response
       dispatch({
         type: FETCH_USER_SUCCESS,
-        payload: { user, token: state.token },
+        payload: { user },
       });
 
       // store user information (stringified) in local storage
@@ -251,6 +276,89 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // -- STRIPE FUNCTIONS --
+  // fetch products function
+  const fetchProducts = async () => {
+    // set isLoading to true
+    dispatch({ type: FETCH_PRODUCTS_BEGIN });
+
+    // try and get data from response of request to stripe API
+    try {
+      const { data } = await axios.get("products", {
+        baseURL: "/api/v1/stripe",
+      });
+
+      // set local state products variable to the products array from response
+      dispatch({
+        type: FETCH_PRODUCTS_SUCCESS,
+        payload: { products: data },
+      });
+    } catch (error) {
+      dispatch({ type: FETCH_PRODUCTS_ERROR });
+    }
+  };
+
+  // create session
+  const createSession = async (priceId) => {
+    // set isLoading to true
+    dispatch({ type: CREATE_SESSION_BEGIN });
+
+    // try and create a stripe session
+    try {
+      const { data } = await authFetch.post("stripe/session", { priceId });
+
+      // if the user is already subscribed, show alert informing user that they are already subscribed, and set isLoading to false
+      if (data.subscribed) {
+        dispatch({ type: CREATE_SESSION_ERROR, payload: { text: data.msg } });
+      } else {
+        // otherwise navigate user to the stripe checkout session
+        dispatch({ type: CREATE_SESSION_SUCCESS });
+        // navigate user to session success url once request has been fulfilled
+        window.location.href = data.session.url;
+      }
+    } catch (error) {
+      // set isLoading to false
+      dispatch({ type: CREATE_SESSION_ERROR });
+      console.log(error);
+    }
+  };
+
+  // get subscription (also fetches user)
+  const getSubscriptions = async () => {
+    // set isLoading to true
+    dispatch({ type: SET_SUBSCRIPTION_BEGIN });
+
+    // try and fetch user and subscription
+    try {
+      // fetch user
+      const { data: user } = await authFetch.get("/me");
+
+      // fetch subscriptions
+      const subscriptions = await authFetch.get("stripe/subscription");
+
+      // if the user has subscriptions (length is greater than 0)
+      if (subscriptions.data.length) {
+        // set is loading to false, update user, and set has subscription flag to true
+        dispatch({
+          type: SET_SUBSCRIPTION_SUCCESS,
+          payload: { user },
+        });
+      } else {
+        // otherwise set is loading to false, update user, and set has subscription flag to false
+        dispatch({
+          type: SET_SUBSCRIPTION_ERROR,
+          payload: { user },
+        });
+      }
+
+      // store user information (stringified) in local storage
+      addUserToLocalStorage({ user: JSON.stringify(user), token: state.token });
+    } catch (error) {
+      // if either of these requests fail, logout the user
+      logoutUser();
+    }
+  };
+
   // -- MISC FUNCTIONS --
 
   // clear alert function
@@ -270,6 +378,12 @@ function AppContextProvider({ children }) {
     localStorage.removeItem("user");
   };
 
+  // add product info to local storage
+  const addProductToLocalStorage = (product) => {
+    localStorage.setItem("productPrice", product.price / 100);
+    localStorage.setItem("productName", product.name);
+  };
+
   // return app context provider component, passing in functions and state values to all child components in application
   return (
     <AppContext.Provider
@@ -281,6 +395,9 @@ function AppContextProvider({ children }) {
         logoutUser,
         updateUser,
         changePassword,
+        fetchProducts,
+        createSession,
+        getSubscriptions,
         clearAlert,
       }}
     >

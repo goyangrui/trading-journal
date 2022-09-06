@@ -24,10 +24,9 @@ function Register() {
     user,
     isLoading,
     showAlert,
-    alertText,
-    alertType,
     registerUser,
     clearAlert,
+    fetchProducts,
   } = useAppContext();
 
   // useNavigate router-dom hook
@@ -35,8 +34,9 @@ function Register() {
 
   // useEffect
   useEffect(() => {
-    // on initial render of register page, clear any alerts
+    // on initial render of register page, clear any alerts and fetch products
     clearAlert();
+    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -60,8 +60,6 @@ function Register() {
     // call register user global context function passing in user inputed information
     const { username, email, password } = values;
     registerUser({ username, email, password });
-
-    console.log(user);
 
     // if user exists
     if (user) {

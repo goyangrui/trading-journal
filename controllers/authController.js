@@ -5,6 +5,8 @@ import { BadRequestError, UnauthenticatedError } from "../errors/index.js";
 
 import User from "../models/User.js";
 
+import stripe from "../utils/stripe.js";
+
 // import custom aws s3 functions for uploading and deleting files
 import { s3Upload, s3Delete } from "../aws/s3Service.js";
 
@@ -25,8 +27,23 @@ const register = async (req, res, next) => {
     throw new BadRequestError("Email already has an account");
   }
 
+  // create a new stripe customer object
+  const customer = await stripe.customers.create(
+    {
+      email,
+    },
+    {
+      apiKey: process.env.STRIPE_SECRET_KEY,
+    }
+  );
+
   // create the user (add the user to the database)
-  const user = await User.create({ username, email, password });
+  const user = await User.create({
+    username,
+    email,
+    password,
+    customerId: customer.id,
+  });
 
   // create a JWT token to send back in the response
   const token = user.createJWT();
@@ -36,6 +53,7 @@ const register = async (req, res, next) => {
       userId: user._id,
       username: user.username,
       email: user.email,
+      customerId: user.customerId,
     },
     token,
   });
@@ -75,6 +93,7 @@ const login = async (req, res) => {
       username: user.username,
       email: user.email,
       image: user.profile,
+      customerId: user.customerId,
     },
     token,
   });
@@ -100,6 +119,16 @@ const updateUser = async (req, res, next) => {
 
     // find the user document via the userId from the token payload
     const user = await User.findById(req.user.userId);
+
+    // unpack the customerId from the req.user
+    const { customerId } = user;
+
+    // update the stripe customer email
+    await stripe.customers.update(
+      customerId,
+      { email },
+      { apiKey: process.env.STRIPE_SECRET_KEY }
+    );
 
     // update the user document's information based on user's inputs
     user.username = username;
@@ -138,6 +167,7 @@ const updateUser = async (req, res, next) => {
         username: user.username,
         email: user.email,
         image: user.profile,
+        customerId: user.customerId,
       },
       token,
       msg: "User information successfully updated",
@@ -171,9 +201,16 @@ const changePassword = async (req, res) => {
   // save the document data (pre-save hook will hash the password)
   await user.save();
 
-  res
-    .status(StatusCodes.OK)
-    .json({ user, msg: "Password successfully changed" });
+  res.status(StatusCodes.OK).json({
+    user: {
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+      image: user.profile,
+      customerId: user.customerId,
+    },
+    msg: "Password successfully changed",
+  });
 };
 
 export { register, login, updateUser, changePassword };

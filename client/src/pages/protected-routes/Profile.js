@@ -21,20 +21,28 @@ const initialState = {
 
 function Profile() {
   // global state variables and functions
-  const { user, isLoading, showAlert, clearAlert, updateUser, changePassword } =
-    useAppContext();
+  const {
+    user,
+    isLoading,
+    showAlert,
+    clearAlert,
+    getSubscriptions,
+    updateUser,
+    changePassword,
+  } = useAppContext();
 
   // local state variables for form fields on initial render
   const [values, setValues] = useState({
     ...initialState,
-    username: user?.username,
-    email: user?.email,
+    username: user?.username || "",
+    email: user?.email || "",
     image: user?.image || defaultImage,
   });
 
   // useEffect
   useEffect(() => {
-    // on initial render of profile page, clear any alerts
+    // on initial render of profile page, clear any alerts, get subscriptions and fetch the user
+    getSubscriptions();
     clearAlert();
   }, []);
 
@@ -44,8 +52,8 @@ function Profile() {
 
     setValues({
       ...values,
-      username: user?.username,
-      email: user?.email,
+      username: user?.username || "",
+      email: user?.email || "",
       image: user?.image || defaultImage,
     });
   }, [user]);

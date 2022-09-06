@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  customerId: {
+    type: String,
+    required: [true, "Please provide stripe customer ID"],
+  },
 });
 
 // Middleware
@@ -59,6 +63,7 @@ UserSchema.methods.createJWT = function () {
       username: this.username,
       email: this.email,
       image: this.profile,
+      customerId: this.customerId,
     },
     process.env.JWT_SECRET,
     {

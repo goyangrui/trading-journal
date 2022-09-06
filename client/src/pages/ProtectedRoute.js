@@ -9,15 +9,15 @@ function ProtectedRoute({ children }) {
   const { fetchUser, token } = useAppContext();
 
   // useRef ensures that the fetch request is only sent once per render
-  const shouldFetch = useRef(true);
+  // const shouldFetch = useRef(true);
 
   // fetch the user on initial render of a protected route (sets the user and token global state variable)
-  useEffect(() => {
-    if (shouldFetch.current) {
-      shouldFetch.current = false;
-      fetchUser();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (shouldFetch.current) {
+  //     shouldFetch.current = false;
+  //     fetchUser();
+  //   }
+  // }, []);
 
   // if the token exists
   if (token) {
