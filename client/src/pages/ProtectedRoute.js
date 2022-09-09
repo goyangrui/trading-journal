@@ -6,7 +6,7 @@ import { useAppContext } from "../context/appContext";
 // Protected route wrapper, to wrap all protected, nested content
 function ProtectedRoute({ children }) {
   // get fetch function, and user state variable from global context
-  const { fetchUser, token } = useAppContext();
+  const { token } = useAppContext();
 
   // useRef ensures that the fetch request is only sent once per render
   // const shouldFetch = useRef(true);
