@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
  * Trade properties
  * 1. Market -> STOCK, FUTURES, OPTIONS 
  * 2. Symbol 
+ * 3. Side -> LONG, SHORT
  * 3. Status -> OPEN, LOSS, WIN, BREAKEVEN
  * 4. Open date
  * 5. Average Entry Price -> based on FIRST execution (buy or sell). Then find average of all buys or sells
@@ -30,6 +31,10 @@ const TradeSchema = new mongoose.Schema({
   symbol: {
     type: String,
     required: [true, 'Please provide symbol'],
+  },
+  side: {
+    type: String,
+    enum: ['long', 'short'],
   },
   status: {
     type: String,
