@@ -12,6 +12,7 @@ import mongoose from 'mongoose';
  * 7. Position size -> sum of all position sizes based on FIRST execution (buy or sell)
  * 8. Return $ -> difference between sells and buys times position size
  * 9. Return % -> difference between sells and buys times position size divided by buys times position size
+ * 10. Net return $ -> return with fees and commissions deducted
  * 10. createdBy -> ID of user who created this trade
  * 
  * -- ADD THESE LATER AFTER BASIC CALCULATION FUNCTIONALITIES HAVE BEEN IMPLEMENTED --
@@ -56,6 +57,9 @@ const TradeSchema = new mongoose.Schema({
     type: Number,
   },
   percentReturn: {
+    type: Number,
+  },
+  netReturn: {
     type: Number,
   },
   createdBy: {

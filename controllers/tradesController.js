@@ -160,18 +160,21 @@ const createTrade = async (req, res) => {
 
   // -- CALCULATE TRADE METRICS BASED ON EXECUTION DOCUMENTS --
 
-  // -- OPEN DATE --
-  // the open date is just the execution date of the first execution
-  const openDate = executionDocs[0].execDate;
-
   // -- SIDE --
+  // the side depends on the action of the first execution - buy means long, and sell means short
   if (executionDocs[0].action === 'buy') {
     var side = 'long';
   } else {
     var side = 'short';
   }
 
-  console.log(side);
+  console.log('side:', side);
+
+  // -- OPEN DATE --
+  // the open date is just the execution date of the first execution
+  const openDate = executionDocs[0].execDate;
+
+  console.log('openDate:', openDate);
 
   // -- AVERAGE ENTRY AND EXIT --
   // average entry price is the average of the buy prices if the first execution is a buy action, and average of sell prices if the first execution is a sell action
@@ -183,7 +186,7 @@ const createTrade = async (req, res) => {
     if (executions[0].action === 'buy') {
       // if the current execution's action is a buy
       if (currentExecution.action === 'buy') {
-        // add its position size and price to the previousValue (initially 0)
+        // add its entry position size and price to the previousValue (initially 0)
         previousValue['entry']['entryPositionTotal'] += currentExecution.positionSize;
         previousValue['entry']['entryPriceTotal'] += currentExecution.price * currentExecution.positionSize;
       } else {
@@ -211,27 +214,28 @@ const createTrade = async (req, res) => {
   
   // calculate averageEntry and averageExit
   let averageEntry = sizeAndPriceTotals['entry']['entryPriceTotal'] / sizeAndPriceTotals['entry']['entryPositionTotal'];
-  averageEntry = parseFloat(averageEntry.toFixed(2)); // round to 2 decimal places
 
   // if exitPositionTotal is NOT 0
   if (sizeAndPriceTotals['exit']['exitPositionTotal'] !== 0) {
     // calculate averageExit
     var averageExit = sizeAndPriceTotals['exit']['exitPriceTotal'] / sizeAndPriceTotals['exit']['exitPositionTotal'];
-    averageExit = parseFloat(averageExit.toFixed(2)); // round to 2 decimal places
   } else {
     // otherwise just set averageExit to 0
     var averageExit = 0;
   }
 
-  console.log(averageEntry, averageExit);
+  console.log('averageEntry:', averageEntry);
+  console.log('averageExit:', averageExit);
 
   // -- POSITION SIZE -- 
   // position size is just the total position size of the entry
   const positionSize = sizeAndPriceTotals['entry']['entryPositionTotal'];
 
+  console.log('positionSize:', positionSize);
+
   // -- DOLLAR RETURN --
   // dollar return is the difference between the average exit price and average entry price times the exit position total
-  let dollarReturn = Math.round(sizeAndPriceTotals['exit']['exitPositionTotal'] * (averageExit - averageEntry))
+  let dollarReturn = sizeAndPriceTotals['exit']['exitPositionTotal'] * (averageExit - averageEntry)
   
   // if the first execution was a sell (short position) 
   if (executionDocs[0].action === 'sell') {
@@ -239,7 +243,19 @@ const createTrade = async (req, res) => {
     dollarReturn *= -1;
   } 
 
-  console.log(dollarReturn);
+  // if the market is options
+  // multiply the dollar return by 100
+  if (market === 'options') {
+    dollarReturn *= 100;
+  }
+
+  // if the market is futures
+  // multiply the dollar return by lot size
+  if (market === 'futures') {
+    dollarReturn *= executionDocs[0].lotSize;
+  }
+
+  console.log('dollarReturn:', dollarReturn);
 
   // -- STATUS --
 
@@ -261,7 +277,7 @@ const createTrade = async (req, res) => {
     }
   }
 
-  console.log(status);
+  console.log('status:', status);
 
   // -- PERCENT RETURN --
   // percent return is the quotient between the dollar return and the total entry price
@@ -269,24 +285,53 @@ const createTrade = async (req, res) => {
   if (status === 'win' || status === 'loss' || status === 'breakeven') {
     // calculate the percent return accordingly
     var percentReturn = (dollarReturn / sizeAndPriceTotals['entry']['entryPriceTotal']) * 100;
+
+    // if the market is options
+    if (market === 'options') {
+      // divide percent return by 100 to neglect the 100x factor of the dollar return calculation
+      percentReturn /= 100;
+    }
+
+    // if the market is futures
+    if (market === 'futures') {
+      // divide percent return by lotSize to neglect the lotSize multiplier factor of the dollar return calculation
+      percentReturn /= executionDocs[0].lotSize;
+    }
+
     percentReturn = parseFloat(percentReturn.toFixed(2)); // round to 2 decimal places
   } else {
     // otherwise, just set percent return at zero
     var percentReturn = 0;
   }
 
-  console.log(percentReturn);
+  console.log('percentReturn:', percentReturn);
+
+  // -- NET RETURN --
+  // dollar return with fees and commissions deducted
+  // if the exit position total is NOT zero 
+  if (sizeAndPriceTotals['exit']['exitPositionTotal'] !== 0) {
+    // calculate to the total fees and commissions from all executions
+    var feesAndComm = executionDocs.reduce((previousValue, currentExecution) => {
+      previousValue += (currentExecution.commissions + currentExecution.fees);
+      return previousValue;
+    }, 0)
+    var netReturn = dollarReturn - feesAndComm;
+  } else {
+    // otherwise, set the net return to 0
+    var netReturn = 0;
+  }
+
+  console.log('netReturn:', netReturn);
 
   // -- UPDATE TRADE DOCUMENT WITH NEWLY UPDATED TRADE METRICS --
-  //  TODO
+  
+  const tradeFinal = await Trade.findByIdAndUpdate(tradeId, {side, status, openDate, averageEntry, averageExit, positionSize, dollarReturn, percentReturn, netReturn}, {new: true})
 
   // TEMP - CLEAR TRADE AND EXECUTION COLLECTIONS
-  await Trade.deleteMany({});
-  await Execution.deleteMany({});
+  // await Trade.deleteMany({});
+  // await Execution.deleteMany({});
 
-  res.status(StatusCodes.CREATED).send('success');
-  // res.status(StatusCodes.CREATED).json({trade});
-  // res.status(StatusCodes.CREATED).json({executionDocs});
+  res.status(StatusCodes.CREATED).json(tradeFinal);
 };
 
 const getAllTrades = (req, res) => {
