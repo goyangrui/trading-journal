@@ -24,6 +24,8 @@ import {
   SET_SUBSCRIPTION_BEGIN,
   SET_SUBSCRIPTION_SUCCESS,
   SET_SUBSCRIPTION_ERROR,
+  FETCH_TRADES_SUCCESS,
+  FETCH_TRADES_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -266,6 +268,22 @@ const reducer = (state, action) => {
       isLoading: false,
       hasSubscription: false,
       user: action.payload.user,
+    };
+  }
+
+  // -- GET TRADES --
+  if (action.type === FETCH_TRADES_SUCCESS) {
+    console.log("fetch trades success");
+    return {
+      ...state,
+      trades: action.payload.trades,
+    };
+  }
+
+  if (action.type === FETCH_TRADES_ERROR) {
+    console.log("fetch trades error");
+    return {
+      ...state,
     };
   }
 

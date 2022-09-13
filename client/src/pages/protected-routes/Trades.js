@@ -2,12 +2,14 @@ import { useEffect } from "react";
 
 import { useAppContext } from "../../context/appContext";
 
-import { Loading } from "../../components";
+import { Loading, TradesComponent } from "../../components";
 
 function Trades() {
   // global state variables and functions
   const { getSubscriptions, hasSubscription, isLoading } = useAppContext();
 
+
+  // on initial render, getSubscriptions
   useEffect(() => {
     getSubscriptions();
   }, []);
@@ -18,8 +20,8 @@ function Trades() {
   } else {
     // otherwise if the user has a subscription
     if (hasSubscription) {
-      // return the main content
-      return <h1>Trades</h1>;
+      // return the main TradesComponent
+      return <TradesComponent />
     } else {
       return <h1>Need subscription to access</h1>;
     }

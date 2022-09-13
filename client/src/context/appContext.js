@@ -29,6 +29,8 @@ import {
   SET_SUBSCRIPTION_BEGIN,
   SET_SUBSCRIPTION_SUCCESS,
   SET_SUBSCRIPTION_ERROR,
+  FETCH_TRADES_SUCCESS,
+  FETCH_TRADES_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -43,6 +45,7 @@ const initialState = {
   alertType: "",
   products: [],
   hasSubscription: false,
+  trades: [],
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -359,6 +362,23 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // -- TRADES FUNCTIONS --
+
+  // get all trades
+  const getTrades = async () => {
+    try {
+      // try and send request to get trades
+      const { data } = await authFetch.get("trades");
+      const { trades } = data;
+
+      // set trades global state variable to the trades array from the response
+      dispatch({ type: FETCH_TRADES_SUCCESS, payload: { trades } });
+    } catch (error) {
+      dispatch({ type: FETCH_TRADES_ERROR });
+      console.log(error);
+    }
+  };
+
   // -- MISC FUNCTIONS --
 
   // clear alert function
@@ -398,6 +418,7 @@ function AppContextProvider({ children }) {
         fetchProducts,
         createSession,
         getSubscriptions,
+        getTrades,
         clearAlert,
       }}
     >
