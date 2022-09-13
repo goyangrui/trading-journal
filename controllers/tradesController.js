@@ -118,7 +118,7 @@ const createTrade = async (req, res) => {
   // -- PARSE REQUEST BODY (make sure all necessary values are provided) -- 
 
   // destructure request body
-  const {market, symbol, executions} = reqBodyFutures;
+  const {market, symbol, executions} = reqBodyOptions;
 
   // if the user did not provide a market, symbol, or execution
   if (!market || !symbol || !executions) {
@@ -324,25 +324,32 @@ const createTrade = async (req, res) => {
   console.log('netReturn:', netReturn);
 
   // -- UPDATE TRADE DOCUMENT WITH NEWLY UPDATED TRADE METRICS --
-  
-  const tradeFinal = await Trade.findByIdAndUpdate(tradeId, {side, status, openDate, averageEntry, averageExit, positionSize, dollarReturn, percentReturn, netReturn}, {new: true})
 
-  // TEMP - CLEAR TRADE AND EXECUTION COLLECTIONS
-  // await Trade.deleteMany({});
-  // await Execution.deleteMany({});
+  const tradeFinal = await Trade.findByIdAndUpdate(tradeId, {side, status, openDate, averageEntry, averageExit, positionSize, dollarReturn, percentReturn, netReturn}, {new: true})
 
   res.status(StatusCodes.CREATED).json(tradeFinal);
 };
 
-const getAllTrades = (req, res) => {
-  res.send("get all trades");
+const getAllTrades = async (req, res) => {
+
+  // get userId from authentication middleware
+  const {userId} = req.user;
+
+  // get all trades with the userId
+  const trades = await Trade.find({createdBy: userId});
+
+  res.status(StatusCodes.OK).json({trades});
 };
 
-const updateTrade = (req, res) => {
+const updateTrade = async (req, res) => {
   res.send("update trade");
 };
 
-const deleteTrade = (req, res) => {
+const deleteTrade = async (req, res) => {
+  // TEMP - CLEAR TRADE AND EXECUTION COLLECTIONS
+  await Trade.deleteMany({});
+  await Execution.deleteMany({});
+
   res.send("delete trade");
 };
 
