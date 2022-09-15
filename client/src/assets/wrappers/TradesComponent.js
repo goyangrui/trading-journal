@@ -5,11 +5,13 @@ const Trades = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-left: 1rem;
+  margin: 0 1rem;
 
   /* button container styles */
   .btn-container {
     display: flex;
+    column-gap: 1rem;
+    margin-bottom: 2rem;
   }
 `;
 

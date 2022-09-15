@@ -10,8 +10,9 @@ import Avatar from "./Avatar";
 import PricingCard from "./PricingCard";
 import Locked from "./Locked";
 import Loading from "./Loading";
-import TradesComponent from './TradesComponent';
-import TradesList from './TradesList';
+import TradesComponent from "./TradesComponent";
+import TradesList from "./TradesList";
+import AddTradeModal from "./AddTradeModal";
 
 export {
   Navbar,
@@ -27,5 +28,6 @@ export {
   Locked,
   Loading,
   TradesComponent,
-  TradesList
+  TradesList,
+  AddTradeModal,
 };

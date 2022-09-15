@@ -118,7 +118,7 @@ const createTrade = async (req, res) => {
   // -- PARSE REQUEST BODY (make sure all necessary values are provided) --
 
   // destructure request body
-  const { market, symbol, executions } = reqBodyOptions;
+  const { market, symbol, executions } = reqBodyStock;
 
   // if the user did not provide a market, symbol, or execution
   if (!market || !symbol || !executions) {
@@ -400,6 +400,7 @@ const getAllTrades = async (req, res) => {
 
   // get all trades with the userId
   const trades = await Trade.find({ createdBy: userId });
+  console.log();
 
   res.status(StatusCodes.OK).json({ trades });
 };
