@@ -117,6 +117,9 @@ const createTrade = async (req, res) => {
 
   // -- PARSE REQUEST BODY (make sure all necessary values are provided) --
 
+  console.log(req.body);
+  return res.send("success");
+
   // destructure request body
   const { market, symbol, executions } = reqBodyStock;
 

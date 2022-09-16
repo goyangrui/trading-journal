@@ -379,6 +379,16 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // create trade
+  const createTrade = async (tradeInfo) => {
+    try {
+      // try and send request to create trades
+      const { data } = await authFetch.post("trades", tradeInfo);
+    } catch (error) {
+      HTMLFormControlsCollection.log(error);
+    }
+  };
+
   // -- MISC FUNCTIONS --
 
   // clear alert function
@@ -419,6 +429,7 @@ function AppContextProvider({ children }) {
         createSession,
         getSubscriptions,
         getTrades,
+        createTrade,
         clearAlert,
       }}
     >
