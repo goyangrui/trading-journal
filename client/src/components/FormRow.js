@@ -5,6 +5,7 @@ function FormRow({
   value,
   labelText,
   handleChange,
+  handleScroll,
   min,
   step,
   options,
@@ -23,6 +24,7 @@ function FormRow({
           id={id || name}
           name={name}
           onChange={handleChange}
+          onWheel={handleScroll}
         >
           {/* for every option in the options array, return an option tag with the item in options as the value */}
           {options.map((item, index) => {
@@ -41,6 +43,7 @@ function FormRow({
           id={id || name}
           name={name}
           onChange={handleChange}
+          onWheel={handleScroll}
           value={value}
           min={min}
           step={step}

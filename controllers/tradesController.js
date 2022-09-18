@@ -7,127 +7,24 @@ import { BadRequestError } from "../errors/index.js";
 import createExecutions from "../helpers/createExecutions.js";
 
 const createTrade = async (req, res) => {
-  // dummy request body for STOCK market
-  const reqBodyStock = {
-    market: "stock",
-    symbol: "AAPL",
-    executions: [
-      {
-        action: "buy",
-        execDate: new Date(),
-        positionSize: 3,
-        price: 100,
-        commissions: 0,
-        fees: 0,
-      },
-      {
-        action: "sell",
-        execDate: new Date(),
-        positionSize: 2,
-        price: 110,
-        commissions: 0,
-        fees: 0,
-      },
-      {
-        action: "sell",
-        execDate: new Date(),
-        positionSize: 1,
-        price: 120,
-        commissions: 0,
-        fees: 0,
-      },
-    ],
-  };
-
-  // dummy request body for OPTIONS market (additional expiration date property for execution)
-  const reqBodyOptions = {
-    market: "options",
-    symbol: "AAPL",
-    executions: [
-      {
-        action: "buy",
-        execDate: new Date(),
-        positionSize: 3,
-        price: 1,
-        commissions: 0,
-        fees: 0,
-        expDate: new Date(),
-      },
-      {
-        action: "sell",
-        execDate: new Date(),
-        positionSize: 2,
-        price: 1.1,
-        commissions: 0,
-        fees: 0,
-        expDate: new Date(),
-      },
-      {
-        action: "sell",
-        execDate: new Date(),
-        positionSize: 1,
-        price: 1.2,
-        commissions: 0,
-        fees: 0,
-        expDate: new Date(),
-      },
-    ],
-  };
-
-  // dummy request body for FUTURES market (additional expiration date AND lot size property for execution)
-  const reqBodyFutures = {
-    market: "futures",
-    symbol: "NQ",
-    executions: [
-      {
-        action: "sell",
-        execDate: new Date(),
-        positionSize: 3,
-        price: 100,
-        commissions: 0,
-        fees: 0,
-        lotSize: 10,
-        expDate: new Date(),
-      },
-      {
-        action: "buy",
-        execDate: new Date(),
-        positionSize: 2,
-        price: 110,
-        commissions: 0,
-        fees: 0,
-        lotSize: 10,
-        expDate: new Date(),
-      },
-      {
-        action: "buy",
-        execDate: new Date(),
-        positionSize: 1,
-        price: 120,
-        commissions: 0,
-        fees: 0,
-        lotSize: 10,
-        expDate: new Date(),
-      },
-    ],
-  };
-
   // get user id
   const { userId } = req.user;
 
   // -- PARSE REQUEST BODY (make sure all necessary values are provided) --
 
   console.log(req.body);
-  return res.send("success");
-
   // destructure request body
-  const { market, symbol, executions } = reqBodyStock;
+  const { market, symbol, executions } = req.body;
 
   // if the user did not provide a market, symbol, or execution
-  if (!market || !symbol || !executions) {
-    throw new BadRequestError(
-      "Please provide Market, Symbol, and at least one Execution"
-    );
+  if (!market) {
+    throw new BadRequestError("Please provide a market");
+  }
+  if (!symbol) {
+    throw new BadRequestError("Please provide a symbol");
+  }
+  if (!executions) {
+    throw new BadRequestError("Please provide at least 1 execution");
   }
 
   // check each execution object in executions array
@@ -157,14 +54,17 @@ const createTrade = async (req, res) => {
     }
 
     // for options and futures markets
-    if (market === "options" || market === "futures") {
+    if (
+      market.toLowerCase() === "options" ||
+      market.toLowerCase() === "futures"
+    ) {
       // if the user did not provide expiration date
       if (!expDate) {
         throw new BadRequestError("Expiration date required");
       }
 
       // for just futures market, if the user did not provide lotsize
-      if (market === "futures" && !lotSize) {
+      if (market.toLowerCase() === "futures" && !lotSize) {
         throw new BadRequestError("Lot size required");
       }
     }
@@ -184,11 +84,13 @@ const createTrade = async (req, res) => {
     userId
   );
 
+  console.log("executionDocs: ", executionDocs);
+
   // -- CALCULATE TRADE METRICS BASED ON EXECUTION DOCUMENTS --
 
   // -- SIDE --
   // the side depends on the action of the first execution - buy means long, and sell means short
-  if (executionDocs[0].action === "buy") {
+  if (executionDocs[0].action.toLowerCase() === "buy") {
     var side = "long";
   } else {
     var side = "short";
@@ -210,9 +112,9 @@ const createTrade = async (req, res) => {
   var sizeAndPriceTotals = executionDocs.reduce(
     (previousValue, currentExecution, currentIndex, executions) => {
       // if the first execution is a buy
-      if (executions[0].action === "buy") {
+      if (executions[0].action.toLowerCase() === "buy") {
         // if the current execution's action is a buy
-        if (currentExecution.action === "buy") {
+        if (currentExecution.action.toLowerCase() === "buy") {
           // add its entry position size and price to the previousValue (initially 0)
           previousValue["entry"]["entryPositionTotal"] +=
             currentExecution.positionSize;
@@ -228,7 +130,7 @@ const createTrade = async (req, res) => {
       } else {
         // otherwise if the first execution is a sell
         // if the current execution's action is a sell
-        if (currentExecution.action === "sell") {
+        if (currentExecution.action.toLowerCase() === "sell") {
           // add its position size to the previousValue (initially 0);
           previousValue["entry"]["entryPositionTotal"] +=
             currentExecution.positionSize;
@@ -291,13 +193,13 @@ const createTrade = async (req, res) => {
 
   // if the market is options
   // multiply the dollar return by 100
-  if (market === "options") {
+  if (market.toLowerCase() === "options") {
     dollarReturn *= 100;
   }
 
   // if the market is futures
   // multiply the dollar return by lot size
-  if (market === "futures") {
+  if (market.toLowerCase() === "futures") {
     dollarReturn *= executionDocs[0].lotSize;
   }
 
@@ -337,13 +239,13 @@ const createTrade = async (req, res) => {
       (dollarReturn / sizeAndPriceTotals["entry"]["entryPriceTotal"]) * 100;
 
     // if the market is options
-    if (market === "options") {
+    if (market.toLowerCase() === "options") {
       // divide percent return by 100 to neglect the 100x factor of the dollar return calculation
       percentReturn /= 100;
     }
 
     // if the market is futures
-    if (market === "futures") {
+    if (market.toLowerCase() === "futures") {
       // divide percent return by lotSize to neglect the lotSize multiplier factor of the dollar return calculation
       percentReturn /= executionDocs[0].lotSize;
     }
@@ -410,14 +312,29 @@ const getAllTrades = async (req, res) => {
 
 const updateTrade = async (req, res) => {
   res.send("update trade");
+  // TO-DO
 };
 
 const deleteTrade = async (req, res) => {
-  // TEMP - CLEAR TRADE AND EXECUTION COLLECTIONS
-  await Trade.deleteMany({});
-  await Execution.deleteMany({});
+  // get array of trade id(s) from request body
+  const tradeIdList = req.body;
+  console.log(tradeIdList);
 
-  res.send("delete trade");
+  // delete all executions correlated to the given trade ids in request body
+  const executions = await Execution.deleteMany({
+    tradeId: {
+      $in: tradeIdList,
+    },
+  });
+
+  // // delete all trades correlated to the following trade ids in request body
+  const trades = await Trade.deleteMany({
+    _id: {
+      $in: tradeIdList,
+    },
+  });
+
+  res.status(StatusCodes.OK).json({ executions, trades });
 };
 
 export { createTrade, getAllTrades, updateTrade, deleteTrade };

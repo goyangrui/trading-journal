@@ -31,6 +31,8 @@ import {
   SET_SUBSCRIPTION_ERROR,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
+  CREATE_TRADE_ERROR,
+  SET_SELECTED_TRADES,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -46,6 +48,7 @@ const initialState = {
   products: [],
   hasSubscription: false,
   trades: [],
+  selectedTrades: {},
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -383,9 +386,39 @@ function AppContextProvider({ children }) {
   const createTrade = async (tradeInfo) => {
     try {
       // try and send request to create trades
-      const { data } = await authFetch.post("trades", tradeInfo);
+      await authFetch.post("trades", tradeInfo);
+
+      // reload the page after trade has been created so that changes are reflected on the tradelist
+      document.location.reload(true);
     } catch (error) {
-      HTMLFormControlsCollection.log(error);
+      // if the error status code is 400 (bad request)
+      if (error.response.status === 400) {
+        dispatch({
+          type: CREATE_TRADE_ERROR,
+          payload: { text: error.response.data.msg, type: "danger" },
+        });
+      } else {
+        // otherwise, it is probably an unauthenticated request, in which case logout the user
+        logoutUser();
+      }
+    }
+  };
+
+  // set selectedTrades global state from tradelist table
+  const setSelectedTrades = (selectedTrades) => {
+    dispatch({ type: SET_SELECTED_TRADES, payload: { selectedTrades } });
+  };
+
+  // delete trade(s)
+  const deleteTrade = async (tradeIdList) => {
+    try {
+      // try and send request to delete trades
+      await authFetch.post("trades/delete", tradeIdList);
+
+      // reload the page after trades have been deleted so that changes are reflected on the tradelist
+      document.location.reload(true);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -430,7 +463,9 @@ function AppContextProvider({ children }) {
         getSubscriptions,
         getTrades,
         createTrade,
+        deleteTrade,
         clearAlert,
+        setSelectedTrades,
       }}
     >
       {children}

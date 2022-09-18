@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { FaTimes } from "react-icons/fa";
 
 import Wrapper from "../assets/wrappers/AddTradeModal";
 
-import { FormRow } from ".";
+import { FormRow, Alert } from ".";
 
 import { useAppContext } from "../context/appContext";
 
@@ -28,10 +28,17 @@ const initialState = {
 
 function AddTradeModal({ toggleModal, setToggleModal }) {
   // global state variables and functions
-  const { createTrade } = useAppContext();
+  const { createTrade, showAlert, clearAlert } = useAppContext();
 
   // local state variables
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState({ ...initialState });
+
+  // useEffect for clearing alerts and resetting local state to initial state
+  // use effect (clear alerts on initial render of this page)
+  useEffect(() => {
+    setState({ ...initialState });
+    clearAlert();
+  }, []);
 
   // close modal button handler
   const closeButtonHandler = (e) => {
@@ -47,6 +54,11 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
   // on input change handler for market and symbol state variables
   const handleChange = (e) => {
     setState({ ...state, [e.target.name]: e.target.value });
+  };
+
+  // handler for any inputs to de-focus when scrolled (particularly for number inputs to prevent numbers from changing due to scroll)
+  const handleScroll = (e) => {
+    e.target.blur();
   };
 
   // on input change handler for execution inputs
@@ -117,6 +129,8 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
 
         {/* Modal Form */}
         <form className="modal-form" onSubmit={handleSubmit}>
+          {/* Alert */}
+          {showAlert && <Alert />}
           {/* Basic trade information */}
           <div className="basic-trade-info">
             {/* Market */}
@@ -135,7 +149,6 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
               value={state.symbol}
             />
           </div>
-
           {/* Executions */}
           {/* For each execution in the executions state array, return an execution form */}
           {state.executions.map((item, index) => {
@@ -199,6 +212,7 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
                   min="0.001"
                   step="0.001"
                   handleChange={handleExecutionChange}
+                  handleScroll={handleScroll}
                   value={state.executions[index]["positionSize"]}
                 />
 
@@ -212,6 +226,7 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
                     min="0.001"
                     step="0.001"
                     handleChange={handleExecutionChange}
+                    handleScroll={handleScroll}
                     value={state.executions[index]["lotSize"]}
                   />
                 )}
@@ -224,6 +239,7 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
                   min="0.001"
                   step="0.001"
                   handleChange={handleExecutionChange}
+                  handleScroll={handleScroll}
                   value={state.executions[index]["price"]}
                 />
 
@@ -232,9 +248,10 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
                   name="commissions"
                   id={`commissions-${index}`}
                   type="number"
-                  min="0.001"
+                  min="0"
                   step="0.001"
                   handleChange={handleExecutionChange}
+                  handleScroll={handleScroll}
                   value={state.executions[index]["commissions"]}
                 />
 
@@ -243,15 +260,15 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
                   name="fees"
                   id={`fees-${index}`}
                   type="number"
-                  min="0.001"
+                  min="0"
                   step="0.001"
                   handleChange={handleExecutionChange}
+                  handleScroll={handleScroll}
                   value={state.executions[index]["fees"]}
                 />
               </div>
             );
           })}
-
           {/* button container */}
           <div className="modal-btn-container">
             {/* add execution button */}

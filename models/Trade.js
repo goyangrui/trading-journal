@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 /*
  * Trade properties
- * 1. Market -> STOCK, FUTURES, OPTIONS 
- * 2. Symbol 
+ * 1. Market -> STOCK, FUTURES, OPTIONS
+ * 2. Symbol
  * 3. Side -> LONG, SHORT
  * 3. Status -> OPEN, LOSS, WIN, BREAKEVEN
  * 4. Open date
@@ -14,7 +14,7 @@ import mongoose from 'mongoose';
  * 9. Return % -> difference between sells and buys times position size divided by buys times position size
  * 10. Net return $ -> return with fees and commissions deducted
  * 10. createdBy -> ID of user who created this trade
- * 
+ *
  * -- ADD THESE LATER AFTER BASIC CALCULATION FUNCTIONALITIES HAVE BEEN IMPLEMENTED --
  * 11. Strategy
  * 12. Mistakes
@@ -22,24 +22,24 @@ import mongoose from 'mongoose';
  * 14. Follow Plan?
  */
 
-// Trade Schema 
+// Trade Schema
 const TradeSchema = new mongoose.Schema({
   market: {
     type: String,
-    required: [true, 'Please provide a market for this trade'],
-    enum: ['stock', 'futures', 'options'],
+    required: [true, "Please provide a market for this trade"],
+    enum: ["STOCK", "FUTURES", "OPTIONS"],
   },
   symbol: {
     type: String,
-    required: [true, 'Please provide symbol'],
+    required: [true, "Please provide symbol"],
   },
   side: {
     type: String,
-    enum: ['long', 'short'],
+    enum: ["LONG", "SHORT"],
   },
   status: {
     type: String,
-    enum: ['open', 'win', 'loss', 'breakeven']
+    enum: ["OPEN", "WIN", "LOSS", "BREAKEVEN"],
   },
   openDate: {
     type: Date,
@@ -64,9 +64,12 @@ const TradeSchema = new mongoose.Schema({
   },
   createdBy: {
     type: mongoose.Types.ObjectId,
-    required: [true, 'Please provide the user ID for which this trade belongs to'],
-    ref: 'User'
-  }
+    required: [
+      true,
+      "Please provide the user ID for which this trade belongs to",
+    ],
+    ref: "User",
+  },
 });
 
-export default mongoose.model('Trade', TradeSchema);
+export default mongoose.model("Trade", TradeSchema);

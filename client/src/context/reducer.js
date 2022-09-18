@@ -26,6 +26,8 @@ import {
   SET_SUBSCRIPTION_ERROR,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
+  CREATE_TRADE_ERROR,
+  SET_SELECTED_TRADES,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -287,6 +289,25 @@ const reducer = (state, action) => {
     };
   }
 
+  // -- CREATE TRADE --
+  if (action.type === CREATE_TRADE_ERROR) {
+    console.log("create trade error");
+    return {
+      ...state,
+      showAlert: true,
+      alertType: action.payload.type,
+      alertText: action.payload.text,
+    };
+  }
+
+  // -- SET SELECTED TRADES --
+  if (action.type === SET_SELECTED_TRADES) {
+    console.log("set selected trades");
+    return {
+      ...state,
+      selectedTrades: action.payload.selectedTrades,
+    };
+  }
   throw new Error(`no such action : ${action.type}`);
 };
 

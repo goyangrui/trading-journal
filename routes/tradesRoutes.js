@@ -10,6 +10,7 @@ import {
 } from "../controllers/tradesController.js";
 
 router.route("/").post(createTrade).get(getAllTrades);
-router.route("/:id").patch(updateTrade).delete(deleteTrade);
+router.route("/:id").patch(updateTrade);
+router.route("/delete").post(deleteTrade);
 
 export default router;

@@ -38,6 +38,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     defaultError.msg = "File must be an image";
   }
   // return res.json({ err });
+  // res.send(err);
 
   return res.status(defaultError.statusCode).json({ msg: defaultError.msg });
 };

@@ -3,6 +3,7 @@ import styled from "styled-components";
 const TradesList = styled.div`
   /* general styles */
   display: grid;
+  margin-bottom: 2rem;
 
   /* table styles */
   .trades-table {
