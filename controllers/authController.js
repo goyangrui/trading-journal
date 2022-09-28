@@ -8,7 +8,7 @@ import User from "../models/User.js";
 import stripe from "../utils/stripe.js";
 
 // import custom aws s3 functions for uploading and deleting files
-import { s3Upload, s3Delete } from "../aws/s3Service.js";
+import { s3UploadProfile, s3DeleteProfile } from "../aws/s3Service.js";
 
 // REGISTER CONTROLLER
 const register = async (req, res, next) => {
@@ -137,18 +137,18 @@ const updateUser = async (req, res, next) => {
     // -- HANDLE PROFILE PICTURE UPDATING --
     // if user sent profile picture file, upload the profile picture
     if (profilePictureFile) {
-      // get the user _id, convert it to string, and pass it into s3Upload function (userId used a key for image)
+      // get the user _id, convert it to string, and pass it into s3UploadProfile function (userId used as key for image)
       const userId = user._id.toString();
 
       // delete the old image from s3 with the userId if it exists
       if (user.profile) {
         // create the key of the image from the user.profile image url
         const key = user.profile.split(process.env.AWS_PROFILE_URL)[1];
-        await s3Delete(key);
+        await s3DeleteProfile(key);
       }
 
       // upload the new file to S3 and retrieve the image location
-      const imageLocation = await s3Upload(profilePictureFile, userId);
+      const imageLocation = await s3UploadProfile(profilePictureFile, userId);
 
       // attach imageLocation to the profile property of user
       user.profile = imageLocation;

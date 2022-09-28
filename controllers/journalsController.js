@@ -19,8 +19,6 @@ const createJournal = async (req, res) => {
   // find the journal entry with the provided date (return null if not found)
   const foundJournal = await Journal.findOne({ date });
 
-  console.log(foundJournal);
-
   // if the journal with the specified date was found, don't create another journal entry
   if (foundJournal) {
     return res
@@ -35,14 +33,31 @@ const createJournal = async (req, res) => {
 };
 
 const editJournal = async (req, res) => {
-  // get the journal id from the request body
-  const { journalId } = req.body;
+  // get the journal id and notes from the request body
+  const { journalId, notes } = req.body;
+
+  // get screenshot file from req.file from multer
+  const screenshotFile = req.file;
+
+  // return res.json({ journalId, notes, screenshotFile });
 
   // find the journal from the passed in id
   const journal = await Journal.findById(journalId);
 
-  // push the screenshot to the screenshots array in the journal document
-  journal.screenshots.push("item1");
+  // check if the journal with the provided id exists
+  if (!journal) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      msg: "Journal with provided id could not be found",
+    });
+  }
+
+  // store the file in AWS S3 screenshots bucket
+  // if the screenshotFile was retrieved from the user
+  if (screenshotFile) {
+  }
+
+  // push the screenshot link to the screenshots array in the journal document
+  journal.screenshots.push(screenshotLink);
   // try and save the document with updated screenshots array (mongoose will throw validation error if pushing the screenshot
   // puts the screenshots array above 2 items)
   await journal.save();

@@ -30,6 +30,7 @@ const fileFilter = (req, file, cb) => {
 
   // if the file type is an image
   if (fileType === "image") {
+    // accept the file
     cb(null, true);
   } else {
     // if the file type is not an image, throw a multer error and handle it in express error handler

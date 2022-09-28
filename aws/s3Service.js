@@ -6,17 +6,17 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 
-// function for uploading file to S3
-const s3Upload = async (file, userId) => {
+// function for uploading profile picture file to S3
+const s3UploadProfile = async (file, userId) => {
   // instantiate S3Client class
-  const s3client = new S3Client();
+  const s3client = new S3Client({ region: process.env.AWS_REGION });
 
-  // create key for the object (where it is stored in the bucket)
+  // create key for the object (where it is stored in the bucket and how to reference it)
   const key = `profile-pictures/${userId}-${file.originalname}`;
 
-  // set up parameters for uploading object to bucket
+  // set up parameters for uploading object to profile pictures bucket
   const param = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.AWS_BUCKET_NAME_PROFILE,
     Key: key,
     Body: file.buffer,
   };
@@ -30,14 +30,14 @@ const s3Upload = async (file, userId) => {
   return imageURL;
 };
 
-// function for deleting file from S3
-const s3Delete = async (key) => {
+// function for deleting profile picture file from S3
+const s3DeleteProfile = async (key) => {
   // instantiate S3Client class
-  const s3client = new S3Client();
+  const s3client = new S3Client({ region: process.env.AWS_REGION });
 
-  // set up parameters for deleting object from bucket
+  // set up parameters for deleting object from profile pictures bucket
   const param = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.AWS_BUCKET_NAME_PROFILE,
     Key: key,
   };
 
@@ -45,4 +45,23 @@ const s3Delete = async (key) => {
   await s3client.send(new DeleteObjectCommand(param));
 };
 
-export { s3Upload, s3Delete };
+// function for uploading screenshot files to S3
+const s3Upload = async (file, userId) => {
+  // instantiate s3Client class
+  const s3client = new S3Client({ region: process.env.AWS_REGION });
+
+  // create key for the screenshot object (where it is stored in the bucket and how to reference it)
+  const key = `screenshots/${userId}-${file.originalname}`;
+
+  // set up parameters for uploading object to screenshots bucket
+  const param = {
+    Bucket: process.env.AWS_BUCKET_NAME_SCREENSHOT,
+    Key: key,
+    Body: file.buffer,
+  };
+
+  // upload image to S3 using param object
+  await s3client.send(new PutObjectCommand(param));
+};
+
+export { s3UploadProfile, s3DeleteProfile };
