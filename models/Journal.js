@@ -30,10 +30,9 @@ const JournalSchema = new mongoose.Schema({
 
 // custom validator function for making sure the length of the screenshots array is less than or equal to 2
 function mapLimit() {
-  console.log(this.screenshots);
   // if adding the screenshot makes the length of the screenshots array greater than 2, return false (validator failed)
-  // return this.screenshots.length <= 2;
-  return true;
+  // otherwise, add the screenshot
+  return this.screenshots.size <= 2;
 }
 
 export default mongoose.model("Journal", JournalSchema);

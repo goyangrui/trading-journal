@@ -47,7 +47,7 @@ const s3DeleteProfile = async (key) => {
 // function for uploading screenshot files to S3
 const s3UploadScreenshot = async (file) => {
   // create key for the screenshot object (where it is stored in the bucket and how to reference it)
-  const key = `screenshots/${uuidv4()}:${file.originalname}`;
+  const key = `screenshots/${uuidv4()}::${file.originalname}`;
 
   // set up parameters for uploading object to screenshots bucket
   const param = {
