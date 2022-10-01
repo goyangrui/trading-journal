@@ -12,15 +12,14 @@ const JournalSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  screenshots: [
-    {
-      type: String,
-      validate: {
-        validator: arrayLimit,
-        message: "You can only have 2 screenshots per journal entry",
-      },
+  screenshots: {
+    type: Map,
+    of: String,
+    validate: {
+      validator: mapLimit,
+      message: "You can only have 2 screenshots per journal entry",
     },
-  ],
+  },
   date: {
     type: Date,
   },
@@ -30,9 +29,11 @@ const JournalSchema = new mongoose.Schema({
 });
 
 // custom validator function for making sure the length of the screenshots array is less than or equal to 2
-function arrayLimit() {
+function mapLimit() {
+  console.log(this.screenshots);
   // if adding the screenshot makes the length of the screenshots array greater than 2, return false (validator failed)
-  return this.screenshots.length <= 2;
+  // return this.screenshots.length <= 2;
+  return true;
 }
 
 export default mongoose.model("Journal", JournalSchema);

@@ -1,5 +1,8 @@
-import Journal from "../models/Journal.js";
 import { StatusCodes } from "http-status-codes";
+import Journal from "../models/Journal.js";
+
+// import AWS S3 service functions
+import { s3UploadScreenshot, s3DeleteScreenshot } from "../aws/s3Service.js";
 
 const createJournal = async (req, res) => {
   // get the text and date from the request body
@@ -27,19 +30,25 @@ const createJournal = async (req, res) => {
   }
 
   // create a journal entry with the provided date, and notes from the request body, and userId from the req.user object
-  const journal = await Journal.create({ notes, date, createdBy: userId });
+  const journal = await Journal.create({
+    notes,
+    date,
+    createdBy: userId,
+    screenshots: new Map(),
+  });
 
   res.status(StatusCodes.CREATED).json(journal);
 };
 
 const editJournal = async (req, res) => {
+  // get the user id from req.user
+  const { userId } = req.user;
+
   // get the journal id and notes from the request body
   const { journalId, notes } = req.body;
 
-  // get screenshot file from req.file from multer
-  const screenshotFile = req.file;
-
-  // return res.json({ journalId, notes, screenshotFile });
+  // get the screenshot file action type from request body
+  const { action } = req.body;
 
   // find the journal from the passed in id
   const journal = await Journal.findById(journalId);
@@ -51,18 +60,46 @@ const editJournal = async (req, res) => {
     });
   }
 
-  // store the file in AWS S3 screenshots bucket
-  // if the screenshotFile was retrieved from the user
-  if (screenshotFile) {
+  // if the action type is "create"
+  if (action === "create") {
+    // get screenshot file from req.file from multer
+    const screenshotFile = req.file;
+
+    // store the file in AWS S3 screenshots bucket
+    // if the screenshotFile was retrieved from the user
+    if (screenshotFile) {
+      // upload the screenshot to S3
+      let { key: screenshotKey, imageURL: screenshotLink } =
+        await s3UploadScreenshot(screenshotFile);
+
+      // get the key from the screenshot link
+      screenshotKey = screenshotKey.split(":")[0];
+
+      // try and set the screenshot key to the screenshot link in the screenshots map in journal document
+      journal.screenshots.set(screenshotKey, screenshotLink);
+    }
+  } else {
+    // otherwise, the user is trying to delete the screenshot
+    // get screenshot key from the request body
+    let { screenshotKey } = req.body;
+
+    console.log(screenshotKey);
+
+    // delete the screenshot from S3
+    await s3DeleteScreenshot(screenshotKey);
+
+    // remove the screenshot from the journal list of screenshots
+    // TODO
   }
 
-  // push the screenshot link to the screenshots array in the journal document
-  journal.screenshots.push(screenshotLink);
-  // try and save the document with updated screenshots array (mongoose will throw validation error if pushing the screenshot
+  // update the notes to the journal document
+  journal.notes = notes;
+
+  // try and save the document with updated screenshots, and notes (mongoose will throw validation error if pushing the screenshot
   // puts the screenshots array above 2 items)
   await journal.save();
 
-  res.send("edit journal");
+  res.status(StatusCodes.OK).json(journal);
 };
 
 const deleteJournal = async (req, res) => {
