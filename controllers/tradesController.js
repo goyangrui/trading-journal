@@ -305,7 +305,6 @@ const getAllTrades = async (req, res) => {
 
   // get all trades with the userId
   const trades = await Trade.find({ createdBy: userId });
-  console.log();
 
   res.status(StatusCodes.OK).json({ trades });
 };

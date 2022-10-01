@@ -9,10 +9,12 @@ import {
   createJournal,
   editJournal,
   deleteJournal,
+  getJournals,
 } from "../controllers/journalsController.js";
 
 router
   .route("/")
+  .get(getJournals)
   .post(createJournal)
   .delete(deleteJournal)
   .patch(upload.single("screenshotFile"), editJournal);

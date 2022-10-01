@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { useAppContext } from "../../context/appContext";
 
-import { Loading } from "../../components";
+import { Loading, JournalsComponent } from "../../components";
 
 function Journal() {
   // global state variables and functions
@@ -19,7 +19,7 @@ function Journal() {
     // otherwise if the user has a subscription
     if (hasSubscription) {
       // return the main content
-      return <h1>Journal</h1>;
+      return <JournalsComponent />;
     } else {
       return <h1>Need subscription to access</h1>;
     }

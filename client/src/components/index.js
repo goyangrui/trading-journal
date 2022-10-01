@@ -13,6 +13,8 @@ import Loading from "./Loading";
 import TradesComponent from "./TradesComponent";
 import TradesList from "./TradesList";
 import AddTradeModal from "./AddTradeModal";
+import JournalsComponent from "./JournalsComponent";
+import JournalsList from "./JournalsList";
 
 export {
   Navbar,
@@ -30,4 +32,6 @@ export {
   TradesComponent,
   TradesList,
   AddTradeModal,
+  JournalsComponent,
+  JournalsList,
 };

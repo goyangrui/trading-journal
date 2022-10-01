@@ -28,6 +28,8 @@ import {
   FETCH_TRADES_ERROR,
   CREATE_TRADE_ERROR,
   SET_SELECTED_TRADES,
+  FETCH_JOURNALS_SUCCESS,
+  FETCH_JOURNALS_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -308,6 +310,23 @@ const reducer = (state, action) => {
       selectedTrades: action.payload.selectedTrades,
     };
   }
+
+  // -- GET JOURNALS --
+  if (action.type === FETCH_JOURNALS_SUCCESS) {
+    console.log("fetch journals success");
+    return {
+      ...state,
+      journals: action.payload.journals,
+    };
+  }
+
+  if (action.type === FETCH_JOURNALS_ERROR) {
+    console.log("fetch journals error");
+    return {
+      ...state,
+    };
+  }
+
   throw new Error(`no such action : ${action.type}`);
 };
 

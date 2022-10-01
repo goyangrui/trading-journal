@@ -46,19 +46,19 @@ function TradesComponent() {
       {/* Button container with add trade, and delete trades buttons */}
       <div className="btn-container">
         {/* add trade button */}
-        <div className="btn" onClick={addTradeHandler}>
+        <button className="btn" onClick={addTradeHandler}>
           Add Trade
-        </div>
+        </button>
 
         {/* delete trades button */}
-        <div
+        <button
           className="btn btn-reverse"
           onClick={(e) => {
             deleteTradeHandler(selectedTrades);
           }}
         >
           Delete Trades
-        </div>
+        </button>
       </div>
 
       {/* Main list to show all trades */}

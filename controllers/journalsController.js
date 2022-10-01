@@ -4,6 +4,16 @@ import Journal from "../models/Journal.js";
 // import AWS S3 service functions
 import { s3UploadScreenshot, s3DeleteScreenshot } from "../aws/s3Service.js";
 
+const getJournals = async (req, res) => {
+  // get the user ID from the req.user object
+  const { userId } = req.user;
+
+  // get all journal entries with the userId
+  const journals = await Journal.find({ createdBy: userId });
+
+  res.status(StatusCodes.OK).json({ journals });
+};
+
 const createJournal = async (req, res) => {
   // get the text and date from the request body
   const { date } = req.body;
@@ -116,4 +126,4 @@ const deleteJournal = async (req, res) => {
   res.send("deleted all journals");
 };
 
-export { createJournal, editJournal, deleteJournal };
+export { createJournal, editJournal, deleteJournal, getJournals };

@@ -33,6 +33,8 @@ import {
   FETCH_TRADES_ERROR,
   CREATE_TRADE_ERROR,
   SET_SELECTED_TRADES,
+  FETCH_JOURNALS_SUCCESS,
+  FETCH_JOURNALS_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -49,6 +51,7 @@ const initialState = {
   hasSubscription: false,
   trades: [],
   selectedTrades: {},
+  journals: [],
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -422,6 +425,22 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // -- JOURNALS FUNCTIONS --
+
+  // get journal entries
+  const getJournals = async () => {
+    try {
+      // send get request to get the journals
+      const { data } = await authFetch.get("journals");
+      const { journals } = data;
+
+      dispatch({ type: FETCH_JOURNALS_SUCCESS, payload: { journals } });
+    } catch (error) {
+      dispatch({ type: FETCH_JOURNALS_ERROR });
+      console.log(error);
+    }
+  };
+
   // -- MISC FUNCTIONS --
 
   // clear alert function
@@ -466,6 +485,7 @@ function AppContextProvider({ children }) {
         deleteTrade,
         clearAlert,
         setSelectedTrades,
+        getJournals,
       }}
     >
       {children}
