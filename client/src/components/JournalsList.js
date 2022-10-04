@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import moment from "moment";
 
 import { useAppContext } from "../context/appContext";
 
-import { Loading } from ".";
+import { Loading, JournalEntry } from ".";
 import Wrapper from "../assets/wrappers/JournalsList";
 
 function JournalsList() {
@@ -35,25 +34,10 @@ function JournalsList() {
     return (
       <Wrapper>
         {/* for every journal in global journals state variable */}
-        {journals.map((journalEntry, index) => {
+        {journals.map((journalEntry) => {
           // return a journal entry component with date, journal notes, screenshots, and table of trades
           return (
-            <div className="journal-entry" key={index}>
-              {/* journal header */}
-              <h5 className="journal-header">
-                {/* date */}
-                {moment(journalEntry.date).format("MMM DD, YYYY")}
-              </h5>
-
-              {/* main journal content */}
-              <div className="journal-content">
-                {/* notes */}
-                Notes:
-                <input className="journal-notes" type="text" />
-                {/* screenshots */}
-                {/* table of relevant trades */}
-              </div>
-            </div>
+            <JournalEntry key={journalEntry._id} journalEntry={journalEntry} />
           );
         })}
       </Wrapper>
