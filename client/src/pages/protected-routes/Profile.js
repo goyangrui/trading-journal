@@ -73,32 +73,36 @@ function Profile() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // if it is the user info form that was submitted
-    if (e.target.name === "info") {
-      // only update username, email, and profile picture
-      updateUser(
-        {
-          username: values.username,
-          email: values.email,
-        },
-        values.file
-      );
+    const submitData = async () => {
+      // if it is the user info form that was submitted
+      if (e.target.name === "info") {
+        // only update username, email, and profile picture
+        await updateUser(
+          {
+            username: values.username,
+            email: values.email,
+          },
+          values.file
+        );
 
-      // clear the file state value after submission
-      setValues({ ...values, file: null });
-    }
+        // clear the file state value after submission
+        setValues({ ...values, file: null });
+      }
 
-    // otherwise if it is the user password form that was submitted
-    if (e.target.name === "password") {
-      // only update user password
-      changePassword({
-        newPassword: values.newPassword,
-        confirmation: values.confirmation,
-      });
+      // otherwise if it is the user password form that was submitted
+      if (e.target.name === "password") {
+        // only update user password
+        await changePassword({
+          newPassword: values.newPassword,
+          confirmation: values.confirmation,
+        });
 
-      // clear the password state values after submission
-      setValues({ ...values, newPassword: "", confirmation: "" });
-    }
+        // clear the password state values after submission
+        setValues({ ...values, newPassword: "", confirmation: "" });
+      }
+    };
+
+    submitData();
   };
 
   return (

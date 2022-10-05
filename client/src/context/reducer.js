@@ -30,6 +30,9 @@ import {
   SET_SELECTED_TRADES,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
+  EDIT_JOURNAL_BEGIN,
+  EDIT_JOURNAL_SUCCESS,
+  EDIT_JOURNAL_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -325,6 +328,22 @@ const reducer = (state, action) => {
     return {
       ...state,
     };
+  }
+
+  // -- EDIT JOURNALS --
+  if (action.type === EDIT_JOURNAL_BEGIN) {
+    console.log("edit journal begin");
+    return { ...state };
+  }
+
+  if (action.type === EDIT_JOURNAL_SUCCESS) {
+    console.log("edit journal success");
+    return { ...state };
+  }
+
+  if (action.type === EDIT_JOURNAL_ERROR) {
+    console.log("edit journal error");
+    return { ...state };
   }
 
   throw new Error(`no such action : ${action.type}`);

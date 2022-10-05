@@ -35,6 +35,9 @@ import {
   SET_SELECTED_TRADES,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
+  EDIT_JOURNAL_BEGIN,
+  EDIT_JOURNAL_SUCCESS,
+  EDIT_JOURNAL_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -441,6 +444,28 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // edit journal entry
+  const editJournal = async ({ journalId, notes, screenshotFile, action }) => {
+    dispatch({ type: EDIT_JOURNAL_BEGIN });
+    // try and create multipart form data and send request to backend
+    try {
+      const formdata = new FormData();
+      formdata.append("journalId", journalId);
+      formdata.append("notes", notes);
+      formdata.append("screenshotFile", screenshotFile);
+      formdata.append("action", action);
+
+      // send patch request to /journals route with multipart form data
+      const { data } = await authFetch.patch("journals", formdata);
+
+      // update journals global state variable
+      dispatch({ type: EDIT_JOURNAL_SUCCESS, payload: { data } });
+    } catch (error) {
+      dispatch({ type: EDIT_JOURNAL_ERROR });
+      console.log(error);
+    }
+  };
+
   // -- MISC FUNCTIONS --
 
   // clear alert function
@@ -486,6 +511,7 @@ function AppContextProvider({ children }) {
         clearAlert,
         setSelectedTrades,
         getJournals,
+        editJournal,
       }}
     >
       {children}

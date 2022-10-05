@@ -2,18 +2,25 @@ import { useState } from "react";
 
 import moment from "moment";
 
+import { FaTimes } from "react-icons/fa";
+
 import { useAppContext } from "../context/appContext";
 import Wrapper from "../assets/wrappers/JournalEntry";
 
 function JournalEntry({ journalEntry }) {
   // global state variables and functions
+  const { editJournal } = useAppContext();
+
   // local state variables and functions
   const [state, setState] = useState({
+    journalId: journalEntry._id,
     notes: journalEntry.notes,
     screenshots: journalEntry.screenshots,
     screenshotFile: null,
     action: "create",
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // handle change
   const handleChange = (e) => {
@@ -23,7 +30,7 @@ function JournalEntry({ journalEntry }) {
       const value = e.target.files[0];
       setState({ ...state, screenshotFile: value });
     } else {
-      // otherwise
+      // otherwise (if the notes text box has been changed)
       const key = e.target.id.split("-")[0];
       const value = e.target.value;
       console.log(key);
@@ -34,6 +41,20 @@ function JournalEntry({ journalEntry }) {
   // form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const submitData = async () => {
+      // set loading to true to prevent user from making further submissions until current submission has been processed
+      setIsLoading(true);
+
+      // send request to backend to edit journal based on state variables
+      await editJournal(state);
+
+      setIsLoading(false);
+
+      // set screenshotFile state back to null
+      setState({ ...state, screenshotFile: null });
+    };
+    submitData();
   };
 
   return (
@@ -62,6 +83,11 @@ function JournalEntry({ journalEntry }) {
           {Object.entries(journalEntry.screenshots).map((screenshot, index) => {
             return (
               <div key={index} className="screenshot-container">
+                <div className="remove-button-container">
+                  <button type="button" className="remove-image-button">
+                    <FaTimes />
+                  </button>
+                </div>
                 <img src={screenshot[1]} alt="screenshot" />
               </div>
             );
