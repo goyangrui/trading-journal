@@ -51,11 +51,8 @@ const createJournal = async (req, res) => {
 };
 
 const editJournal = async (req, res) => {
-  // get the journal id and notes from the request body
-  const { journalId, notes } = req.body;
-
-  // get the screenshot file action type from request body
-  const { action } = req.body;
+  // get the journal id from the request body
+  const { journalId } = req.body;
 
   // find the journal from the passed in id
   const journal = await Journal.findById(journalId);
@@ -67,53 +64,55 @@ const editJournal = async (req, res) => {
     });
   }
 
-  // if the action type is "create"
-  if (action === "create") {
-    // only add add screenshot to S3 bucket and journal screenshots map
-    // if the number of screenshots in the journal is less than 2
-    if (journal.screenshots.size < 2) {
-      // get screenshot file from req.file from multer
-      const screenshotFile = req.file;
+  // -- NOTES --
+  // get the notes from the request body
+  const { notes } = req.body;
 
-      // store the file in AWS S3 screenshots bucket
-      // if the screenshotFile was retrieved from the user
-      if (screenshotFile) {
-        // upload the screenshot to S3
-        let { key: screenshotKey, imageURL: screenshotLink } =
-          await s3UploadScreenshot(screenshotFile);
-
-        // get the uuid key from the screenshotKey (for Journal document)
-        const screenshotDocKey = screenshotKey.split("::")[0];
-
-        // try and set the screenshot key to the screenshot link in the screenshots map in journal document
-        journal.screenshots.set(screenshotDocKey, screenshotLink);
-      }
-    }
-  } else {
-    // otherwise if the action is anything else (delete), the user is trying to delete the screenshot
-    // get screenshot doc key and link from the request body
-    const { screenshotLink, screenshotDocKey } = req.body;
-
-    // only if the user provided the screenshot link and doc key
-    if (screenshotLink && screenshotDocKey) {
-      // extrapolate the screenshot key for the S3 bucket from the screenshotLink
-      const screenshotKey = screenshotLink.split(
-        process.env.AWS_SCREENSHOT_URL
-      )[1];
-
-      // if the screenshot key (from the link spliting) exists
-      if (screenshotKey) {
-        // delete the screenshot from S3
-        await s3DeleteScreenshot(screenshotKey);
-
-        // remove the screenshot from the journal list of screenshots
-        journal.screenshots.delete(screenshotDocKey);
-      }
-    }
+  // if the notes exists
+  if (notes) {
+    // update the notes to the journal document
+    journal.notes = notes;
   }
 
-  // update the notes to the journal document
-  journal.notes = notes;
+  // -- SCREENSHOTS --
+  // get screenshot file from req.file from multer
+  const screenshotFile = req.file;
+
+  // -- ADD SCREENSHOT --
+  // only add screenshot to S3 bucket and journal screenshots map
+  // if the number of screenshots in the journal is less than 2, and the screenshotFile exists from the user request
+  if (journal.screenshots.size < 2 && screenshotFile) {
+    // store the file in AWS S3 screenshots bucket
+    let { key: screenshotKey, imageURL: screenshotLink } =
+      await s3UploadScreenshot(screenshotFile);
+
+    // get the uuid key from the screenshotKey (for Journal document)
+    const screenshotDocKey = screenshotKey.split("::")[0];
+
+    // set the screenshot key to the screenshot link in the screenshots map in journal document
+    journal.screenshots.set(screenshotDocKey, screenshotLink);
+  }
+
+  // -- REMOVE SCREENSHOT --
+  // get screenshot doc key and link from the request body
+  const { screenshotLink, screenshotDocKey } = req.body;
+
+  // only if the user provided the screenshot link and doc key, delete the screenshot
+  if (screenshotLink && screenshotDocKey) {
+    // extrapolate the screenshot key for the S3 bucket from the screenshotLink
+    const screenshotKey = screenshotLink.split(
+      process.env.AWS_SCREENSHOT_URL
+    )[1];
+
+    // if the screenshot key (from the link spliting) exists
+    if (screenshotKey) {
+      // delete the screenshot from S3
+      await s3DeleteScreenshot(screenshotKey);
+
+      // remove the screenshot from the journal list of screenshots
+      journal.screenshots.delete(screenshotDocKey);
+    }
+  }
 
   // try and save the document with updated screenshots, and notes (mongoose will throw validation error if pushing screenshots map size above 2)
   await journal.save();

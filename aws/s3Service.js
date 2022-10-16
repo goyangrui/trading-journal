@@ -2,11 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // import AWS S3 service
 // import S3 from "aws-sdk/clients/s3.js";
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 // import instance of s3client with region
 import { s3client } from "./s3client.js";

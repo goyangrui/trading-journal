@@ -57,7 +57,7 @@ app.use("/api/v1/me", authMiddleware, userInfoRouter);
 // trades routes
 app.use("/api/v1/trades", authMiddleware, tradesRouter);
 
-// journals routues
+// journals routes
 app.use("/api/v1/journals", authMiddleware, journalRouter);
 
 // -- ROUTE NOT FOUND MIDDLEWARE --

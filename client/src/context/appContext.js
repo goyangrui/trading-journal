@@ -445,21 +445,45 @@ function AppContextProvider({ children }) {
   };
 
   // edit journal entry
-  const editJournal = async ({ journalId, notes, screenshotFile, action }) => {
+  const editJournal = async ({
+    journalId,
+    notes,
+    screenshotFile,
+    screenshotLink,
+    screenshotDocKey,
+  }) => {
     dispatch({ type: EDIT_JOURNAL_BEGIN });
     // try and create multipart form data and send request to backend
     try {
       const formdata = new FormData();
       formdata.append("journalId", journalId);
-      formdata.append("notes", notes);
-      formdata.append("screenshotFile", screenshotFile);
-      formdata.append("action", action);
 
-      // send patch request to /journals route with multipart form data
-      const { data } = await authFetch.patch("journals", formdata);
+      // if notes exists
+      if (notes) {
+        formdata.append("notes", notes);
+      }
 
-      // update journals global state variable
-      dispatch({ type: EDIT_JOURNAL_SUCCESS, payload: { data } });
+      // if screenshotFile exists
+      if (screenshotFile) {
+        formdata.append("screenshotFile", screenshotFile);
+      }
+
+      if (screenshotLink && screenshotDocKey) {
+        formdata.append("screenshotLink", screenshotLink);
+        formdata.append("screenshotDocKey", screenshotDocKey);
+      }
+
+      // send patch request to /journals route with multipart form data to update journals on backend
+      await authFetch.patch("journals", formdata);
+
+      // send get request to get the journals
+      const { data } = await authFetch.get("journals");
+
+      // update global state journals array
+      dispatch({
+        type: EDIT_JOURNAL_SUCCESS,
+        payload: { journals: data.journals },
+      });
     } catch (error) {
       dispatch({ type: EDIT_JOURNAL_ERROR });
       console.log(error);

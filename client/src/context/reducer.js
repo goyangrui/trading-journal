@@ -338,7 +338,7 @@ const reducer = (state, action) => {
 
   if (action.type === EDIT_JOURNAL_SUCCESS) {
     console.log("edit journal success");
-    return { ...state };
+    return { ...state, journals: action.payload.journals };
   }
 
   if (action.type === EDIT_JOURNAL_ERROR) {

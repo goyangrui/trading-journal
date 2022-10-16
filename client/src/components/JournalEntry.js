@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import moment from "moment";
 
@@ -11,50 +11,56 @@ function JournalEntry({ journalEntry }) {
   // global state variables and functions
   const { editJournal } = useAppContext();
 
-  // local state variables and functions
-  const [state, setState] = useState({
-    journalId: journalEntry._id,
-    notes: journalEntry.notes,
-    screenshots: journalEntry.screenshots,
-    screenshotFile: null,
-    action: "create",
-  });
+  // local state for notes
+  const [notes, setNotes] = useState(journalEntry.notes);
 
+  // local state variable for loading state
   const [isLoading, setIsLoading] = useState(false);
 
-  // handle change
-  const handleChange = (e) => {
-    // if it is a file input that has changed
+  // useRef hook to reference form DOM element
+  const formEl = useRef(null);
+
+  // handle change for text box (notes) and file input
+  const handleChange = async (e) => {
+    // if the event id is file-input
     if (e.target.id === "file-input") {
-      // get the screenshotFile state property to the file that was just added
-      const value = e.target.files[0];
-      setState({ ...state, screenshotFile: value });
+      setIsLoading(true);
+
+      // call editJournal function with journalId, the screenshot file, and the action type (create)
+      await editJournal({
+        journalId: journalEntry._id,
+        screenshotFile: e.target.files[0],
+      });
+
+      setIsLoading(false);
     } else {
-      // otherwise (if the notes text box has been changed)
-      const key = e.target.id.split("-")[0];
-      const value = e.target.value;
-      console.log(key);
-      setState({ ...state, [key]: value });
+      // otherwise it will be the text box that has been altered, in which case update the local state notes variable
+      setNotes(e.target.value);
     }
   };
 
-  // form submission handler
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // handle blur for notes (submit form if notes text box is blurred)
+  const handleBlur = async () => {
+    setIsLoading(true);
 
-    const submitData = async () => {
-      // set loading to true to prevent user from making further submissions until current submission has been processed
-      setIsLoading(true);
+    // call editJournal function with journalId, notes
+    await editJournal({ journalId: journalEntry._id, notes });
 
-      // send request to backend to edit journal based on state variables
-      await editJournal(state);
+    setIsLoading(false);
+  };
 
-      setIsLoading(false);
+  // handle click of delete image button
+  const handleDeleteImage = async ({ screenshotDocKey, screenshotLink }) => {
+    setIsLoading(true);
 
-      // set screenshotFile state back to null
-      setState({ ...state, screenshotFile: null });
-    };
-    submitData();
+    // call editJournal function with journalId, screenshotDocKey, screenshotLink
+    await editJournal({
+      journalId: journalEntry._id,
+      screenshotDocKey,
+      screenshotLink,
+    });
+
+    setIsLoading(false);
   };
 
   return (
@@ -66,15 +72,22 @@ function JournalEntry({ journalEntry }) {
       </h5>
 
       {/* main journal content */}
-      <form className="journal-content" onSubmit={handleSubmit}>
+      <form
+        ref={formEl}
+        className="journal-content"
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
         {/* notes text box */}
         <label htmlFor={`notes-${journalEntry._id}`}>Notes:</label>
         <input
           id={`notes-${journalEntry._id}`}
           className="journal-notes"
           type="text"
-          value={state.notes}
+          value={notes}
           onChange={handleChange}
+          onBlur={handleBlur}
         />
 
         {/* screenshots */}
@@ -83,8 +96,18 @@ function JournalEntry({ journalEntry }) {
           {Object.entries(journalEntry.screenshots).map((screenshot, index) => {
             return (
               <div key={index} className="screenshot-container">
+                {/* remove button with handler which passes screenshot link and key */}
                 <div className="remove-button-container">
-                  <button type="button" className="remove-image-button">
+                  <button
+                    type="button"
+                    className="remove-image-button"
+                    onClick={() => {
+                      handleDeleteImage({
+                        screenshotDocKey: screenshot[0],
+                        screenshotLink: screenshot[1],
+                      });
+                    }}
+                  >
                     <FaTimes />
                   </button>
                 </div>
@@ -98,7 +121,14 @@ function JournalEntry({ journalEntry }) {
               <label htmlFor="file-input" className="add-image-box">
                 Add Image
               </label>
-              <input id="file-input" type="file" onChange={handleChange} />
+              <input
+                id="file-input"
+                type="file"
+                onChange={handleChange}
+                onClick={(e) => {
+                  e.target.value = null;
+                }}
+              />
             </>
           )}
         </div>
