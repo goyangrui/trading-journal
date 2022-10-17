@@ -23,7 +23,7 @@ function JournalEntry({ journalEntry }) {
   // handle change for text box (notes) and file input
   const handleChange = async (e) => {
     // if the event id is file-input
-    if (e.target.id === "file-input") {
+    if (e.target.className === "file-input") {
       setIsLoading(true);
 
       // call editJournal function with journalId, the screenshot file, and the action type (create)
@@ -118,11 +118,15 @@ function JournalEntry({ journalEntry }) {
           {/* only display a file-input box if the screenshots objects length is less than 2 */}
           {Object.keys(journalEntry.screenshots).length < 2 && (
             <>
-              <label htmlFor="file-input" className="add-image-box">
+              <label
+                htmlFor={`file-input-${journalEntry._id}`}
+                className="add-image-box"
+              >
                 Add Image
               </label>
               <input
-                id="file-input"
+                className="file-input"
+                id={`file-input-${journalEntry._id}`}
                 type="file"
                 onChange={handleChange}
                 onClick={(e) => {

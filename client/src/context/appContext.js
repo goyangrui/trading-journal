@@ -38,6 +38,9 @@ import {
   EDIT_JOURNAL_BEGIN,
   EDIT_JOURNAL_SUCCESS,
   EDIT_JOURNAL_ERROR,
+  CREATE_JOURNAL_BEGIN,
+  CREATE_JOURNAL_SUCCESS,
+  CREATE_JOURNAL_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -394,6 +397,12 @@ function AppContextProvider({ children }) {
       // try and send request to create trades
       await authFetch.post("trades", tradeInfo);
 
+      // try and send request to create journal with the given trade date
+      await authFetch.post("journals", {
+        date: tradeInfo.executions[0].execDate,
+        notes: "",
+      });
+
       // reload the page after trade has been created so that changes are reflected on the tradelist
       document.location.reload(true);
     } catch (error) {
@@ -490,6 +499,37 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // create journal entry
+  const createJournal = async (journalInfo) => {
+    dispatch({ type: CREATE_JOURNAL_BEGIN });
+    try {
+      // send post request to try and create journal with given journal info
+      await authFetch.post("journals", journalInfo);
+
+      // send get request to fetch all of the journals
+      const { data } = await authFetch.get("journals");
+
+      // if journal creation is successful, update the global state journals array
+      dispatch({
+        type: CREATE_JOURNAL_SUCCESS,
+        payload: { journals: data.journals },
+      });
+
+      // reload the page after journal has been successfully created
+      document.location.reload(true);
+    } catch (error) {
+      // if there is an error, set show alert to true with given alert text
+      console.log(error);
+      dispatch({
+        type: CREATE_JOURNAL_ERROR,
+        payload: {
+          type: "danger",
+          text: "Journal entry with given date already exists",
+        },
+      });
+    }
+  };
+
   // -- MISC FUNCTIONS --
 
   // clear alert function
@@ -536,6 +576,7 @@ function AppContextProvider({ children }) {
         setSelectedTrades,
         getJournals,
         editJournal,
+        createJournal,
       }}
     >
       {children}

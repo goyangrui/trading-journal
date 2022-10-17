@@ -89,7 +89,7 @@ const JournalEntry = styled.div`
   }
 
   /* hide file input button */
-  #file-input {
+  .file-input {
     display: none;
   }
 `;

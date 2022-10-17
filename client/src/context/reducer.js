@@ -33,6 +33,9 @@ import {
   EDIT_JOURNAL_BEGIN,
   EDIT_JOURNAL_SUCCESS,
   EDIT_JOURNAL_ERROR,
+  CREATE_JOURNAL_BEGIN,
+  CREATE_JOURNAL_SUCCESS,
+  CREATE_JOURNAL_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -344,6 +347,27 @@ const reducer = (state, action) => {
   if (action.type === EDIT_JOURNAL_ERROR) {
     console.log("edit journal error");
     return { ...state };
+  }
+
+  // -- CREATE JOURNAL --
+  if (action.type === CREATE_JOURNAL_BEGIN) {
+    console.log("create journal begin");
+    return { ...state };
+  }
+
+  if (action.type === CREATE_JOURNAL_SUCCESS) {
+    console.log("create journal success");
+    return { ...state, journals: action.payload.journals };
+  }
+
+  if (action.type === CREATE_JOURNAL_ERROR) {
+    console.log("create journal error");
+    return {
+      ...state,
+      showAlert: true,
+      alertType: action.payload.type,
+      alertText: action.payload.text,
+    };
   }
 
   throw new Error(`no such action : ${action.type}`);
