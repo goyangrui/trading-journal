@@ -30,7 +30,7 @@ const TradesList = styled.div`
   /* table body row styles */
   .trades-table .table-body-row {
     transition: var(--transition);
-    background-color: var(--gray-500);
+    background-color: var(--gray-600);
   }
   .trades-table .table-body-row:hover {
     background-color: var(--primary-600);
@@ -38,7 +38,7 @@ const TradesList = styled.div`
   }
 
   /* table body row data styles */
-  .trades-table td {
+  .trades-table .table-body-row td {
     font-size: 0.75rem;
     color: var(--gray-200);
     text-align: left;

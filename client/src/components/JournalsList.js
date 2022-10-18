@@ -40,6 +40,9 @@ function JournalsList() {
             <JournalEntry key={journalEntry._id} journalEntry={journalEntry} />
           );
         })}
+
+        {/* if there is no journals */}
+        {journals.length === 0 && <h5>No journals</h5>}
       </Wrapper>
     );
   }

@@ -30,12 +30,23 @@ const JournalEntry = styled.div`
   /* journal notes styles */
   .journal-notes {
     display: flex;
+    resize: none;
+    padding: 0.5rem;
     border-radius: var(--borderRadius-2);
-    border: 2px solid var(--primary-600);
-    margin-bottom: 1rem;
-    height: 50px;
-    max-height: 200px;
+    border: 2px solid var(--gray-700);
+    outline: none;
+    margin: 1rem 0;
+    height: 40px;
+    max-height: 100px;
     width: 100%;
+  }
+
+  .journal-notes:focus {
+    border-color: var(--primary-500);
+  }
+
+  .journal-notes::-webkit-scrollbar {
+    width: 0px;
   }
 
   /* screenshots container */
@@ -43,6 +54,8 @@ const JournalEntry = styled.div`
     display: flex;
     justify-content: space-around;
     align-items: center;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
   }
 
   .screenshot-container,
@@ -91,6 +104,41 @@ const JournalEntry = styled.div`
   /* hide file input button */
   .file-input {
     display: none;
+  }
+
+  /* trades table styles */
+  .trades-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  /* trades table header styles */
+  .trades-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    text-align: left;
+    letter-spacing: 0.05rem;
+    color: var(--gray-300);
+    padding: 0.75rem 0.5rem;
+    background-color: var(--gray-700);
+  }
+
+  /* table body row styles */
+  .trades-table .table-body-row {
+    transition: var(--transition);
+    background-color: var(--gray-600);
+  }
+  .trades-table .table-body-row:hover {
+    background-color: var(--primary-600);
+    cursor: pointer;
+  }
+
+  /* table body row data styles */
+  .trades-table .table-body-row td {
+    font-size: 0.75rem;
+    color: var(--gray-200);
+    text-align: left;
+    padding: 0.75rem 0.5rem;
   }
 `;
 

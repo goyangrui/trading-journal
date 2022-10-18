@@ -36,7 +36,21 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
   // useEffect for clearing alerts and resetting local state to initial state
   // use effect (clear alerts on initial render of this page)
   useEffect(() => {
-    setState({ ...initialState });
+    setState({
+      ...initialState,
+      executions: [
+        {
+          action: "BUY",
+          execDate: new Date().toISOString().slice(0, 10),
+          positionSize: 0,
+          price: 0,
+          commissions: 0,
+          fees: 0,
+          lotSize: 0,
+          expDate: new Date().toISOString().slice(0, 10),
+        },
+      ],
+    });
     clearAlert();
   }, []);
 

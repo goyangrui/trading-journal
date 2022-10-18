@@ -157,7 +157,7 @@ function TradesList() {
                     )}
                   </td>
                   <td>{trade.status}</td>
-                  <td>{moment(trade.openDate).format("MMM DD, YYYY")}</td>
+                  <td>{moment(trade.openDate).utc().format("MMM DD, YYYY")}</td>
                   <td>{trade.market}</td>
                   <td>{trade.symbol}</td>
                   <td>${Math.round(trade.averageEntry * 100) / 100}</td>

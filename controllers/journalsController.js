@@ -16,8 +16,8 @@ const getJournals = async (req, res) => {
 
 const createJournal = async (req, res) => {
   // get the text and date from the request body
-  const { date } = req.body;
-  let { notes } = req.body;
+  // get method from request body (manual creation, or from trade creation)
+  const { date, notes, method } = req.body;
 
   // get the user id from req.user
   const { userId } = req.user;
@@ -29,14 +29,22 @@ const createJournal = async (req, res) => {
       .json({ msg: "Please provide date of journal entry" });
   }
 
-  // find the journal entry with the provided date (return null if not found)
-  const foundJournal = await Journal.findOne({ date });
+  // find the journal entry with the provided date AND createdBy userId (return null if not found)
+  const foundJournal = await Journal.findOne({ date, createdBy: userId });
 
-  // if the journal with the specified date was found, don't create another journal entry
+  // if the journal with the specified date was found
   if (foundJournal) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ msg: "Journal entry with provided date already exists" });
+    // if the method is through trade creation, don't throw an exception
+    if (method === "trade-creation") {
+      return res
+        .status(StatusCodes.OK)
+        .json({ msg: "Journal was not created" });
+    } else {
+      // otherwise if the journal entry was created manually
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "Journal entry with provided date already exists" });
+    }
   }
 
   // create a journal entry with the provided date, and notes from the request body, and userId from the req.user object
@@ -68,8 +76,8 @@ const editJournal = async (req, res) => {
   // get the notes from the request body
   const { notes } = req.body;
 
-  // if the notes exists
-  if (notes) {
+  // if the notes exists (can be empty string, but not undefined)
+  if (notes !== undefined) {
     // update the notes to the journal document
     journal.notes = notes;
   }

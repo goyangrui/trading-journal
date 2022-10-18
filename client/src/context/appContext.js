@@ -401,6 +401,7 @@ function AppContextProvider({ children }) {
       await authFetch.post("journals", {
         date: tradeInfo.executions[0].execDate,
         notes: "",
+        method: "trade-creation",
       });
 
       // reload the page after trade has been created so that changes are reflected on the tradelist
@@ -467,8 +468,8 @@ function AppContextProvider({ children }) {
       const formdata = new FormData();
       formdata.append("journalId", journalId);
 
-      // if notes exists
-      if (notes) {
+      // if notes exists (can be empty string, but not undefined)
+      if (notes !== undefined) {
         formdata.append("notes", notes);
       }
 
@@ -524,7 +525,7 @@ function AppContextProvider({ children }) {
         type: CREATE_JOURNAL_ERROR,
         payload: {
           type: "danger",
-          text: "Journal entry with given date already exists",
+          text: error.response.data.msg,
         },
       });
     }

@@ -9,7 +9,7 @@ import Wrapper from "../assets/wrappers/JournalEntry";
 
 function JournalEntry({ journalEntry }) {
   // global state variables and functions
-  const { editJournal } = useAppContext();
+  const { editJournal, trades } = useAppContext();
 
   // local state for notes
   const [notes, setNotes] = useState(journalEntry.notes);
@@ -17,8 +17,8 @@ function JournalEntry({ journalEntry }) {
   // local state variable for loading state
   const [isLoading, setIsLoading] = useState(false);
 
-  // useRef hook to reference form DOM element
-  const formEl = useRef(null);
+  // useRef hook to reference text area DOM element
+  const textAreaEl = useRef(null);
 
   // handle change for text box (notes) and file input
   const handleChange = async (e) => {
@@ -36,6 +36,15 @@ function JournalEntry({ journalEntry }) {
     } else {
       // otherwise it will be the text box that has been altered, in which case update the local state notes variable
       setNotes(e.target.value);
+
+      textAreaEl.current.style.height = "44px";
+
+      // get the scroll height from the event target (text area)
+      const scrollHeight = e.target.scrollHeight;
+      console.log(scrollHeight);
+
+      // set the height property of the text area element to the scrollheight
+      textAreaEl.current.style.height = `${scrollHeight}px`;
     }
   };
 
@@ -68,26 +77,26 @@ function JournalEntry({ journalEntry }) {
       {/* journal header */}
       <h5 className="journal-header">
         {/* date */}
-        {moment(journalEntry.date).format("MMM DD, YYYY")}
+        {moment(journalEntry.date).utc().format("MMM DD, YYYY")}
       </h5>
 
       {/* main journal content */}
       <form
-        ref={formEl}
         className="journal-content"
         onSubmit={(e) => {
           e.preventDefault();
         }}
       >
         {/* notes text box */}
-        <label htmlFor={`notes-${journalEntry._id}`}>Notes:</label>
-        <input
+        <textarea
           id={`notes-${journalEntry._id}`}
           className="journal-notes"
           type="text"
           value={notes}
+          placeholder="Enter notes here..."
           onChange={handleChange}
           onBlur={handleBlur}
+          ref={textAreaEl}
         />
 
         {/* screenshots */}
@@ -136,9 +145,54 @@ function JournalEntry({ journalEntry }) {
             </>
           )}
         </div>
-
-        {/* table of relevant trades */}
       </form>
+
+      {/* table of relevant trades */}
+      <table className="trades-table">
+        {/* table header row with names of metrics and other information*/}
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Open Date</th>
+            <th>Market</th>
+            <th>Symbol</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th>Position Size</th>
+            <th>$ Return</th>
+            <th>% Return</th>
+            <th>Net Return</th>
+            <th>Side</th>
+          </tr>
+        </thead>
+        <tbody>
+          {trades.map((trade) => {
+            {
+              /* filter trades array for trades that have the same execution date as the journal date */
+              /* for each filtered trade in trades global state variable array, display the trades and their relevant trade metrics information as a row in the table body */
+            }
+            if (
+              trade.openDate.slice(0, 10) === journalEntry.date.slice(0, 10)
+            ) {
+              return (
+                <tr className="table-body-row" key={trade._id}>
+                  <td>{trade.status}</td>
+                  <td>{moment(trade.openDate).utc().format("MMM DD, YYYY")}</td>
+                  <td>{trade.market}</td>
+                  <td>{trade.symbol}</td>
+                  <td>${Math.round(trade.averageEntry * 100) / 100}</td>
+                  <td>${Math.round(trade.averageExit * 100) / 100}</td>
+                  <td>{Math.round(trade.positionSize * 100) / 100}</td>
+                  <td>${Math.round(trade.dollarReturn * 100) / 100}</td>
+                  <td>{Math.round(trade.percentReturn * 100) / 100}%</td>
+                  <td>${Math.round(trade.netReturn * 100) / 100}</td>
+                  <td>{trade.side}</td>
+                </tr>
+              );
+            }
+          })}
+        </tbody>
+      </table>
     </Wrapper>
   );
 }
