@@ -73,13 +73,22 @@ const editJournal = async (req, res) => {
   }
 
   // -- NOTES --
-  // get the notes from the request body
-  const { notes } = req.body;
+  // get the notes and textarea height from the request body
+  let { notes, height } = req.body;
 
   // if the notes exists (can be empty string, but not undefined)
   if (notes !== undefined) {
     // update the notes to the journal document
     journal.notes = notes;
+  }
+
+  // if the height exists
+  if (height !== undefined) {
+    // cast height to integer
+    height = parseInt(height);
+    // update the height to the journal document
+
+    journal.height = height;
   }
 
   // -- SCREENSHOTS --

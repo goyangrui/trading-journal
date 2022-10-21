@@ -4,6 +4,7 @@ import mongoose from "mongoose";
  * some general text for the user to type whatever they want
  * contain a list of links to images stored on AWS S3 (maximum of 2 images per journal entry)
  * date of entry
+ * height value to store the height of the notes text area (default of 40)
  * an associated user id
  */
 
@@ -22,6 +23,10 @@ const JournalSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
+  },
+  height: {
+    type: Number,
+    default: 40,
   },
   createdBy: {
     type: mongoose.Types.ObjectId,

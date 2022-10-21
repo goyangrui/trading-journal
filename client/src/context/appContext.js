@@ -458,6 +458,7 @@ function AppContextProvider({ children }) {
   const editJournal = async ({
     journalId,
     notes,
+    height,
     screenshotFile,
     screenshotLink,
     screenshotDocKey,
@@ -471,6 +472,11 @@ function AppContextProvider({ children }) {
       // if notes exists (can be empty string, but not undefined)
       if (notes !== undefined) {
         formdata.append("notes", notes);
+      }
+
+      // if height exists
+      if (height) {
+        formdata.append("height", height);
       }
 
       // if screenshotFile exists

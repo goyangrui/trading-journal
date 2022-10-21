@@ -14,11 +14,19 @@ function JournalEntry({ journalEntry }) {
   // local state for notes
   const [notes, setNotes] = useState(journalEntry.notes);
 
+  // local state for the height of the notes textarea
+  const [height, setHeight] = useState(journalEntry.height);
+
   // local state variable for loading state
   const [isLoading, setIsLoading] = useState(false);
 
   // useRef hook to reference text area DOM element
   const textAreaEl = useRef(null);
+
+  // on the initial render, set the journal entry notes textarea to the stored value
+  useEffect(() => {
+    textAreaEl.current.style.height = `${height}px`;
+  }, []);
 
   // handle change for text box (notes) and file input
   const handleChange = async (e) => {
@@ -34,7 +42,7 @@ function JournalEntry({ journalEntry }) {
 
       setIsLoading(false);
     } else {
-      // otherwise it will be the text box that has been altered, in which case update the local state notes variable
+      // otherwise it will be the text box that has been altered, in which case update the local state notes and height variable
       setNotes(e.target.value);
 
       textAreaEl.current.style.height = "44px";
@@ -45,6 +53,9 @@ function JournalEntry({ journalEntry }) {
 
       // set the height property of the text area element to the scrollheight
       textAreaEl.current.style.height = `${scrollHeight}px`;
+
+      // store the scroll height in the local state height variable
+      setHeight(scrollHeight);
     }
   };
 
@@ -53,7 +64,7 @@ function JournalEntry({ journalEntry }) {
     setIsLoading(true);
 
     // call editJournal function with journalId, notes
-    await editJournal({ journalId: journalEntry._id, notes });
+    await editJournal({ journalId: journalEntry._id, notes, height });
 
     setIsLoading(false);
   };
