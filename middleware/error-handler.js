@@ -11,6 +11,10 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     defaultError.statusCode = StatusCodes.BAD_REQUEST;
     defaultError.msg = Object.values(err.errors)
       .map((item) => {
+        // if the item type is maxlength
+        if (item.properties.type === "maxlength") {
+          return `max length allowed is ${item.properties.maxlength}`;
+        }
         return item.message;
       })
       .join(", ");

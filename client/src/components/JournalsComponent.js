@@ -2,15 +2,17 @@ import { useState } from "react";
 
 import { JournalsList, AddJournalModal } from ".";
 
+import { useAppContext } from "../context/appContext";
+
 import Wrapper from "../assets/wrappers/JournalsComponent";
 
 function JournalsComponent() {
-  // local state functions and variables
-  const [toggleModal, setToggleModal] = useState(false);
+  // global state functions and variables
+  const { showMainModal, toggleMainModal } = useAppContext();
 
   // handle click of add journal entry button
   const addJournalHandler = () => {
-    setToggleModal(!toggleModal);
+    toggleMainModal();
   };
 
   return (
@@ -24,12 +26,7 @@ function JournalsComponent() {
       </div>
 
       {/* add journal modal */}
-      {toggleModal && (
-        <AddJournalModal
-          toggleModal={toggleModal}
-          setToggleModal={setToggleModal}
-        />
-      )}
+      {showMainModal && <AddJournalModal />}
 
       {/* journals list */}
       <JournalsList />

@@ -24,9 +24,16 @@ import {
   SET_SUBSCRIPTION_BEGIN,
   SET_SUBSCRIPTION_SUCCESS,
   SET_SUBSCRIPTION_ERROR,
+  TOGGLE_MODAL_SUCCESS,
+  TOGGLE_TAGMODAL_SUCCESS,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
+  CREATE_TRADE_BEGIN,
   CREATE_TRADE_ERROR,
+  CREATE_TRADE_SUCCESS,
+  DELETE_TRADE_BEGIN,
+  DELETE_TRADE_SUCCESS,
+  DELETE_TRADE_ERROR,
   SET_SELECTED_TRADES,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
@@ -36,6 +43,9 @@ import {
   CREATE_JOURNAL_BEGIN,
   CREATE_JOURNAL_SUCCESS,
   CREATE_JOURNAL_ERROR,
+  CREATE_TAG_BEGIN,
+  CREATE_TAG_SUCCESS,
+  CREATE_TAG_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -281,6 +291,23 @@ const reducer = (state, action) => {
     };
   }
 
+  // -- TOGGLE MODAL --
+  if (action.type === TOGGLE_MODAL_SUCCESS) {
+    console.log("toggle main modal success");
+    return {
+      ...state,
+      showMainModal: !state.showMainModal,
+    };
+  }
+
+  if (action.type === TOGGLE_TAGMODAL_SUCCESS) {
+    console.log("toggle tag modal success");
+    return {
+      ...state,
+      showTagModal: !state.showTagModal,
+    };
+  }
+
   // -- GET TRADES --
   if (action.type === FETCH_TRADES_SUCCESS) {
     console.log("fetch trades success");
@@ -298,6 +325,20 @@ const reducer = (state, action) => {
   }
 
   // -- CREATE TRADE --
+  if (action.type === CREATE_TRADE_BEGIN) {
+    console.log("create trade begin");
+    return { ...state };
+  }
+
+  if (action.type === CREATE_TRADE_SUCCESS) {
+    console.log("create trade success");
+    return {
+      ...state,
+      trades: action.payload.trades,
+      showMainModal: !state.showMainModal,
+    };
+  }
+
   if (action.type === CREATE_TRADE_ERROR) {
     console.log("create trade error");
     return {
@@ -306,6 +347,22 @@ const reducer = (state, action) => {
       alertType: action.payload.type,
       alertText: action.payload.text,
     };
+  }
+
+  // -- DELETE TRADE --
+  if (action.type === DELETE_TRADE_BEGIN) {
+    console.log("delete trade begin");
+    return { ...state };
+  }
+
+  if (action.type === DELETE_TRADE_SUCCESS) {
+    console.log("delete trade success");
+    return { ...state, trades: action.payload.trades };
+  }
+
+  if (action.type === DELETE_TRADE_ERROR) {
+    console.log("delete trade error");
+    return { ...state };
   }
 
   // -- SET SELECTED TRADES --
@@ -357,11 +414,40 @@ const reducer = (state, action) => {
 
   if (action.type === CREATE_JOURNAL_SUCCESS) {
     console.log("create journal success");
-    return { ...state, journals: action.payload.journals };
+    return {
+      ...state,
+      journals: action.payload.journals,
+      showMainModal: !state.showMainModal,
+    };
   }
 
   if (action.type === CREATE_JOURNAL_ERROR) {
     console.log("create journal error");
+    return {
+      ...state,
+      showAlert: true,
+      alertType: action.payload.type,
+      alertText: action.payload.text,
+    };
+  }
+
+  // -- CREATE TAG --
+  if (action.type === CREATE_TAG_BEGIN) {
+    console.log("create tag begin");
+    return { ...state };
+  }
+
+  if (action.type === CREATE_TAG_SUCCESS) {
+    console.log("create tag success");
+    return {
+      ...state,
+      tags: action.payload.tags,
+      showTagModal: !state.showTagModal,
+    };
+  }
+
+  if (action.type === CREATE_TAG_ERROR) {
+    console.log("create tag error");
     return {
       ...state,
       showAlert: true,

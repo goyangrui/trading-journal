@@ -185,12 +185,13 @@ ul {
 }
 
 .btn-reverse {
-  color: var(--primary-500);
-  background: var(--primary-200);
+  color: var(--gray-500);
+  background: var(--gray-200);
+  border: 2px solid var(--gray-400);
 }
 
 .btn-reverse:hover {
-  color: var(--primary-500);
+  color: var(--gray-500);
 }
 
 .btn-block {

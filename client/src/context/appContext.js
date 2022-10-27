@@ -29,9 +29,16 @@ import {
   SET_SUBSCRIPTION_BEGIN,
   SET_SUBSCRIPTION_SUCCESS,
   SET_SUBSCRIPTION_ERROR,
+  TOGGLE_MODAL_SUCCESS,
+  TOGGLE_TAGMODAL_SUCCESS,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
+  CREATE_TRADE_BEGIN,
+  CREATE_TRADE_SUCCESS,
   CREATE_TRADE_ERROR,
+  DELETE_TRADE_BEGIN,
+  DELETE_TRADE_SUCCESS,
+  DELETE_TRADE_ERROR,
   SET_SELECTED_TRADES,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
@@ -41,6 +48,9 @@ import {
   CREATE_JOURNAL_BEGIN,
   CREATE_JOURNAL_SUCCESS,
   CREATE_JOURNAL_ERROR,
+  CREATE_TAG_BEGIN,
+  CREATE_TAG_SUCCESS,
+  CREATE_TAG_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -51,6 +61,8 @@ const initialState = {
   token: localStorage.getItem("token"),
   isLoading: false,
   showAlert: false,
+  showMainModal: false,
+  showTagModal: false,
   alertText: "",
   alertType: "",
   products: [],
@@ -58,6 +70,7 @@ const initialState = {
   trades: [],
   selectedTrades: {},
   journals: [],
+  tags: [],
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -374,6 +387,15 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // -- MODAL TOGGLE FUNCTIONS --
+  const toggleMainModal = async () => {
+    dispatch({ type: TOGGLE_MODAL_SUCCESS });
+  };
+
+  const toggleTagModal = async () => {
+    dispatch({ type: TOGGLE_TAGMODAL_SUCCESS });
+  };
+
   // -- TRADES FUNCTIONS --
 
   // get all trades
@@ -394,6 +416,7 @@ function AppContextProvider({ children }) {
   // create trade
   const createTrade = async (tradeInfo) => {
     try {
+      dispatch({ type: CREATE_TRADE_BEGIN });
       // try and send request to create trades
       await authFetch.post("trades", tradeInfo);
 
@@ -404,8 +427,17 @@ function AppContextProvider({ children }) {
         method: "trade-creation",
       });
 
-      // reload the page after trade has been created so that changes are reflected on the tradelist
-      document.location.reload(true);
+      // send get request to get all of the trades
+      const { data } = await authFetch.get("trades");
+
+      // update global state trades array variable (cause trades page to update and re-render)
+      dispatch({
+        type: CREATE_TRADE_SUCCESS,
+        payload: { trades: data.trades },
+      });
+
+      // clear alerts
+      dispatch({ type: CLEAR_ALERT }); // clear alerts
     } catch (error) {
       // if the error status code is 400 (bad request)
       if (error.response.status === 400) {
@@ -428,13 +460,23 @@ function AppContextProvider({ children }) {
   // delete trade(s)
   const deleteTrade = async (tradeIdList) => {
     try {
+      dispatch({ type: DELETE_TRADE_BEGIN });
       // try and send request to delete trades
       await authFetch.post("trades/delete", tradeIdList);
 
-      // reload the page after trades have been deleted so that changes are reflected on the tradelist
-      document.location.reload(true);
+      // send request to get all of the trades
+      const { data } = await authFetch.get("trades");
+
+      // if the trade deletion process is successful, update the global state trades array (causing a re-render on the front end)
+      dispatch({
+        type: DELETE_TRADE_SUCCESS,
+        payload: { trades: data.trades },
+      });
+      // // reload the page after trades have been deleted so that changes are reflected on the tradelist
+      // document.location.reload(true);
     } catch (error) {
       console.log(error);
+      dispatch({ type: DELETE_TRADE_ERROR });
     }
   };
 
@@ -516,14 +558,14 @@ function AppContextProvider({ children }) {
       // send get request to fetch all of the journals
       const { data } = await authFetch.get("journals");
 
-      // if journal creation is successful, update the global state journals array
+      // if journal creation is successful, update the global state journals array (cause journals page to update and re-render)
       dispatch({
         type: CREATE_JOURNAL_SUCCESS,
         payload: { journals: data.journals },
       });
 
-      // reload the page after journal has been successfully created
-      document.location.reload(true);
+      // clear alerts
+      dispatch({ type: CLEAR_ALERT }); // clear alerts
     } catch (error) {
       // if there is an error, set show alert to true with given alert text
       console.log(error);
@@ -533,6 +575,30 @@ function AppContextProvider({ children }) {
           type: "danger",
           text: error.response.data.msg,
         },
+      });
+    }
+  };
+
+  // create tag
+  const createTag = async (text) => {
+    // try and send post request to create tag
+    try {
+      dispatch({ type: CREATE_TAG_BEGIN });
+      await authFetch.post("/tags", { text });
+
+      // send get request to get all of the tags after adding it
+      const { data } = await authFetch.get("/tags");
+
+      // add tag to the global context tag property
+      dispatch({ type: CREATE_TAG_SUCCESS, payload: { tags: data.tags } });
+
+      // clear alerts
+      dispatch({ type: CLEAR_ALERT }); // clear alerts
+    } catch (error) {
+      console.log(error);
+      dispatch({
+        type: CREATE_TAG_ERROR,
+        payload: { type: "danger", text: error.response.data.msg },
       });
     }
   };
@@ -576,6 +642,8 @@ function AppContextProvider({ children }) {
         fetchProducts,
         createSession,
         getSubscriptions,
+        toggleMainModal,
+        toggleTagModal,
         getTrades,
         createTrade,
         deleteTrade,
@@ -584,6 +652,7 @@ function AppContextProvider({ children }) {
         getJournals,
         editJournal,
         createJournal,
+        createTag,
       }}
     >
       {children}

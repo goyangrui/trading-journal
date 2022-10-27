@@ -26,14 +26,22 @@ const initialState = {
   ],
 };
 
-function AddTradeModal({ toggleModal, setToggleModal }) {
+function AddTradeModal() {
   // global state variables and functions
-  const { createTrade, showAlert, clearAlert } = useAppContext();
+  const {
+    createTrade,
+    showAlert,
+    clearAlert,
+    showMainModal,
+    toggleMainModal,
+    showTagModal,
+    toggleTagModal,
+  } = useAppContext();
 
   // local state variables
   const [state, setState] = useState({ ...initialState });
 
-  // useEffect for clearing alerts and resetting local state to initial state
+  // useEffect for resetting local state to initial state
   // use effect (clear alerts on initial render of this page)
   useEffect(() => {
     setState({
@@ -51,18 +59,23 @@ function AddTradeModal({ toggleModal, setToggleModal }) {
         },
       ],
     });
-    clearAlert();
   }, []);
 
   // close modal button handler
   const closeButtonHandler = (e) => {
-    setToggleModal(!toggleModal);
+    toggleMainModal();
   };
 
   // add trades form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    createTrade(state);
+
+    const submitData = async () => {
+      // create trade, update global trades state, then toggle modal
+      await createTrade(state);
+    };
+
+    submitData();
   };
 
   // on input change handler for market and symbol state variables

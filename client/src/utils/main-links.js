@@ -18,7 +18,7 @@ const links = [
     path: "/app/journal",
     icon: <FaBook />,
   },
-  { id: 4, text: "Rules", path: "/app/rules", icon: <BsFillFileRuledFill /> },
+  // { id: 4, text: "Rules", path: "/app/rules", icon: <BsFillFileRuledFill /> },
   {
     id: 5,
     text: "Profile",

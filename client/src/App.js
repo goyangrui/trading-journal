@@ -55,7 +55,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="trades" element={<Trades />} />
               <Route path="journal" element={<Journal />} />
-              <Route path="rules" element={<Rules />} />
+              {/* <Route path="rules" element={<Rules />} /> */}
               <Route path="profile" element={<Profile />} />
               <Route path="sub" element={<Subscription />} />
 

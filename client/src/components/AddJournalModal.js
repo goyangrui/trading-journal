@@ -14,16 +14,23 @@ const initialState = {
   notes: "",
 };
 
-function AddJournalModal({ toggleModal, setToggleModal }) {
+function AddJournalModal() {
   // local state variables and functions
   const [state, setState] = useState(initialState);
 
   // global state variables and functions
-  const { showAlert, createJournal } = useAppContext();
+  const {
+    showAlert,
+    createJournal,
+    showMainModal,
+    toggleMainModal,
+    showTagModal,
+    toggleTagModal,
+  } = useAppContext();
 
   // handle modal close button
   const closeButtonHandler = () => {
-    setToggleModal(!toggleModal);
+    toggleMainModal();
   };
 
   // handle change for form inputs
@@ -34,7 +41,13 @@ function AddJournalModal({ toggleModal, setToggleModal }) {
   // handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    createJournal(state);
+
+    const submitData = async () => {
+      // create journal, update global journals state, then toggle modal
+      await createJournal(state);
+    };
+
+    submitData();
   };
 
   return (

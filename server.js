@@ -15,6 +15,7 @@ import tradesRouter from "./routes/tradesRoutes.js";
 import userInfoRouter from "./routes/userInfoRoutes.js";
 import journalRouter from "./routes/journalsRoutes.js";
 import stripeRouter from "./routes/stripeRoutes.js";
+import tagRouter from "./routes/tagRoutes.js";
 
 // import custom middleware
 import errorHandlerMiddleware from "./middleware/error-handler.js";
@@ -59,6 +60,9 @@ app.use("/api/v1/trades", authMiddleware, tradesRouter);
 
 // journals routes
 app.use("/api/v1/journals", authMiddleware, journalRouter);
+
+// tag routes
+app.use("/api/v1/tags", authMiddleware, tagRouter);
 
 // -- ROUTE NOT FOUND MIDDLEWARE --
 app.use(notFoundMiddleware);
