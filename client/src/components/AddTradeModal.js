@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 
 import { FaTimes } from "react-icons/fa";
 
+import { IoIosArrowDropdownCircle } from "react-icons/io";
+import { ImCheckboxUnchecked, ImCheckboxChecked } from "react-icons/im";
+
 import Wrapper from "../assets/wrappers/AddTradeModal";
 
 import { FormRow, Alert } from ".";
@@ -32,17 +35,19 @@ function AddTradeModal() {
     createTrade,
     showAlert,
     clearAlert,
-    showMainModal,
     toggleMainModal,
-    showTagModal,
-    toggleTagModal,
+    fetchTags,
+    tags,
+    selectedTags,
+    setSelectedTags,
   } = useAppContext();
 
   // local state variables
   const [state, setState] = useState({ ...initialState });
 
-  // useEffect for resetting local state to initial state
-  // use effect (clear alerts on initial render of this page)
+  const [toggleDropdown, setToggleDropdown] = useState(false);
+
+  // useEffect for resetting local state to initial state, and fetching tags
   useEffect(() => {
     setState({
       ...initialState,
@@ -59,11 +64,48 @@ function AddTradeModal() {
         },
       ],
     });
+
+    // fetch tags from database
+    fetchTags();
   }, []);
+
+  // when global tags array has been changed (i.e. after they are fetched initially)
+  useEffect(() => {
+    // if there are any tags, loop through each tag, and set the selected tags to all false (i.e. none of the tags are selected by default)
+    if (tags.length !== 0) {
+      // map the tags array to a map of tag id's as the key, and false as the value
+      const tagIdMap = new Map(
+        tags.map((tag) => {
+          return [tag._id, false];
+        })
+      );
+
+      // convert the Map to an object
+      const tagIdObject = Object.fromEntries(tagIdMap);
+
+      // set the global selectedTags state
+      setSelectedTags({ ...tagIdObject });
+    }
+  }, [tags]);
 
   // close modal button handler
   const closeButtonHandler = (e) => {
     toggleMainModal();
+    clearAlert();
+  };
+
+  // tag options toggle handler
+  const handleTagDropdown = () => {
+    setToggleDropdown(!toggleDropdown);
+  };
+
+  // handle tag select
+  const handleTagSelect = (tagId) => {
+    // set id of selected tag to be the opposite state (true or false) of what it was originally
+    setSelectedTags({
+      ...selectedTags,
+      [tagId]: !selectedTags[tagId],
+    });
   };
 
   // add trades form submission handler
@@ -72,7 +114,7 @@ function AddTradeModal() {
 
     const submitData = async () => {
       // create trade, update global trades state, then toggle modal
-      await createTrade(state);
+      await createTrade(state, selectedTags);
     };
 
     submitData();
@@ -175,6 +217,59 @@ function AddTradeModal() {
               handleChange={handleChange}
               value={state.symbol}
             />
+            {/* Tags */}
+            {/* multi-select dropdown component */}
+            <div className="multi-select-dropdown-container">
+              <label className="form-label" htmlFor="multi-select-dropdown">
+                Tags
+              </label>
+              <div
+                className="multi-select-dropdown"
+                onClick={handleTagDropdown}
+              >
+                {/* selected tags will appear in this */}
+                {tags.map((tag) => {
+                  if (selectedTags[tag._id]) {
+                    return (
+                      <div key={tag._id} className="selected-tag-item">
+                        {tag.text}
+                      </div>
+                    );
+                  }
+                })}
+
+                {/* dropdown icon */}
+                <div className="dropdown-button-container">
+                  <IoIosArrowDropdownCircle />
+                </div>
+              </div>
+              {/* list of options */}
+              {/* only show list of options if dropdown is toggled */}
+              {toggleDropdown && (
+                <ul className="tag-options-list">
+                  {tags.map((tag) => {
+                    return (
+                      <li
+                        id={tag._id}
+                        key={tag._id}
+                        className="tag-item"
+                        onClick={(e) => {
+                          handleTagSelect(tag._id);
+                        }}
+                      >
+                        {/* if this tag has been selected, show the checked box, otherwise show the unchecked box */}
+                        {selectedTags[tag._id] ? (
+                          <ImCheckboxChecked />
+                        ) : (
+                          <ImCheckboxUnchecked />
+                        )}
+                        {tag.text}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
           </div>
           {/* Executions */}
           {/* For each execution in the executions state array, return an execution form */}

@@ -1,5 +1,6 @@
 import Trade from "../models/Trade.js";
 import Execution from "../models/Execution.js";
+import Tag from "../models/Tag.js";
 
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../errors/index.js";
@@ -12,9 +13,9 @@ const createTrade = async (req, res) => {
 
   // -- PARSE REQUEST BODY (make sure all necessary values are provided) --
 
-  console.log(req.body);
   // destructure request body
-  const { market, symbol, executions } = req.body;
+  const { market, symbol, executions } = req.body.tradeInfo;
+  const { selectedTagsId } = req.body;
 
   // if the user did not provide a market, symbol, or execution
   if (!market) {
@@ -91,9 +92,9 @@ const createTrade = async (req, res) => {
   // -- SIDE --
   // the side depends on the action of the first execution - buy means long, and sell means short
   if (executionDocs[0].action.toLowerCase() === "buy") {
-    var side = "long";
+    var side = "LONG";
   } else {
-    var side = "short";
+    var side = "SHORT";
   }
 
   console.log("side:", side);
@@ -213,18 +214,18 @@ const createTrade = async (req, res) => {
     sizeAndPriceTotals["exit"]["exitPositionTotal"]
   ) {
     // position is still open
-    var status = "open";
+    var status = "OPEN";
   } else {
     // otherwise, the position must be closed
     // if the dollar return is positive
     if (dollarReturn > 0) {
-      var status = "win";
+      var status = "WIN";
     } else if (dollarReturn < 0) {
       // otherwise if the dollar return is negative
-      var status = "loss";
+      var status = "LOSS";
     } else {
       // otherwise, if the dollar return is 0
-      var status = "breakeven";
+      var status = "BREAKEVEN";
     }
   }
 
@@ -233,7 +234,7 @@ const createTrade = async (req, res) => {
   // -- PERCENT RETURN --
   // percent return is the quotient between the dollar return and the total entry price
   // if the position is closed
-  if (status === "win" || status === "loss" || status === "breakeven") {
+  if (status === "WIN" || status === "LOSS" || status === "BREAKEVEN") {
     // calculate the percent return accordingly
     var percentReturn =
       (dollarReturn / sizeAndPriceTotals["entry"]["entryPriceTotal"]) * 100;
@@ -280,7 +281,7 @@ const createTrade = async (req, res) => {
 
   // -- UPDATE TRADE DOCUMENT WITH NEWLY UPDATED TRADE METRICS --
 
-  const tradeFinal = await Trade.findByIdAndUpdate(
+  const tradeUpdateMetrics = await Trade.findByIdAndUpdate(
     tradeId,
     {
       side,
@@ -292,11 +293,32 @@ const createTrade = async (req, res) => {
       dollarReturn,
       percentReturn,
       netReturn,
+      tags: {},
     },
     { new: true }
   );
 
-  res.status(StatusCodes.CREATED).json(tradeFinal);
+  // -- ADD TAGS TO TRADE DOCUMENT --
+  // find tag docs with given selectedTagsId
+  const tagDocs = await Tag.find({
+    _id: {
+      $in: selectedTagsId,
+    },
+  });
+
+  console.log("tags:", tagDocs);
+
+  // for each tag, add tag to the trade query
+  const tradeFinal = await Trade.findById(tradeId);
+  tagDocs.forEach((tagDoc) => {
+    tradeFinal.tags.set(tagDoc._id, tagDoc.text);
+  });
+
+  console.log(tradeFinal);
+
+  await tradeFinal.save();
+
+  await res.status(StatusCodes.CREATED).json(tradeFinal);
 };
 
 const getAllTrades = async (req, res) => {

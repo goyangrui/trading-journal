@@ -19,6 +19,7 @@ function TradesComponent() {
     toggleMainModal,
     showTagModal,
     toggleTagModal,
+    clearAlert,
     showAlert,
   } = useAppContext();
 
@@ -56,6 +57,7 @@ function TradesComponent() {
     setTag("");
     // toggle tag modal
     toggleTagModal();
+    clearAlert();
   };
 
   // handle change for tag text box
@@ -121,6 +123,7 @@ function TradesComponent() {
                 type="text"
                 className="add-tag-text"
                 onChange={handleTag}
+                autoComplete="off"
               />
 
               {/* save and cancel button container */}

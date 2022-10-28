@@ -139,6 +139,7 @@ function TradesList() {
               <th>% Return</th>
               <th>Net Return</th>
               <th>Side</th>
+              <th>Tags</th>
             </tr>
           </thead>
           {/* for each trade in trades global state variable array, display the trades and their relevant trade metrics information as a row in the table body */}
@@ -167,6 +168,15 @@ function TradesList() {
                   <td>{Math.round(trade.percentReturn * 100) / 100}%</td>
                   <td>${Math.round(trade.netReturn * 100) / 100}</td>
                   <td>{trade.side}</td>
+                  <td className="tag-cell">
+                    {Object.entries(trade.tags).map((tag) => {
+                      return (
+                        <span key={tag[0]} className="tag">
+                          {tag[1]}
+                        </span>
+                      );
+                    })}
+                  </td>
                 </tr>
               );
             })}

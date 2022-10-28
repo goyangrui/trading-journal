@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useReducer } from "react";
 import axios from "axios";
 
 import reducer from "./reducer";
@@ -31,6 +31,7 @@ import {
   SET_SUBSCRIPTION_ERROR,
   TOGGLE_MODAL_SUCCESS,
   TOGGLE_TAGMODAL_SUCCESS,
+  FETCH_TRADES_BEGIN,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
   CREATE_TRADE_BEGIN,
@@ -40,6 +41,7 @@ import {
   DELETE_TRADE_SUCCESS,
   DELETE_TRADE_ERROR,
   SET_SELECTED_TRADES,
+  FETCH_JOURNALS_BEGIN,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
   EDIT_JOURNAL_BEGIN,
@@ -48,10 +50,14 @@ import {
   CREATE_JOURNAL_BEGIN,
   CREATE_JOURNAL_SUCCESS,
   CREATE_JOURNAL_ERROR,
+  FETCH_TAGS_BEGIN,
+  FETCH_TAGS_SUCCESS,
+  FETCH_TAGS_ERROR,
   CREATE_TAG_BEGIN,
   CREATE_TAG_SUCCESS,
   CREATE_TAG_ERROR,
   CLEAR_ALERT,
+  SET_SELECTED_TAGS,
 } from "./actions";
 
 // initial global state (used for keeping track of existence of user)
@@ -71,6 +77,7 @@ const initialState = {
   selectedTrades: {},
   journals: [],
   tags: [],
+  selectedTags: {},
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -401,6 +408,7 @@ function AppContextProvider({ children }) {
   // get all trades
   const getTrades = async () => {
     try {
+      dispatch({ type: FETCH_TRADES_BEGIN });
       // try and send request to get trades
       const { data } = await authFetch.get("trades");
       const { trades } = data;
@@ -414,11 +422,20 @@ function AppContextProvider({ children }) {
   };
 
   // create trade
-  const createTrade = async (tradeInfo) => {
+  const createTrade = async (tradeInfo, selectedTags) => {
     try {
       dispatch({ type: CREATE_TRADE_BEGIN });
-      // try and send request to create trades
-      await authFetch.post("trades", tradeInfo);
+      // filter the selected tags to only send the selected tag ID's which have a value of true
+      const selectedTagsId = Object.entries(selectedTags)
+        .filter((pair) => {
+          return pair[1];
+        })
+        .map((pair) => {
+          return pair[0];
+        });
+
+      // try and send request to create trades with trade info and given tags
+      await authFetch.post("trades", { tradeInfo, selectedTagsId });
 
       // try and send request to create journal with the given trade date
       await authFetch.post("journals", {
@@ -485,6 +502,7 @@ function AppContextProvider({ children }) {
   // get journal entries
   const getJournals = async () => {
     try {
+      dispatch({ type: FETCH_JOURNALS_BEGIN });
       // send get request to get the journals
       const { data } = await authFetch.get("journals");
       const { journals } = data;
@@ -579,12 +597,25 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // get tags
+  const fetchTags = async () => {
+    try {
+      dispatch({ type: FETCH_TAGS_BEGIN });
+      const { data } = await authFetch.get("tags");
+
+      dispatch({ type: FETCH_TAGS_SUCCESS, payload: { tags: data.tags } });
+    } catch (error) {
+      console.log(error);
+      dispatch({ type: FETCH_TAGS_ERROR });
+    }
+  };
+
   // create tag
   const createTag = async (text) => {
     // try and send post request to create tag
     try {
       dispatch({ type: CREATE_TAG_BEGIN });
-      await authFetch.post("/tags", { text });
+      await authFetch.post("tags", { text });
 
       // send get request to get all of the tags after adding it
       const { data } = await authFetch.get("/tags");
@@ -601,6 +632,11 @@ function AppContextProvider({ children }) {
         payload: { type: "danger", text: error.response.data.msg },
       });
     }
+  };
+
+  // set selected tag
+  const setSelectedTags = async (selectedTags) => {
+    dispatch({ type: SET_SELECTED_TAGS, payload: { selectedTags } });
   };
 
   // -- MISC FUNCTIONS --
@@ -620,12 +656,6 @@ function AppContextProvider({ children }) {
   const removeUserFromLocalStorage = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-  };
-
-  // add product info to local storage
-  const addProductToLocalStorage = (product) => {
-    localStorage.setItem("productPrice", product.price / 100);
-    localStorage.setItem("productName", product.name);
   };
 
   // return app context provider component, passing in functions and state values to all child components in application
@@ -652,7 +682,9 @@ function AppContextProvider({ children }) {
         getJournals,
         editJournal,
         createJournal,
+        fetchTags,
         createTag,
+        setSelectedTags,
       }}
     >
       {children}

@@ -108,6 +108,8 @@ const editJournal = async (req, res) => {
 
     // set the screenshot key to the screenshot link in the screenshots map in journal document
     journal.screenshots.set(screenshotDocKey, screenshotLink);
+
+    console.log(journal);
   }
 
   // -- REMOVE SCREENSHOT --

@@ -26,6 +26,7 @@ import {
   SET_SUBSCRIPTION_ERROR,
   TOGGLE_MODAL_SUCCESS,
   TOGGLE_TAGMODAL_SUCCESS,
+  FETCH_TRADES_BEGIN,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
   CREATE_TRADE_BEGIN,
@@ -35,6 +36,7 @@ import {
   DELETE_TRADE_SUCCESS,
   DELETE_TRADE_ERROR,
   SET_SELECTED_TRADES,
+  FETCH_JOURNALS_BEGIN,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
   EDIT_JOURNAL_BEGIN,
@@ -43,9 +45,13 @@ import {
   CREATE_JOURNAL_BEGIN,
   CREATE_JOURNAL_SUCCESS,
   CREATE_JOURNAL_ERROR,
+  FETCH_TAGS_BEGIN,
+  FETCH_TAGS_SUCCESS,
+  FETCH_TAGS_ERROR,
   CREATE_TAG_BEGIN,
   CREATE_TAG_SUCCESS,
   CREATE_TAG_ERROR,
+  SET_SELECTED_TAGS,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -309,6 +315,11 @@ const reducer = (state, action) => {
   }
 
   // -- GET TRADES --
+  if (action.type === FETCH_TRADES_BEGIN) {
+    console.log("fetch trades begin");
+    return { ...state };
+  }
+
   if (action.type === FETCH_TRADES_SUCCESS) {
     console.log("fetch trades success");
     return {
@@ -375,6 +386,11 @@ const reducer = (state, action) => {
   }
 
   // -- GET JOURNALS --
+  if (action.type === FETCH_JOURNALS_BEGIN) {
+    console.log("fetch journals begin");
+    return { ...state };
+  }
+
   if (action.type === FETCH_JOURNALS_SUCCESS) {
     console.log("fetch journals success");
     return {
@@ -431,6 +447,22 @@ const reducer = (state, action) => {
     };
   }
 
+  // -- FETCH TAGS --
+  if (action.type === FETCH_TAGS_BEGIN) {
+    console.log("fetch tags begin");
+    return { ...state };
+  }
+
+  if (action.type === FETCH_TAGS_SUCCESS) {
+    console.log("fetch tags success");
+    return { ...state, tags: action.payload.tags };
+  }
+
+  if (action.type === FETCH_TAGS_ERROR) {
+    console.log("fetch tags error");
+    return { ...state };
+  }
+
   // -- CREATE TAG --
   if (action.type === CREATE_TAG_BEGIN) {
     console.log("create tag begin");
@@ -454,6 +486,12 @@ const reducer = (state, action) => {
       alertType: action.payload.type,
       alertText: action.payload.text,
     };
+  }
+
+  // set selected tags
+  if (action.type === SET_SELECTED_TAGS) {
+    console.log("tags set");
+    return { ...state, selectedTags: action.payload.selectedTags };
   }
 
   throw new Error(`no such action : ${action.type}`);

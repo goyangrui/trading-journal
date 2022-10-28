@@ -65,6 +65,19 @@ const TradesList = styled.div`
     text-align: center;
     margin-top: 3rem;
   }
+
+  /* tag styles */
+  .tag-cell {
+    display: flex;
+    /* flex-wrap: wrap; */
+    height: 100%;
+    width: 100%;
+    align-items: center;
+  }
+
+  .tag {
+    white-space: nowrap;
+  }
 `;
 
 export default TradesList;

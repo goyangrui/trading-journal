@@ -64,6 +64,10 @@ const Trades = styled.div`
     column-gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
+
+  .btn {
+    white-space: nowrap;
+  }
 `;
 
 export default Trades;

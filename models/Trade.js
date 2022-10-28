@@ -13,7 +13,8 @@ import mongoose from "mongoose";
  * 8. Return $ -> difference between sells and buys times position size
  * 9. Return % -> difference between sells and buys times position size divided by buys times position size
  * 10. Net return $ -> return with fees and commissions deducted
- * 10. createdBy -> ID of user who created this trade
+ * 11. createdBy -> ID of user who created this trade
+ * 12. tags -> array of tags that are assigned to this trade
  *
  * -- ADD THESE LATER AFTER BASIC CALCULATION FUNCTIONALITIES HAVE BEEN IMPLEMENTED --
  * 11. Strategy
@@ -69,6 +70,10 @@ const TradeSchema = new mongoose.Schema({
       "Please provide the user ID for which this trade belongs to",
     ],
     ref: "User",
+  },
+  tags: {
+    type: Map,
+    of: String,
   },
 });
 

@@ -47,6 +47,7 @@ function FormRow({
           value={value}
           min={min}
           step={step}
+          autoComplete="off"
         />
       )}
     </div>
