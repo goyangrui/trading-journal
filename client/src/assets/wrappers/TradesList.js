@@ -2,22 +2,33 @@ import styled from "styled-components";
 
 const TradesList = styled.div`
   /* general styles */
-  display: grid;
+  display: flex;
+  justify-content: center;
+  overflow: scroll;
   margin-bottom: 2rem;
+  margin-right: 1rem;
+  margin-left: 1rem;
 
   /* table styles */
   .trades-table {
+    width: 100%;
     border-collapse: collapse;
     box-shadow: var(--shadow-4);
   }
 
+  .trades-table tbody {
+    background-color: var(--gray-600);
+  }
+
   /* table header styles */
   .trades-table th {
+    font-family: var(--headingFont);
+    font-weight: bold;
     font-size: 0.75rem;
     text-transform: uppercase;
     text-align: left;
     letter-spacing: 0.05rem;
-    color: var(--gray-300);
+    color: var(--gray-100);
     padding: 0.75rem 0.5rem;
     background-color: var(--gray-700);
   }
@@ -33,14 +44,15 @@ const TradesList = styled.div`
     background-color: var(--gray-600);
   }
   .trades-table .table-body-row:hover {
-    background-color: var(--primary-600);
+    background-color: var(--primary-hover);
     cursor: pointer;
   }
 
   /* table body row data styles */
   .trades-table .table-body-row td {
     font-size: 0.75rem;
-    color: var(--gray-200);
+    font-weight: 500;
+    color: var(--gray-100);
     text-align: left;
     padding: 0.75rem 0.5rem;
   }
@@ -66,17 +78,62 @@ const TradesList = styled.div`
     margin-top: 3rem;
   }
 
+  /* table label styles */
+  .label {
+    display: flex;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0.1rem;
+    border-radius: var(--borderRadius-1);
+  }
+
+  /* side label styles */
+  .side-long {
+    border: 2px solid var(--green-main);
+  }
+
+  .side-short {
+    border: 2px solid var(--red-main);
+  }
+
+  /* status label styles */
+  .status-open {
+    border: 2px solid var(--yellow-main);
+    background-color: var(--yellow-main);
+  }
+
+  .status-win {
+    border: 2px solid var(--green-main);
+    background-color: var(--green-main);
+  }
+
+  .status-loss {
+    border: 2px solid var(--red-main);
+    background-color: var(--red-main);
+  }
+
+  /* return styles */
+  .return-win {
+    color: var(--green-main);
+  }
+
+  .return-loss {
+    color: var(--red-main);
+  }
+
   /* tag styles */
   .tag-cell {
     display: flex;
-    /* flex-wrap: wrap; */
-    height: 100%;
-    width: 100%;
+    column-gap: 0.25rem;
+    overflow: hidden;
+    max-width: 100px;
     align-items: center;
+    margin: 1.2rem 0;
   }
 
   .tag {
-    white-space: nowrap;
+    border: 2px solid var(--primary-600);
+    background-color: var(--primary-600);
   }
 `;
 

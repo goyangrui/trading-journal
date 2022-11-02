@@ -6,17 +6,13 @@ const SharedMain = styled.div`
 
   /* sidebar and main content flex */
   .main-content {
-    display: flex;
-    width: 100%;
     margin-top: var(--nav-height-2);
   }
 
   /* main content page */
   .main-page {
     display: flex;
-    width: 100%;
     justify-content: center;
-    align-items: center;
     margin-left: calc(var(--sidebar-width-1));
     margin-top: 1rem;
     transition: var(--transition);

@@ -115,7 +115,11 @@ function TradesList() {
 
   // if getTrades is still loading
   if (isLoading) {
-    return <Loading />;
+    return (
+      <div className="loading-container">
+        <Loading />
+      </div>
+    );
   } else {
     // otherwise return the list of trades
     return (
@@ -157,21 +161,77 @@ function TradesList() {
                       <ImCheckboxUnchecked />
                     )}
                   </td>
-                  <td>{trade.status}</td>
+                  <td>
+                    <span
+                      className={`label ${
+                        trade.status === "OPEN"
+                          ? "status-open"
+                          : trade.status === "WIN"
+                          ? "status-win"
+                          : "status-loss"
+                      }`}
+                    >
+                      {trade.status}
+                    </span>
+                  </td>
                   <td>{moment(trade.openDate).utc().format("MMM DD, YYYY")}</td>
                   <td>{trade.market}</td>
                   <td>{trade.symbol}</td>
                   <td>${Math.round(trade.averageEntry * 100) / 100}</td>
                   <td>${Math.round(trade.averageExit * 100) / 100}</td>
                   <td>{Math.round(trade.positionSize * 100) / 100}</td>
-                  <td>${Math.round(trade.dollarReturn * 100) / 100}</td>
-                  <td>{Math.round(trade.percentReturn * 100) / 100}%</td>
-                  <td>${Math.round(trade.netReturn * 100) / 100}</td>
-                  <td>{trade.side}</td>
+                  <td>
+                    <span
+                      className={`${
+                        trade.dollarReturn > 0
+                          ? "return-win"
+                          : trade.dollarReturn === 0
+                          ? "return-even"
+                          : "return-loss"
+                      }`}
+                    >
+                      ${Math.round(trade.dollarReturn * 100) / 100}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`${
+                        trade.dollarReturn > 0
+                          ? "return-win"
+                          : trade.dollarReturn === 0
+                          ? "return-even"
+                          : "return-loss"
+                      }`}
+                    >
+                      {Math.round(trade.percentReturn * 100) / 100}%
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`${
+                        trade.dollarReturn > 0
+                          ? "return-win"
+                          : trade.dollarReturn === 0
+                          ? "return-even"
+                          : "return-loss"
+                      }`}
+                    >
+                      ${Math.round(trade.netReturn * 100) / 100}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`label ${
+                        trade.side === "LONG" ? "side-long" : "side-short"
+                      }`}
+                    >
+                      {trade.side}
+                    </span>
+                  </td>
                   <td className="tag-cell">
                     {Object.entries(trade.tags).map((tag) => {
                       return (
-                        <span key={tag[0]} className="tag">
+                        <span key={tag[0]} className="label tag">
                           {tag[1]}
                         </span>
                       );

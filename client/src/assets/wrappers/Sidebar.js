@@ -6,6 +6,7 @@ const Sidebar = styled.nav`
   position: fixed;
   height: 100%;
   width: var(--sidebar-width-1);
+  z-index: 10;
   transition: var(--transition);
   box-shadow: var(--shadow-4);
 

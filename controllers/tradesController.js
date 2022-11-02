@@ -187,7 +187,7 @@ const createTrade = async (req, res) => {
     (averageExit - averageEntry);
 
   // if the first execution was a sell (short position)
-  if (executionDocs[0].action === "sell") {
+  if (executionDocs[0].action.toLowerCase() === "sell") {
     // multiply the dollar return buy -1 because to make money in short selling, the exit price needs to be lower than the entry price!
     dollarReturn *= -1;
   }

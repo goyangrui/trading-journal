@@ -3,6 +3,7 @@ import styled from "styled-components";
 const JournalsComponent = styled.div`
   /* general journal component styles */
   display: flex;
+  align-items: center;
   flex-direction: column;
   width: 100%;
   margin: 0 1rem;

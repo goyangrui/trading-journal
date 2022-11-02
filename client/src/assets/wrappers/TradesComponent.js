@@ -5,7 +5,12 @@ const Trades = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 0 1rem;
+
+  /* loading container */
+  .loading-container {
+    display: flex;
+    justify-content: center;
+  }
 
   /* button container styles */
   .btn-container {
@@ -13,6 +18,8 @@ const Trades = styled.div`
     justify-content: flex-start;
     column-gap: 1rem;
     margin-bottom: 2rem;
+    margin-right: 1rem;
+    margin-left: 1rem;
   }
 
   /* add tag container */
