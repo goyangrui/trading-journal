@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { useAppContext } from "../../context/appContext";
 
-import { Loading } from "../../components";
+import { Loading, DashboardComponent } from "../../components";
 
 function Dashboard() {
   // global state variables and functions
@@ -19,7 +19,7 @@ function Dashboard() {
     // otherwise if the user has a subscription
     if (hasSubscription) {
       // return the main content
-      return <h1>Dashboard</h1>;
+      return <DashboardComponent />;
     } else {
       return <h1>Need subscription to access</h1>;
     }

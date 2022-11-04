@@ -3,6 +3,7 @@ import styled from "styled-components";
 const TradesList = styled.div`
   /* general styles */
   display: flex;
+  flex-direction: column;
   justify-content: center;
   overflow: scroll;
   margin-bottom: 2rem;

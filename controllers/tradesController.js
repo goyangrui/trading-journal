@@ -358,4 +358,140 @@ const deleteTrade = async (req, res) => {
   res.status(StatusCodes.OK).json({ executions, trades });
 };
 
-export { createTrade, getAllTrades, updateTrade, deleteTrade };
+// get trades in format that can easily be viewed using chartjs
+const getChartTradeData = async (req, res) => {
+  // get userId from req.user
+  const { userId } = req.user;
+
+  // get url query params (number of days in the past from current time)
+  let { days } = req.query;
+
+  // if the days is not provided, set it to 30 by default
+  if (!days) {
+    days = 30;
+  }
+
+  // -- FIND TRADES BETWEEN DATE GIVEN DAYS PRIOR AND CURRENT DATE
+  // compute date that is the given number of days prior to the current date
+  const currentDate = new Date(); // current date
+  currentDate.setUTCHours(0, 0, 0, 0); // current date at midnight in UTC
+  let beginningDate = new Date();
+  beginningDate.setUTCHours(0, 0, 0, 0);
+  beginningDate.setDate(beginningDate.getDate() - days); // date of given days prior at midnight in UTC
+
+  // find trades for the given user and whose dates are in the range of the given dates
+  const trades = await Trade.find({
+    createdBy: userId,
+    openDate: { $gte: beginningDate, $lte: currentDate },
+  });
+
+  // sort the trades in ascending order by date
+  trades.sort((a, b) => {
+    return a.openDate - b.openDate;
+  });
+
+  // -- GET LABELS FOR CUMULATIVE P&L AND DAILY AVERAGE P&L GRAPHS
+  // map each trade to an array of dates, and filter dates so there are no duplicates
+  // these will be the X-labels for the area chart of the running P&L and average P&L
+  const dates = trades
+    .map((trade) => {
+      // return the date, but stringified so they can later be compared to eliminate duplicate dates
+      return trade.openDate.toJSON();
+    })
+    .filter((date, index, array) => {
+      // indexOf returns the index of the first instance of the current date in the array, so
+      // array.indexOf(date) === index will only ever return true once: for the first instance of the date
+      return array.indexOf(date) === index;
+    });
+
+  // get number of trading days (length of dates array)
+  const numDaysTraded = dates.length;
+
+  // -- GET CUMULATIVE P&L AND ARRAY OF RUNNING P&L'S FOR EACH DAY --
+  // -- ALSO GET TOTAL LOSSES AND TOTAL PROFITS --
+  // -- ALSO GET AVERAGE DAILY P&L AND ARRAY OF AVERAGE P&L'S FOR EACH DAY --
+  // -- ALSO GET AVERAGE RISK TO REWARD AND ARRAY OF RISK TO REWARDS FOR EACH DAY --
+
+  let cumulativePL = 0; // running total of P&L
+  let totalProfits = 0; // running total of profits
+  let totalLosses = 0; // running total of losses
+  let cumulativePLObject = {}; // object to store running total of each day that the user traded
+  let averagePLObject = {}; // object to store average P&L for each day
+
+  // loop through each date
+  dates.forEach((date) => {
+    // find trade(s) associated with current date
+    var tradesCurrentDate = trades.filter((trade) => {
+      return trade.openDate.toJSON() === date;
+    });
+
+    // compute the sum of returns of trades for current date
+    // also compute the total profits total losses for the current date
+    const currentDatePL = tradesCurrentDate.reduce(
+      (previousValue, currentTrade) => {
+        // add the net returns of the current trade to the total returns of the current date
+        previousValue.netReturns += currentTrade.netReturn;
+        // if the current trade's net return is positive
+        if (currentTrade.netReturn >= 0) {
+          // add the net return of the current trade to the current date's profits
+          previousValue.profits += currentTrade.netReturn;
+        } else {
+          // otherwise if the net return is negative, add the net return of the current trade to the current date's losses
+          previousValue.losses += currentTrade.netReturn;
+        }
+        return previousValue;
+      },
+      { netReturns: 0, profits: 0, losses: 0 }
+    );
+
+    // sum current running total with the sum of the returns of the trades for the current date
+    cumulativePL += currentDatePL.netReturns;
+    // sum the total profits to the profits for the current date
+    totalProfits += currentDatePL.profits;
+    // sum the total losses to the losses for the current date
+    totalLosses += currentDatePL.losses;
+
+    // compute average P&L of current date
+    const dailyAvgPL = currentDatePL.netReturns / tradesCurrentDate.length;
+
+    // assign the current cumulativePL as a property to the current date
+    cumulativePLObject[date] = cumulativePL;
+
+    // assign the average P&L of the current date as a property to the current date
+    averagePLObject[date] = dailyAvgPL;
+  });
+
+  const dailyAvgPL = cumulativePL / numDaysTraded; // average P&L across all days
+  const RR = totalLosses / totalProfits; // compute R:R for all trades in current period
+
+  // create stats object to store all stats
+  const stats = {
+    cumulativePL,
+    dailyAvgPL,
+    totalProfits,
+    totalLosses,
+    RR,
+  };
+
+  res.status(StatusCodes.OK).json({
+    userId,
+    days,
+    beginningDate,
+    currentDate,
+    trades,
+    dates,
+    stats,
+    cumulativePLObject,
+    averagePLObject,
+  });
+
+  // find trades that have the given userId, and whose date property is greater than or equal to the computed date
+};
+
+export {
+  createTrade,
+  getAllTrades,
+  updateTrade,
+  deleteTrade,
+  getChartTradeData,
+};
