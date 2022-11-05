@@ -56,8 +56,11 @@ import {
   CREATE_TAG_BEGIN,
   CREATE_TAG_SUCCESS,
   CREATE_TAG_ERROR,
-  CLEAR_ALERT,
   SET_SELECTED_TAGS,
+  FETCH_CHARTDATA_BEGIN,
+  FETCH_CHARTDATA_SUCCESS,
+  FETCH_CHARTDATA_ERROR,
+  CLEAR_ALERT,
 } from "./actions";
 
 // initial global state (used for keeping track of existence of user)
@@ -78,6 +81,7 @@ const initialState = {
   journals: [],
   tags: [],
   selectedTags: {},
+  chartData: {},
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -639,6 +643,32 @@ function AppContextProvider({ children }) {
     dispatch({ type: SET_SELECTED_TAGS, payload: { selectedTags } });
   };
 
+  // -- CHART TRADES DATA FUNCTIONS --
+  const getChartData = async (days) => {
+    try {
+      dispatch({ type: FETCH_CHARTDATA_BEGIN });
+
+      // if the user provided the number of days in the past of data
+      if (days) {
+        // send get request with the query parameter
+        const { data: chartData } = await authFetch(
+          `/trades/data?days=${days}`
+        );
+        dispatch({ type: FETCH_CHARTDATA_SUCCESS, payload: { chartData } });
+      } else {
+        // otherwise if the user did not provide the number of days
+        // send get request without the query parameter
+        const { data: chartData } = await authFetch("/trades/data");
+        dispatch({ type: FETCH_CHARTDATA_SUCCESS, payload: { chartData } });
+      }
+
+      // update global state chartData variable
+    } catch (error) {
+      console.log(error);
+      dispatch({ type: FETCH_CHARTDATA_ERROR });
+    }
+  };
+
   // -- MISC FUNCTIONS --
 
   // clear alert function
@@ -685,6 +715,7 @@ function AppContextProvider({ children }) {
         fetchTags,
         createTag,
         setSelectedTags,
+        getChartData,
       }}
     >
       {children}

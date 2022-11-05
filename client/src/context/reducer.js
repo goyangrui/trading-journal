@@ -52,6 +52,9 @@ import {
   CREATE_TAG_SUCCESS,
   CREATE_TAG_ERROR,
   SET_SELECTED_TAGS,
+  FETCH_CHARTDATA_BEGIN,
+  FETCH_CHARTDATA_SUCCESS,
+  FETCH_CHARTDATA_ERROR,
   CLEAR_ALERT,
 } from "./actions";
 
@@ -492,6 +495,22 @@ const reducer = (state, action) => {
   if (action.type === SET_SELECTED_TAGS) {
     console.log("tags set");
     return { ...state, selectedTags: action.payload.selectedTags };
+  }
+
+  // -- FETCH CHART DATA --
+  if (action.type === FETCH_CHARTDATA_BEGIN) {
+    console.log("fetch chart data begin");
+    return { ...state };
+  }
+
+  if (action.type === FETCH_CHARTDATA_SUCCESS) {
+    console.log("fetch chart data success");
+    return { ...state, chartData: action.payload.chartData };
+  }
+
+  if (action.type === FETCH_CHARTDATA_ERROR) {
+    console.log("fetch chart data error");
+    return { ...state };
   }
 
   throw new Error(`no such action : ${action.type}`);

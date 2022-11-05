@@ -366,24 +366,30 @@ const getChartTradeData = async (req, res) => {
   // get url query params (number of days in the past from current time)
   let { days } = req.query;
 
-  // if the days is not provided, set it to 30 by default
-  if (!days) {
-    days = 30;
+  let trades = undefined;
+  let currentDate = undefined;
+  let beginningDate = undefined;
+  // if the days is provided
+  if (days) {
+    // -- FIND TRADES BETWEEN DATE GIVEN DAYS PRIOR AND CURRENT DATE
+    // compute date that is the given number of days prior to the current date
+    currentDate = new Date(); // current date
+    currentDate.setUTCHours(0, 0, 0, 0); // current date at midnight in UTC
+    beginningDate = new Date();
+    beginningDate.setUTCHours(0, 0, 0, 0);
+    beginningDate.setDate(beginningDate.getDate() - days); // date of given days prior at midnight in UTC
+
+    // find trades for the given user and whose dates are in the range of the given dates
+    trades = await Trade.find({
+      createdBy: userId,
+      openDate: { $gte: beginningDate, $lte: currentDate },
+    });
+  } else {
+    // -- FIND ALL TRADES FOR THE GIVEN USER --
+    trades = await Trade.find({
+      createdBy: userId,
+    });
   }
-
-  // -- FIND TRADES BETWEEN DATE GIVEN DAYS PRIOR AND CURRENT DATE
-  // compute date that is the given number of days prior to the current date
-  const currentDate = new Date(); // current date
-  currentDate.setUTCHours(0, 0, 0, 0); // current date at midnight in UTC
-  let beginningDate = new Date();
-  beginningDate.setUTCHours(0, 0, 0, 0);
-  beginningDate.setDate(beginningDate.getDate() - days); // date of given days prior at midnight in UTC
-
-  // find trades for the given user and whose dates are in the range of the given dates
-  const trades = await Trade.find({
-    createdBy: userId,
-    openDate: { $gte: beginningDate, $lte: currentDate },
-  });
 
   // sort the trades in ascending order by date
   trades.sort((a, b) => {
@@ -400,7 +406,7 @@ const getChartTradeData = async (req, res) => {
     })
     .filter((date, index, array) => {
       // indexOf returns the index of the first instance of the current date in the array, so
-      // array.indexOf(date) === index will only ever return true once: for the first instance of the date
+      // array.indexOf(date) === index will only ever return true once : for the first instance of the date
       return array.indexOf(date) === index;
     });
 
@@ -413,9 +419,9 @@ const getChartTradeData = async (req, res) => {
   // -- ALSO GET AVERAGE RISK TO REWARD AND ARRAY OF RISK TO REWARDS FOR EACH DAY --
 
   let cumulativePL = 0; // running total of P&L
-  let totalProfits = 0; // running total of profits
+  let cumulativePLObject = {}; // object to store running total P&L of each day that the user traded
   let totalLosses = 0; // running total of losses
-  let cumulativePLObject = {}; // object to store running total of each day that the user traded
+  let totalProfits = 0; // running total of profits
   let averagePLObject = {}; // object to store average P&L for each day
 
   // loop through each date
@@ -474,18 +480,10 @@ const getChartTradeData = async (req, res) => {
   };
 
   res.status(StatusCodes.OK).json({
-    userId,
-    days,
-    beginningDate,
-    currentDate,
-    trades,
-    dates,
     stats,
     cumulativePLObject,
     averagePLObject,
   });
-
-  // find trades that have the given userId, and whose date property is greater than or equal to the computed date
 };
 
 export {
