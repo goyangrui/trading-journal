@@ -398,7 +398,7 @@ const getChartTradeData = async (req, res) => {
 
   // -- GET LABELS FOR CUMULATIVE P&L AND DAILY AVERAGE P&L GRAPHS
   // map each trade to an array of dates, and filter dates so there are no duplicates
-  // these will be the X-labels for the area chart of the running P&L and average P&L
+  // these will be the X-labels for the area chart of the running P&L, average P&L, and RR
   const dates = trades
     .map((trade) => {
       // return the date, but stringified so they can later be compared to eliminate duplicate dates
@@ -417,12 +417,16 @@ const getChartTradeData = async (req, res) => {
   // -- ALSO GET TOTAL LOSSES AND TOTAL PROFITS --
   // -- ALSO GET AVERAGE DAILY P&L AND ARRAY OF AVERAGE P&L'S FOR EACH DAY --
   // -- ALSO GET AVERAGE RISK TO REWARD AND ARRAY OF RISK TO REWARDS FOR EACH DAY --
+  // -- ALSO GET TOTAL NUMBER OF WINS AND LOSSES
 
   let cumulativePL = 0; // running total of P&L
   let cumulativePLObject = {}; // object to store running total P&L of each day that the user traded
   let totalLosses = 0; // running total of losses
   let totalProfits = 0; // running total of profits
   let averagePLObject = {}; // object to store average P&L for each day
+  let RRObject = {}; // object to store RR for each day
+  let wins = 0; // total number of winning trades
+  let losses = 0; // total number of losing trades
 
   // loop through each date
   dates.forEach((date) => {
@@ -438,12 +442,16 @@ const getChartTradeData = async (req, res) => {
         // add the net returns of the current trade to the total returns of the current date
         previousValue.netReturns += currentTrade.netReturn;
         // if the current trade's net return is positive
-        if (currentTrade.netReturn >= 0) {
+        if (currentTrade.netReturn > 0) {
           // add the net return of the current trade to the current date's profits
           previousValue.profits += currentTrade.netReturn;
+          // also add one to the win counter in the WLObject
+          wins += 1;
         } else {
           // otherwise if the net return is negative, add the net return of the current trade to the current date's losses
           previousValue.losses += currentTrade.netReturn;
+          // also add one to the loss counter in the WLObject
+          losses += 1;
         }
         return previousValue;
       },
@@ -460,15 +468,42 @@ const getChartTradeData = async (req, res) => {
     // compute average P&L of current date
     const dailyAvgPL = currentDatePL.netReturns / tradesCurrentDate.length;
 
+    // compute RR of the current date
+    let currentDateRR = 0;
+    // if the losses for the current date is 0
+    if (currentDatePL.losses == 0) {
+      // set the RR of the current date to the total profits
+      currentDateRR = currentDatePL.profits;
+    } else {
+      // otherwise, compute the RR of the current date based on the losses of the current date
+      currentDateRR = currentDatePL.profits / (-1 * currentDatePL.losses);
+    }
+
     // assign the current cumulativePL as a property to the current date
-    cumulativePLObject[date] = cumulativePL;
+    cumulativePLObject[date.slice(0, 10)] = cumulativePL;
 
     // assign the average P&L of the current date as a property to the current date
-    averagePLObject[date] = dailyAvgPL;
+    averagePLObject[date.slice(0, 10)] = dailyAvgPL;
+
+    // assign the RR of the current date as a property to the current date
+    RRObject[date.slice(0, 10)] = currentDateRR;
   });
 
   const dailyAvgPL = cumulativePL / numDaysTraded; // average P&L across all days
-  const RR = totalLosses / totalProfits; // compute R:R for all trades in current period
+  let RR = 0;
+  // if the total losses are 0
+  if (totalLosses == 0) {
+    // set the RR to be equal to the total profits made
+    RR = totalProfits;
+  } else {
+    // otherwise compute RR based on losses
+    RR = totalProfits / (-1 * totalLosses); // compute R:R for all trades in current period
+  }
+
+  // compute win and loss percentage
+  const winPercentage = (wins * 100) / (wins + losses);
+  const lossPercentage = (losses * 100) / (wins + losses);
+  const WLObject = { winPercentage, lossPercentage }; // object to store win and loss percentage
 
   // create stats object to store all stats
   const stats = {
@@ -483,6 +518,8 @@ const getChartTradeData = async (req, res) => {
     stats,
     cumulativePLObject,
     averagePLObject,
+    RRObject,
+    WLObject,
   });
 };
 
