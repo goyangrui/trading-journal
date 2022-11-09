@@ -138,7 +138,7 @@ function DashboardComponent() {
             {/* overall profit factor */}
             <div className="chart-stat">
               <span>Profit Factor</span>
-              <span>{`${chartData.stats.RR.toFixed(2)}`}</span>
+              <span>{`${chartData.stats.profitFactor.toFixed(2)}`}</span>
             </div>
             {/* area graph of daily average P&L */}
             <div className="chart-container">
@@ -154,12 +154,12 @@ function DashboardComponent() {
                   },
                 }}
                 data={{
-                  labels: Object.keys(chartData.RRObject),
+                  labels: Object.keys(chartData.profitFactorObject),
                   datasets: [
                     {
                       fill: true,
                       label: "Profit Factor",
-                      data: Object.values(chartData.RRObject),
+                      data: Object.values(chartData.profitFactorObject),
                       borderColor: "#ff8906",
                       backgroundColor: "#ff890670",
                     },
@@ -194,12 +194,47 @@ function DashboardComponent() {
                   datasets: [
                     {
                       data: Object.values(chartData.WLObject),
+                      backgroundColor: ["#3ad398", "#e45d5d"],
                     },
                   ],
                 }}
               />
             </div>
           </div>
+        </div>
+        {/* STATS TABLE */}
+        <div className="stats-table-container">
+          <div className="stats-table-header-container">
+            <h4>Statistics</h4>
+          </div>
+          <table className="stats-table">
+            <tbody className="stats-table-body">
+              <tr>
+                <td>Total profits</td>
+                <td>$ {chartData.stats.totalProfits.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Total losses</td>
+                <td>$ {chartData.stats.totalLosses.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Largest Win</td>
+                <td>$ {chartData.stats.largestWin.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Largest Loss</td>
+                <td>$ {chartData.stats.largestLoss.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Number of Wins</td>
+                <td>{chartData.stats.wins}</td>
+              </tr>
+              <tr>
+                <td>Number of Losses</td>
+                <td>{chartData.stats.losses}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </Wrapper>
     );

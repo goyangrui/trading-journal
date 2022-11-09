@@ -398,7 +398,7 @@ const getChartTradeData = async (req, res) => {
 
   // -- GET LABELS FOR CUMULATIVE P&L AND DAILY AVERAGE P&L GRAPHS
   // map each trade to an array of dates, and filter dates so there are no duplicates
-  // these will be the X-labels for the area chart of the running P&L, average P&L, and RR
+  // these will be the X-labels for the area chart of the running P&L, average P&L, and Profit factor
   const dates = trades
     .map((trade) => {
       // return the date, but stringified so they can later be compared to eliminate duplicate dates
@@ -414,19 +414,23 @@ const getChartTradeData = async (req, res) => {
   const numDaysTraded = dates.length;
 
   // -- GET CUMULATIVE P&L AND ARRAY OF RUNNING P&L'S FOR EACH DAY --
-  // -- ALSO GET TOTAL LOSSES AND TOTAL PROFITS --
   // -- ALSO GET AVERAGE DAILY P&L AND ARRAY OF AVERAGE P&L'S FOR EACH DAY --
   // -- ALSO GET AVERAGE RISK TO REWARD AND ARRAY OF RISK TO REWARDS FOR EACH DAY --
-  // -- ALSO GET TOTAL NUMBER OF WINS AND LOSSES
+
+  // -- ALSO GET TOTAL LOSSES AND TOTAL PROFITS --
+  // -- ALSO GET TOTAL NUMBER OF WINS AND LOSSES --
+  // -- ALSO GET THE LARGEST WIN AND LARGEST LOSS --
 
   let cumulativePL = 0; // running total of P&L
   let cumulativePLObject = {}; // object to store running total P&L of each day that the user traded
+  let averagePLObject = {}; // object to store average P&L for each day
+  let profitFactorObject = {}; // object to store profitFactor for each day
   let totalLosses = 0; // running total of losses
   let totalProfits = 0; // running total of profits
-  let averagePLObject = {}; // object to store average P&L for each day
-  let RRObject = {}; // object to store RR for each day
   let wins = 0; // total number of winning trades
   let losses = 0; // total number of losing trades
+  let largestWin = 0; // largest win
+  let largestLoss = 0; // largest loss
 
   // loop through each date
   dates.forEach((date) => {
@@ -453,6 +457,20 @@ const getChartTradeData = async (req, res) => {
           // also add one to the loss counter in the WLObject
           losses += 1;
         }
+
+        // if the current trade's netReturn is greater than the current largest win
+        if (currentTrade.netReturn > largestWin) {
+          // set the largestWin to the current trade's net return
+          largestWin = currentTrade.netReturn;
+        }
+        // otherwise, if the current trade's net return is less than the current largest loss
+        else if (currentTrade.netReturn < largestLoss) {
+          // set the largestLoss to the current trade's net return
+          largestLoss = currentTrade.netReturn;
+        } // otherwise do nothing
+        else {
+          // do nothing
+        }
         return previousValue;
       },
       { netReturns: 0, profits: 0, losses: 0 }
@@ -468,15 +486,16 @@ const getChartTradeData = async (req, res) => {
     // compute average P&L of current date
     const dailyAvgPL = currentDatePL.netReturns / tradesCurrentDate.length;
 
-    // compute RR of the current date
-    let currentDateRR = 0;
+    // compute profitFactor of the current date
+    let currentDateProfitFactor = 0;
     // if the losses for the current date is 0
     if (currentDatePL.losses == 0) {
-      // set the RR of the current date to the total profits
-      currentDateRR = currentDatePL.profits;
+      // set the profitFactor of the current date to the total profits
+      currentDateProfitFactor = currentDatePL.profits;
     } else {
-      // otherwise, compute the RR of the current date based on the losses of the current date
-      currentDateRR = currentDatePL.profits / (-1 * currentDatePL.losses);
+      // otherwise, compute the profitFactor of the current date based on the losses of the current date
+      currentDateProfitFactor =
+        currentDatePL.profits / (-1 * currentDatePL.losses);
     }
 
     // assign the current cumulativePL as a property to the current date
@@ -485,19 +504,19 @@ const getChartTradeData = async (req, res) => {
     // assign the average P&L of the current date as a property to the current date
     averagePLObject[date.slice(0, 10)] = dailyAvgPL;
 
-    // assign the RR of the current date as a property to the current date
-    RRObject[date.slice(0, 10)] = currentDateRR;
+    // assign the profitFactor of the current date as a property to the current date
+    profitFactorObject[date.slice(0, 10)] = currentDateProfitFactor;
   });
 
   const dailyAvgPL = cumulativePL / numDaysTraded; // average P&L across all days
-  let RR = 0;
+  let profitFactor = 0;
   // if the total losses are 0
   if (totalLosses == 0) {
-    // set the RR to be equal to the total profits made
-    RR = totalProfits;
+    // set the profitFactor to be equal to the total profits made
+    profitFactor = totalProfits;
   } else {
-    // otherwise compute RR based on losses
-    RR = totalProfits / (-1 * totalLosses); // compute R:R for all trades in current period
+    // otherwise compute profitFactor based on losses
+    profitFactor = totalProfits / (-1 * totalLosses); // compute profitFactor for all trades in current period
   }
 
   // compute win and loss percentage
@@ -509,16 +528,21 @@ const getChartTradeData = async (req, res) => {
   const stats = {
     cumulativePL,
     dailyAvgPL,
+    profitFactor,
+    winPercentage,
     totalProfits,
     totalLosses,
-    RR,
+    wins,
+    losses,
+    largestWin,
+    largestLoss,
   };
 
   res.status(StatusCodes.OK).json({
     stats,
     cumulativePLObject,
     averagePLObject,
-    RRObject,
+    profitFactorObject,
     WLObject,
   });
 };
