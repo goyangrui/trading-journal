@@ -21,7 +21,7 @@ function Journal() {
       // return the main content
       return <JournalsComponent />;
     } else {
-      return <h1>Need subscription to access</h1>;
+      return <h2>Need subscription to access</h2>;
     }
   }
 }

@@ -21,7 +21,7 @@ function Rules() {
       // return the main content
       return <h1>Rules</h1>;
     } else {
-      return <h1>Need subscription to access</h1>;
+      return <h2>Need subscription to access</h2>;
     }
   }
 }

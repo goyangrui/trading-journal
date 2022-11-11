@@ -7,7 +7,7 @@ import { FaTimes } from "react-icons/fa";
 import { useAppContext } from "../context/appContext";
 import Wrapper from "../assets/wrappers/JournalEntry";
 
-function JournalEntry({ journalEntry }) {
+function JournalEntry({ journalEntry, handleClickImage }) {
   // global state variables and functions
   const { editJournal, trades } = useAppContext();
 
@@ -131,7 +131,11 @@ function JournalEntry({ journalEntry }) {
                     <FaTimes />
                   </button>
                 </div>
-                <img src={screenshot[1]} alt="screenshot" />
+                <img
+                  onClick={handleClickImage}
+                  src={screenshot[1]}
+                  alt="screenshot"
+                />
               </div>
             );
           })}

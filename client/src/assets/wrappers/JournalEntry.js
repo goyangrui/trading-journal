@@ -79,6 +79,10 @@ const JournalEntry = styled.div`
     height: 100%;
   }
 
+  .screenshot-container img:hover {
+    cursor: pointer;
+  }
+
   /* remove image button */
   .remove-button-container {
     position: absolute;

@@ -380,14 +380,17 @@ const getChartTradeData = async (req, res) => {
     beginningDate.setDate(beginningDate.getDate() - days); // date of given days prior at midnight in UTC
 
     // find trades for the given user and whose dates are in the range of the given dates
+    // also, the trades must be closed (WIN, LOSS, OR BREAKEVEN)
     trades = await Trade.find({
       createdBy: userId,
       openDate: { $gte: beginningDate, $lte: currentDate },
+      status: { $in: ["WIN", "LOSS", "BREAKEVEN"] },
     });
   } else {
     // -- FIND ALL TRADES FOR THE GIVEN USER --
     trades = await Trade.find({
       createdBy: userId,
+      status: { $in: ["WIN", "LOSS", "BREAKEVEN"] },
     });
   }
 
@@ -544,6 +547,7 @@ const getChartTradeData = async (req, res) => {
     averagePLObject,
     profitFactorObject,
     WLObject,
+    numDaysTraded,
   });
 };
 

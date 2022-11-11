@@ -8,7 +8,6 @@ function Trades() {
   // global state variables and functions
   const { getSubscriptions, hasSubscription, isLoading } = useAppContext();
 
-
   // on initial render, getSubscriptions
   useEffect(() => {
     getSubscriptions();
@@ -21,9 +20,9 @@ function Trades() {
     // otherwise if the user has a subscription
     if (hasSubscription) {
       // return the main TradesComponent
-      return <TradesComponent />
+      return <TradesComponent />;
     } else {
-      return <h1>Need subscription to access</h1>;
+      return <h2>Need subscription to access</h2>;
     }
   }
 }
