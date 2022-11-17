@@ -51,6 +51,9 @@ import {
   CREATE_TAG_BEGIN,
   CREATE_TAG_SUCCESS,
   CREATE_TAG_ERROR,
+  DELETE_TAG_BEGIN,
+  DELETE_TAG_SUCCESS,
+  DELETE_TAG_ERROR,
   SET_SELECTED_TAGS,
   FETCH_CHARTDATA_BEGIN,
   FETCH_CHARTDATA_SUCCESS,
@@ -472,12 +475,32 @@ const reducer = (state, action) => {
     return { ...state };
   }
 
+  // -- DELETE TAG --
+  if (action.type === DELETE_TAG_BEGIN) {
+    console.log("delete tag begin");
+    return { ...state };
+  }
+
+  if (action.type === DELETE_TAG_SUCCESS) {
+    console.log("delete tag success");
+    return {
+      ...state,
+      tags: action.payload.tags,
+      trades: action.payload.trades,
+    };
+  }
+
+  if (action.type === DELETE_TAG_ERROR) {
+    console.log("delete tag error");
+    return { ...state };
+  }
+
   if (action.type === CREATE_TAG_SUCCESS) {
     console.log("create tag success");
     return {
       ...state,
       tags: action.payload.tags,
-      showTagModal: !state.showTagModal,
+      // showTagModal: !state.showTagModal,
     };
   }
 

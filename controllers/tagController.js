@@ -42,9 +42,10 @@ const deleteTag = async (req, res) => {
   const { id } = req.params;
 
   // delete the tag with the given id
-  const tag = await Tag.deleteOne({ _id: id });
+  const tag = await Tag.findOne({ _id: id });
+  const tagDeleted = await tag.deleteOne();
 
-  res.status(StatusCodes.OK).json({ msg: "tag deleted", tag });
+  res.status(StatusCodes.OK).json({ msg: "tag deleted", tagDeleted });
 };
 
 export { getTags, createTag, deleteTag };

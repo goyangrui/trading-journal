@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { FaTimes } from "react-icons/fa";
 
 import Wrapper from "../assets/wrappers/TradesComponent";
 
@@ -9,6 +10,9 @@ import { useAppContext } from "../context/appContext";
 function TradesComponent() {
   // tag text local state variable
   const [tag, setTag] = useState("");
+
+  // local isLoading variable for loading the tags in the tag modal
+  const [isLoading, setIsLoading] = useState(true);
 
   // global state functions and variables
   const {
@@ -21,7 +25,20 @@ function TradesComponent() {
     toggleTagModal,
     clearAlert,
     showAlert,
+    fetchTags,
+    tags,
+    deleteTag,
   } = useAppContext();
+
+  // useEffect
+  // on initial render, fetch the tags and retrieve the updated global state tags variable to be displayed to the user
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchTags();
+      setIsLoading(false);
+    };
+    loadData();
+  }, []);
 
   // add trade button handler (toggles modal)
   const addTradeHandler = (e) => {
@@ -72,9 +89,15 @@ function TradesComponent() {
     // create tag, update global tags array, then toggle tag modal
     const submitData = async () => {
       await createTag(tag);
+      setTag("");
     };
 
     submitData();
+  };
+
+  // delete tag button handler
+  const deleteTagHandler = (tagId) => {
+    deleteTag(tagId);
   };
 
   return (
@@ -100,7 +123,7 @@ function TradesComponent() {
         <div className="add-tag-container">
           {/* add tag button */}
           <button className="btn" onClick={addTagHandler}>
-            Add Tag
+            Manage Tags
           </button>
         </div>
       </div>
@@ -110,12 +133,35 @@ function TradesComponent() {
         <div className="add-tag-modal">
           <div className="tag-modal-content">
             {/* header */}
-            <h3>Add tag</h3>
+            <h3>Manage tags</h3>
 
             {/* alert */}
             {showAlert && <Alert />}
 
-            {/* modal form */}
+            {/* modal delete tag container */}
+            {/* only show this container if tags have been loaded */}
+            {!isLoading && (
+              <div className="delete-tag-container">
+                {/* display existing tags with remove button */}
+                {tags.map((tagItem) => {
+                  return (
+                    <span key={tagItem._id} className="delete-tag-item">
+                      <button
+                        className="close-button"
+                        onClick={() => {
+                          deleteTagHandler(tagItem._id);
+                        }}
+                      >
+                        <FaTimes />
+                      </button>
+                      {tagItem.text}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* modal add tag form */}
             <form className="add-tag-form" onSubmit={submitTagHandler}>
               {/* text box for user to type tag they want to add */}
               <input
@@ -123,6 +169,7 @@ function TradesComponent() {
                 type="text"
                 className="add-tag-text"
                 onChange={handleTag}
+                value={tag}
                 autoComplete="off"
               />
 
@@ -130,7 +177,7 @@ function TradesComponent() {
               <div className="btn-container">
                 {/* button to save tag */}
                 <button type="submit" className="btn">
-                  save
+                  add
                 </button>
                 {/* button to cancel tag creation */}
                 <button

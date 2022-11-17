@@ -56,12 +56,16 @@ import {
   CREATE_TAG_BEGIN,
   CREATE_TAG_SUCCESS,
   CREATE_TAG_ERROR,
+  DELETE_TAG_BEGIN,
+  DELETE_TAG_SUCCESS,
+  DELETE_TAG_ERROR,
   SET_SELECTED_TAGS,
   FETCH_CHARTDATA_BEGIN,
   FETCH_CHARTDATA_SUCCESS,
   FETCH_CHARTDATA_ERROR,
   CLEAR_ALERT,
 } from "./actions";
+import { Action } from "history";
 
 // initial global state (used for keeping track of existence of user)
 // on each re-render, get the user data and token from local storage
@@ -638,6 +642,30 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // delete tag
+  const deleteTag = async (tagId) => {
+    try {
+      // try and send a delete request to delete tag
+      dispatch({ type: DELETE_TAG_BEGIN });
+      await authFetch.delete(`tags/${tagId}`);
+
+      // send get request to get all of the tags after adding it
+      const { data: tagsData } = await authFetch.get("/tags");
+
+      // send get request to get all of the trades
+      const { data: tradesData } = await authFetch.get("/trades");
+
+      // update global tags property
+      dispatch({
+        type: DELETE_TAG_SUCCESS,
+        payload: { tags: tagsData.tags, trades: tradesData.trades },
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({ type: DELETE_TAG_ERROR });
+    }
+  };
+
   // set selected tag
   const setSelectedTags = async (selectedTags) => {
     dispatch({ type: SET_SELECTED_TAGS, payload: { selectedTags } });
@@ -714,6 +742,7 @@ function AppContextProvider({ children }) {
         createJournal,
         fetchTags,
         createTag,
+        deleteTag,
         setSelectedTags,
         getChartData,
       }}

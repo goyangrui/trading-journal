@@ -53,13 +53,64 @@ const Trades = styled.div`
     justify-content: center;
     margin: 2rem auto;
     padding: 1rem;
-    width: var(--fluid-width);
-    max-width: 15rem;
+    width: 50%;
+    min-width: 30rem;
+    max-width: 20rem;
     background-color: var(--gray-100);
+  }
+
+  .delete-tag-container {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    column-gap: 0.25rem;
+    row-gap: 0.25rem;
+  }
+
+  .delete-tag-item {
+    display: flex;
+    column-gap: 0.25rem;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    color: var(--gray-50);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.25rem;
+    border-radius: var(--borderRadius-1);
+    border: 2px solid var(--primary-600);
+    background-color: var(--primary-500);
+  }
+
+  .delete-tag-item .close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    width: 20px;
+    color: var(--primary-800);
+    padding: 0.1rem;
+    border-radius: 20px;
+    border: 2px solid var(--primary-700);
+    background-color: var(--primary-500);
+    transition: var(--transition);
+  }
+
+  .delete-tag-item .close-button:hover {
+    cursor: pointer;
+    border: 2px solid var(--primary-200);
+    color: var(--primary-200);
+  }
+
+  .add-tag-form {
+    width: 100%;
   }
 
   /* add tag text box */
   .add-tag-text {
+    width: 100%;
     margin-bottom: 1rem;
     border-radius: var(--borderRadius-2);
     border: 2px solid var(--gray-700);

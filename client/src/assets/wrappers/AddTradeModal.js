@@ -75,12 +75,14 @@ const AddTradeModal = styled.div`
   /* multi-select dropdown styles */
   .multi-select-dropdown {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    row-gap: 0.25rem;
     width: 100%;
     padding-top: 0.375rem;
     padding-bottom: 0.375rem;
     padding-left: 0.75rem;
-    height: 2.25rem;
+    min-height: 2.25rem;
     border: 1px solid var(--gray-200);
     border-radius: var(--borderRadius-2);
     user-select: none;
@@ -88,6 +90,8 @@ const AddTradeModal = styled.div`
 
   /* tag multi-select dropdown button container styles */
   .dropdown-button-container {
+    position: absolute;
+    right: 0.25rem;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -124,12 +128,14 @@ const AddTradeModal = styled.div`
     height: 100%;
     justify-content: center;
     align-items: center;
-    padding: 0.3rem;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.3rem;
     margin-right: 0.5rem;
     background-color: var(--primary-500);
     color: var(--gray-100);
     border-radius: var(--borderRadius-2);
-    border: 1px solid var(--primary-600);
+    border: 2px solid var(--primary-600);
     box-shadow: var(--shadow-1);
     white-space: nowrap;
   }
