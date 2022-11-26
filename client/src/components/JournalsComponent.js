@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { JournalsList, AddJournalModal } from ".";
+import { JournalsList, AddJournalModal, EditTradeModal } from ".";
 
 import { useAppContext } from "../context/appContext";
 
@@ -8,7 +8,8 @@ import Wrapper from "../assets/wrappers/JournalsComponent";
 
 function JournalsComponent() {
   // global state functions and variables
-  const { showMainModal, toggleMainModal } = useAppContext();
+  const { showMainModal, toggleMainModal, showEditTradeModal, editTrade } =
+    useAppContext();
 
   // handle click of add journal entry button
   const addJournalHandler = () => {
@@ -30,6 +31,9 @@ function JournalsComponent() {
 
       {/* journals list */}
       <JournalsList />
+
+      {/* If the showEditTradeModal flag is set to true, show the EditTradeModal component */}
+      {showEditTradeModal && <EditTradeModal editTrade={editTrade} />}
     </Wrapper>
   );
 }

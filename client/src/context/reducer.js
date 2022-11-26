@@ -26,6 +26,7 @@ import {
   SET_SUBSCRIPTION_ERROR,
   TOGGLE_MODAL_SUCCESS,
   TOGGLE_TAGMODAL_SUCCESS,
+  TOGGLE_EDIT_TRADEMODAL_SUCCESS,
   FETCH_TRADES_BEGIN,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
@@ -35,6 +36,9 @@ import {
   DELETE_TRADE_BEGIN,
   DELETE_TRADE_SUCCESS,
   DELETE_TRADE_ERROR,
+  FETCH_EXECUTIONS_BEGIN,
+  FETCH_EXECUTIONS_SUCCESS,
+  FETCH_EXECUTIONS_ERROR,
   SET_SELECTED_TRADES,
   FETCH_JOURNALS_BEGIN,
   FETCH_JOURNALS_SUCCESS,
@@ -320,6 +324,15 @@ const reducer = (state, action) => {
     };
   }
 
+  if (action.type === TOGGLE_EDIT_TRADEMODAL_SUCCESS) {
+    console.log("toggle edit trade modal success");
+    return {
+      ...state,
+      showEditTradeModal: !state.showEditTradeModal,
+      editTrade: action.payload.trade,
+    };
+  }
+
   // -- GET TRADES --
   if (action.type === FETCH_TRADES_BEGIN) {
     console.log("fetch trades begin");
@@ -388,6 +401,29 @@ const reducer = (state, action) => {
     return {
       ...state,
       selectedTrades: action.payload.selectedTrades,
+    };
+  }
+
+  // -- GET EXECUTIONS --
+  if (action.type === FETCH_EXECUTIONS_BEGIN) {
+    console.log("fetch executions begin");
+    return {
+      ...state,
+    };
+  }
+
+  if (action.type === FETCH_EXECUTIONS_SUCCESS) {
+    console.log("fetch executions success");
+    return {
+      ...state,
+      executions: action.payload.executions,
+    };
+  }
+
+  if (action.type === FETCH_EXECUTIONS_ERROR) {
+    console.log("fetch executions error");
+    return {
+      ...state,
     };
   }
 

@@ -12,6 +12,7 @@ import "express-async-errors";
 // import routers
 import authRouter from "./routes/authRoutes.js";
 import tradesRouter from "./routes/tradesRoutes.js";
+import executionRouter from "./routes/executionRoutes.js";
 import userInfoRouter from "./routes/userInfoRoutes.js";
 import journalRouter from "./routes/journalsRoutes.js";
 import stripeRouter from "./routes/stripeRoutes.js";
@@ -57,6 +58,9 @@ app.use("/api/v1/me", authMiddleware, userInfoRouter);
 
 // trades routes
 app.use("/api/v1/trades", authMiddleware, tradesRouter);
+
+// execution routes
+app.use("/api/v1/executions", authMiddleware, executionRouter);
 
 // journals routes
 app.use("/api/v1/journals", authMiddleware, journalRouter);

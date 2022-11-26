@@ -10,8 +10,13 @@ import Wrapper from "../assets/wrappers/TradesList";
 
 function TradesList() {
   // global state variables
-  const { getTrades, trades, setSelectedTrades, selectedTrades } =
-    useAppContext();
+  const {
+    getTrades,
+    trades,
+    setSelectedTrades,
+    selectedTrades,
+    toggleEditTradeModal,
+  } = useAppContext();
 
   // local state variables
   // local isLoading for trades list
@@ -113,6 +118,11 @@ function TradesList() {
     }
   };
 
+  // function for handling click of trade table row (to open edit trade modal)
+  const handleTradeRowClick = (trade) => {
+    toggleEditTradeModal(trade);
+  };
+
   // if getTrades is still loading
   if (isLoading) {
     return (
@@ -150,7 +160,13 @@ function TradesList() {
           <tbody>
             {trades.map((trade) => {
               return (
-                <tr className="table-body-row" key={trade._id}>
+                <tr
+                  className="table-body-row"
+                  key={trade._id}
+                  onClick={(e) => {
+                    handleTradeRowClick(trade);
+                  }}
+                >
                   <td onClick={(e) => handleCheckboxClick(trade._id)}>
                     {/* if the state of the selectedTrade at tradeId is true (i.e. selected) */}
                     {selectedTrades[trade._id] ? (

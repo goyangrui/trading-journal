@@ -110,6 +110,12 @@ const JournalEntry = styled.div`
     display: none;
   }
 
+  .table-container {
+    width: 100%;
+    overflow: scroll;
+    overflow-y: hidden; /* Hide vertical scrollbar */
+  }
+
   /* trades table styles */
   .trades-table {
     width: 100%;
@@ -156,9 +162,9 @@ const JournalEntry = styled.div`
   /* table body row data specific styles */
 
   /* make status, market, symbol, and side columns uppercase */
-  .trades-table td:nth-child(2),
+  .trades-table td:nth-child(1),
+  .trades-table td:nth-child(3),
   .trades-table td:nth-child(4),
-  .trades-table td:nth-child(5),
   .trades-table td:last-child {
     text-transform: uppercase;
   }

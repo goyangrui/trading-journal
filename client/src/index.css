@@ -308,3 +308,12 @@ ul {
   margin: 5rem auto;
   margin-top: calc(var(--nav-height-1) + 3rem);
 }
+
+/* gradient heading (since gradients are not supported with styled components */
+.gradient-heading {
+  font-weight: bold;
+  background-image: linear-gradient(to right, #ff471a, var(--primary-500));
+  background-size: 100%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

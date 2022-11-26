@@ -3,7 +3,7 @@ import { FaTimes } from "react-icons/fa";
 
 import Wrapper from "../assets/wrappers/TradesComponent";
 
-import { TradesList, AddTradeModal, Alert } from ".";
+import { TradesList, AddTradeModal, Alert, EditTradeModal } from ".";
 
 import { useAppContext } from "../context/appContext";
 
@@ -28,6 +28,8 @@ function TradesComponent() {
     fetchTags,
     tags,
     deleteTag,
+    showEditTradeModal,
+    editTrade,
   } = useAppContext();
 
   // useEffect
@@ -198,6 +200,9 @@ function TradesComponent() {
 
       {/* Add Trade Modal (show if toggleModal state is true) */}
       {showMainModal && <AddTradeModal />}
+
+      {/* If the showEditTradeModal flag is set to true, show the EditTradeModal component */}
+      {showEditTradeModal && <EditTradeModal editTrade={editTrade} />}
     </Wrapper>
   );
 }

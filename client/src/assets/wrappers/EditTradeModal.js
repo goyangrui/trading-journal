@@ -1,25 +1,67 @@
 import styled from "styled-components";
 
-const TradesList = styled.div`
-  /* general styles */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: scroll;
-  overflow-y: hidden; /* Hide vertical scrollbar */
-  margin-bottom: 2rem;
-  margin-right: 1rem;
-  margin-left: 1rem;
+const EditTradeModal = styled.div`
+  /* general modal styles */
 
-  /* table styles */
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+  overflow: auto;
+
+  /* modal content styles */
+  .modal-content {
+    margin: 2rem auto;
+    padding: 1rem;
+    width: var(--fluid-width);
+    background-color: var(--gray-100);
+  }
+
+  /* modal header */
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* modal header close button */
+  .modal-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    width: 35px;
+    border: none;
+    background-color: var(--gray-100);
+    color: var(--gray-900);
+    font-size: 1.5rem;
+    transition: var(--transition);
+  }
+
+  .modal-close-btn:hover {
+    cursor: pointer;
+    color: var(--gray-600);
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .table-container {
+    overflow: scroll;
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    margin-bottom: 1rem;
+  }
+
+  /* trades table styles */
   .trades-table {
     width: 100%;
     border-collapse: collapse;
     box-shadow: var(--shadow-4);
-  }
-
-  .trades-table tbody {
-    background-color: var(--gray-600);
   }
 
   /* table header styles */
@@ -35,9 +77,9 @@ const TradesList = styled.div`
     background-color: var(--gray-700);
   }
 
-  /* table header first column styles */
-  .trades-table th:first-child {
-    font-size: 1rem;
+  /* table body styles */
+  .trades-table tbody {
+    background-color: var(--gray-600);
   }
 
   /* table body row styles */
@@ -59,25 +101,14 @@ const TradesList = styled.div`
     padding: 0.75rem 0.5rem;
   }
 
-  /* table body first column styles */
-  .trades-table td:first-child {
-    font-size: 1rem;
-  }
-
   /* table body row data specific styles */
 
   /* make status, market, symbol, and side columns uppercase */
-  .trades-table td:nth-child(2),
+  .trades-table td:nth-child(1),
+  .trades-table td:nth-child(3),
   .trades-table td:nth-child(4),
-  .trades-table td:nth-child(5),
   .trades-table td:last-child {
     text-transform: uppercase;
-  }
-
-  /* center no trades header */
-  .no-trades {
-    text-align: center;
-    margin-top: 3rem;
   }
 
   /* table label styles */
@@ -139,4 +170,4 @@ const TradesList = styled.div`
   }
 `;
 
-export default TradesList;
+export default EditTradeModal;

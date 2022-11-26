@@ -9,7 +9,7 @@ import Wrapper from "../assets/wrappers/JournalEntry";
 
 function JournalEntry({ journalEntry, handleClickImage }) {
   // global state variables and functions
-  const { editJournal, trades } = useAppContext();
+  const { editJournal, trades, toggleEditTradeModal } = useAppContext();
 
   // local state for notes
   const [notes, setNotes] = useState(journalEntry.notes);
@@ -81,6 +81,11 @@ function JournalEntry({ journalEntry, handleClickImage }) {
     });
 
     setIsLoading(false);
+  };
+
+  // function for handling click of trade table row (to open edit trade modal)
+  const handleTradeRowClick = (trade) => {
+    toggleEditTradeModal(trade);
   };
 
   return (
@@ -163,106 +168,116 @@ function JournalEntry({ journalEntry, handleClickImage }) {
       </form>
 
       {/* table of relevant trades */}
-      <table className="trades-table">
-        {/* table header row with names of metrics and other information*/}
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Open Date</th>
-            <th>Market</th>
-            <th>Symbol</th>
-            <th>Entry</th>
-            <th>Exit</th>
-            <th>Position Size</th>
-            <th>$ Return</th>
-            <th>% Return</th>
-            <th>Net Return</th>
-            <th>Side</th>
-          </tr>
-        </thead>
-        {/* for each trade in trades global state variable array, display the trades and their relevant trade metrics information as a row in the table body */}
-        <tbody>
-          {trades.map((trade) => {
-            // filter trades array for trades that have the same execution date as theh journal date
-            // for each filtered trade in trades global state variable array, display the trades and their relevant trade metrics information as a row in the table body
-            if (
-              trade.openDate.slice(0, 10) === journalEntry.date.slice(0, 10)
-            ) {
-              return (
-                <tr className="table-body-row" key={trade._id}>
-                  <td>
-                    <span
-                      className={`label ${
-                        trade.status === "OPEN"
-                          ? "status-open"
-                          : trade.status === "WIN"
-                          ? "status-win"
-                          : "status-loss"
-                      }`}
-                    >
-                      {trade.status}
-                    </span>
-                  </td>
-                  <td>{moment(trade.openDate).utc().format("MMM DD, YYYY")}</td>
-                  <td>{trade.market}</td>
-                  <td>{trade.symbol}</td>
-                  <td>${Math.round(trade.averageEntry * 100) / 100}</td>
-                  <td>${Math.round(trade.averageExit * 100) / 100}</td>
-                  <td>{Math.round(trade.positionSize * 100) / 100}</td>
-                  <td>
-                    <span
-                      className={`${
-                        trade.dollarReturn > 0
-                          ? "return-win"
-                          : trade.dollarReturn === 0
-                          ? "return-even"
-                          : "return-loss"
-                      }`}
-                    >
-                      ${Math.round(trade.dollarReturn * 100) / 100}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`${
-                        trade.dollarReturn > 0
-                          ? "return-win"
-                          : trade.dollarReturn === 0
-                          ? "return-even"
-                          : "return-loss"
-                      }`}
-                    >
-                      {Math.round(trade.percentReturn * 100) / 100}%
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`${
-                        trade.dollarReturn > 0
-                          ? "return-win"
-                          : trade.dollarReturn === 0
-                          ? "return-even"
-                          : "return-loss"
-                      }`}
-                    >
-                      ${Math.round(trade.netReturn * 100) / 100}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`label ${
-                        trade.side === "LONG" ? "side-long" : "side-short"
-                      }`}
-                    >
-                      {trade.side}
-                    </span>
-                  </td>
-                </tr>
-              );
-            }
-          })}
-        </tbody>
-      </table>
+      <div className="table-container">
+        <table className="trades-table">
+          {/* table header row with names of metrics and other information*/}
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Open Date</th>
+              <th>Market</th>
+              <th>Symbol</th>
+              <th>Entry</th>
+              <th>Exit</th>
+              <th>Position Size</th>
+              <th>$ Return</th>
+              <th>% Return</th>
+              <th>Net Return</th>
+              <th>Side</th>
+            </tr>
+          </thead>
+          {/* for each trade in trades global state variable array, display the trades and their relevant trade metrics information as a row in the table body */}
+          <tbody>
+            {trades.map((trade) => {
+              // filter trades array for trades that have the same execution date as the journal date
+              // for each filtered trade in trades global state variable array, display the trades and their relevant trade metrics information as a row in the table body
+              if (
+                trade.openDate.slice(0, 10) === journalEntry.date.slice(0, 10)
+              ) {
+                return (
+                  <tr
+                    className="table-body-row"
+                    key={trade._id}
+                    onClick={(e) => {
+                      handleTradeRowClick(trade);
+                    }}
+                  >
+                    <td>
+                      <span
+                        className={`label ${
+                          trade.status === "OPEN"
+                            ? "status-open"
+                            : trade.status === "WIN"
+                            ? "status-win"
+                            : "status-loss"
+                        }`}
+                      >
+                        {trade.status}
+                      </span>
+                    </td>
+                    <td>
+                      {moment(trade.openDate).utc().format("MMM DD, YYYY")}
+                    </td>
+                    <td>{trade.market}</td>
+                    <td>{trade.symbol}</td>
+                    <td>${Math.round(trade.averageEntry * 100) / 100}</td>
+                    <td>${Math.round(trade.averageExit * 100) / 100}</td>
+                    <td>{Math.round(trade.positionSize * 100) / 100}</td>
+                    <td>
+                      <span
+                        className={`${
+                          trade.dollarReturn > 0
+                            ? "return-win"
+                            : trade.dollarReturn === 0
+                            ? "return-even"
+                            : "return-loss"
+                        }`}
+                      >
+                        ${Math.round(trade.dollarReturn * 100) / 100}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`${
+                          trade.dollarReturn > 0
+                            ? "return-win"
+                            : trade.dollarReturn === 0
+                            ? "return-even"
+                            : "return-loss"
+                        }`}
+                      >
+                        {Math.round(trade.percentReturn * 100) / 100}%
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`${
+                          trade.dollarReturn > 0
+                            ? "return-win"
+                            : trade.dollarReturn === 0
+                            ? "return-even"
+                            : "return-loss"
+                        }`}
+                      >
+                        ${Math.round(trade.netReturn * 100) / 100}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`label ${
+                          trade.side === "LONG" ? "side-long" : "side-short"
+                        }`}
+                      >
+                        {trade.side}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              }
+            })}
+          </tbody>
+        </table>
+      </div>
     </Wrapper>
   );
 }

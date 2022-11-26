@@ -18,6 +18,7 @@ import JournalsList from "./JournalsList";
 import JournalEntry from "./JournalEntry";
 import AddJournalModal from "./AddJournalModal";
 import DashboardComponent from "./DashboardComponent";
+import EditTradeModal from "./EditTradeModal";
 
 export {
   Navbar,
@@ -40,4 +41,5 @@ export {
   JournalEntry,
   AddJournalModal,
   DashboardComponent,
+  EditTradeModal,
 };

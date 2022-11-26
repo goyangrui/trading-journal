@@ -31,6 +31,7 @@ import {
   SET_SUBSCRIPTION_ERROR,
   TOGGLE_MODAL_SUCCESS,
   TOGGLE_TAGMODAL_SUCCESS,
+  TOGGLE_EDIT_TRADEMODAL_SUCCESS,
   FETCH_TRADES_BEGIN,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
@@ -41,6 +42,9 @@ import {
   DELETE_TRADE_SUCCESS,
   DELETE_TRADE_ERROR,
   SET_SELECTED_TRADES,
+  FETCH_EXECUTIONS_BEGIN,
+  FETCH_EXECUTIONS_SUCCESS,
+  FETCH_EXECUTIONS_ERROR,
   FETCH_JOURNALS_BEGIN,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
@@ -65,7 +69,6 @@ import {
   FETCH_CHARTDATA_ERROR,
   CLEAR_ALERT,
 } from "./actions";
-import { Action } from "history";
 
 // initial global state (used for keeping track of existence of user)
 // on each re-render, get the user data and token from local storage
@@ -76,11 +79,14 @@ const initialState = {
   showAlert: false,
   showMainModal: false,
   showTagModal: false,
+  showEditTradeModal: false,
+  editTrade: {},
   alertText: "",
   alertType: "",
   products: [],
   hasSubscription: false,
   trades: [],
+  executions: [],
   selectedTrades: {},
   journals: [],
   tags: [],
@@ -411,6 +417,10 @@ function AppContextProvider({ children }) {
     dispatch({ type: TOGGLE_TAGMODAL_SUCCESS });
   };
 
+  const toggleEditTradeModal = async (trade) => {
+    dispatch({ type: TOGGLE_EDIT_TRADEMODAL_SUCCESS, payload: { trade } });
+  };
+
   // -- TRADES FUNCTIONS --
 
   // get all trades
@@ -502,6 +512,25 @@ function AppContextProvider({ children }) {
     } catch (error) {
       console.log(error);
       dispatch({ type: DELETE_TRADE_ERROR });
+    }
+  };
+
+  // get executions
+  const getExecutions = async (tradeId) => {
+    try {
+      dispatch({ type: FETCH_EXECUTIONS_BEGIN });
+      // try and send request to get executions
+      const { data } = await authFetch.get("executions", {
+        params: { tradeId },
+      });
+
+      dispatch({
+        type: FETCH_EXECUTIONS_SUCCESS,
+        payload: { executions: data.executions },
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({ type: FETCH_EXECUTIONS_ERROR });
     }
   };
 
@@ -732,11 +761,13 @@ function AppContextProvider({ children }) {
         getSubscriptions,
         toggleMainModal,
         toggleTagModal,
+        toggleEditTradeModal,
         getTrades,
         createTrade,
         deleteTrade,
         clearAlert,
         setSelectedTrades,
+        getExecutions,
         getJournals,
         editJournal,
         createJournal,

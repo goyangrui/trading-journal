@@ -334,6 +334,10 @@ const getAllTrades = async (req, res) => {
 const updateTrade = async (req, res) => {
   res.send("update trade");
   // TO-DO
+
+  // if the user is editting an execution
+  // get the execution that the user updated from the executions
+  // change the values which the user changed
 };
 
 const deleteTrade = async (req, res) => {
