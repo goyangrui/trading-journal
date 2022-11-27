@@ -8,8 +8,7 @@ import mongoose from "mongoose";
  * 4. Price
  * 5. Commissions
  * 6. Fees
- * 7. Lot size (for Futures, how many contracts per lot/positionSize)
- * 8. Expiration date (for Options and Futures)
+ * 7. Expiration date (for Options and Futures)
  * 8. TradeId -> which trade is this execution for
  * 9. createdBy -> ID of user who created this execution
  */
@@ -40,14 +39,6 @@ const ExecutionSchema = new mongoose.Schema({
   fees: {
     type: Number,
     required: [true, "Please provide amount in fees"],
-  },
-  // conditional requirement -> if trade market is 'futures', require, otherwise don't require
-  lotSize: {
-    type: Number,
-  },
-  // conditional requirement -> if trade market is 'options' || 'futures', require, otherwise don't require
-  expDate: {
-    type: Date,
   },
   tradeId: {
     type: mongoose.Types.ObjectId,

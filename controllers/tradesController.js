@@ -14,7 +14,8 @@ const createTrade = async (req, res) => {
   // -- PARSE REQUEST BODY (make sure all necessary values are provided) --
 
   // destructure request body
-  const { market, symbol, executions } = req.body.tradeInfo;
+  const { market, symbol, executions, option, strikePrice, lotSize, expDate } =
+    req.body.tradeInfo;
   const { selectedTagsId } = req.body;
 
   // if the user did not provide a market, symbol, or execution
@@ -28,21 +29,50 @@ const createTrade = async (req, res) => {
     throw new BadRequestError("Please provide at least 1 execution");
   }
 
+  // if the user provided OPTIONS as the market, make sure they provided the strike price and option type
+  if (market.toLowerCase() === "options" && !option) {
+    throw new BadRequestError("Please provide option contract type");
+  }
+
+  if (market.toLowerCase() === "options" && !strikePrice) {
+    throw new BadRequestError("Please provide option strike price");
+  }
+
+  if (market.toLowerCase() === "options" && strikePrice <= 0) {
+    throw new BadRequestError("Please provide a valid option strike price");
+  }
+
+  // if the user provided FUTURES as the market, make sure they provided the lot size multiplier
+  if (market.toLowerCase() === "futures" && !lotSize) {
+    throw new BadRequestError(
+      "Please provide lot size multiplier for futures contract"
+    );
+  }
+
+  if (market.toLowerCase() === "futures" && lotSize <= 0) {
+    throw new BadRequestError(
+      "Please provide a valid lot size multiplier for futures contract"
+    );
+  }
+
+  // if the user provided OPTIONS OR FUTURES as the market, make sure they provided the expiration date
+  if (
+    (market.toLowerCase() === "futures" ||
+      market.toLowerCase() === "options") &&
+    !expDate
+  ) {
+    throw new BadRequestError(
+      "Please provide an expiration date for the contract"
+    );
+  }
+
   // check each execution object in executions array
   executions.forEach((execution) => {
     // destructure execution object
-    const {
-      action,
-      execDate,
-      positionSize,
-      price,
-      commissions,
-      fees,
-      lotSize,
-      expDate,
-    } = execution;
+    const { action, execDate, positionSize, price, commissions, fees } =
+      execution;
 
-    // for any market
+    // if the user doesn't provide any of the following information for each execution, throw a bad request error
     if (
       !action ||
       !execDate ||
@@ -53,26 +83,36 @@ const createTrade = async (req, res) => {
     ) {
       throw new BadRequestError("Missing required fields for execution(s)");
     }
-
-    // for options and futures markets
-    if (
-      market.toLowerCase() === "options" ||
-      market.toLowerCase() === "futures"
-    ) {
-      // if the user did not provide expiration date
-      if (!expDate) {
-        throw new BadRequestError("Expiration date required");
-      }
-
-      // for just futures market, if the user did not provide lotsize
-      if (market.toLowerCase() === "futures" && !lotSize) {
-        throw new BadRequestError("Lot size required");
-      }
-    }
   });
 
   // -- CREATE INITIAL TRADE DOCUMENT --
-  const trade = await Trade.create({ market, symbol, createdBy: userId });
+  let trade = undefined;
+  // if the user entered OPTIONS for their market
+  if (market.toLowerCase() === "options") {
+    // create trade with the addition of option type, strike price, and expiration date
+    trade = await Trade.create({
+      market,
+      symbol,
+      createdBy: userId,
+      option,
+      strikePrice,
+      expDate,
+    });
+  }
+  // otherwise if the user entered FUTURES for their market
+  else if (market.toLowerCase() === "futures") {
+    // create trade with the addition with lot size multiplier, and expiration date
+    trade = await Trade.create({
+      market,
+      symbol,
+      createdBy: userId,
+      lotSize,
+      expDate,
+    });
+  } else {
+    // otherwise (if the market is STOCKS), create trade with only market, symbol, and createdBy property
+    trade = await Trade.create({ market, symbol, createdBy: userId });
+  }
 
   // get the trade id
   const tradeId = trade._id;
@@ -201,7 +241,7 @@ const createTrade = async (req, res) => {
   // if the market is futures
   // multiply the dollar return by lot size
   if (market.toLowerCase() === "futures") {
-    dollarReturn *= executionDocs[0].lotSize;
+    dollarReturn *= lotSize;
   }
 
   console.log("dollarReturn:", dollarReturn);
@@ -248,7 +288,7 @@ const createTrade = async (req, res) => {
     // if the market is futures
     if (market.toLowerCase() === "futures") {
       // divide percent return by lotSize to neglect the lotSize multiplier factor of the dollar return calculation
-      percentReturn /= executionDocs[0].lotSize;
+      percentReturn /= lotSize;
     }
 
     percentReturn = parseFloat(percentReturn.toFixed(2)); // round to 2 decimal places

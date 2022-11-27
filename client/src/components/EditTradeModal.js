@@ -159,9 +159,11 @@ function EditTradeModal({ editTrade: trade }) {
                 <thead>
                   <tr>
                     <th>Action</th>
-                    <th>Type</th>
-                    <th>Expire</th>
+                    <th>Market</th>
+                    <th>Option Type</th>
                     <th>Strike</th>
+                    <th>Expire</th>
+                    <th>Lot Size Multiplier</th>
                     <th>Execution Date</th>
                     <th>Position Size</th>
                     <th>Price</th>
@@ -176,12 +178,26 @@ function EditTradeModal({ editTrade: trade }) {
                       <tr className="table-body-row" key={execution._id}>
                         <td>{execution.action}</td>
                         <td>{trade.market}</td>
+                        <td>{trade.option}</td>
                         <td>
-                          {moment(execution.expDate)
-                            .utc()
-                            .format("MMM DD, YYYY")}
+                          {/* only if strike price exists, display it */}
+                          {trade.strikePrice && (
+                            <span>{`$${
+                              Math.round(trade.strikePrice * 100) / 100
+                            }`}</span>
+                          )}
                         </td>
-                        <td>strike</td>
+                        <td>
+                          {/* only if the expiration date exists, display it */}
+                          {trade.expDate &&
+                            moment(execution.expDate)
+                              .utc()
+                              .format("MMM DD, YYYY")}
+                        </td>
+                        <td>
+                          {/* only if the lot size multiplier exists, display it */}
+                          {trade.lotSize && trade.lotSize}
+                        </td>
                         <td>
                           {moment(execution.execDate)
                             .utc()

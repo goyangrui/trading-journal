@@ -3,18 +3,22 @@ import mongoose from "mongoose";
 /*
  * Trade properties
  * 1. Market -> STOCK, FUTURES, OPTIONS
- * 2. Symbol
- * 3. Side -> LONG, SHORT
- * 3. Status -> OPEN, LOSS, WIN, BREAKEVEN
- * 4. Open date
- * 5. Average Entry Price -> based on FIRST execution (buy or sell). Then find average of all buys or sells
- * 6. Average Exit Price -> based on opposite of first execution. Then find average of all buys or sells
- * 7. Position size -> sum of all position sizes based on FIRST execution (buy or sell)
- * 8. Return $ -> difference between sells and buys times position size
- * 9. Return % -> difference between sells and buys times position size divided by buys times position size
- * 10. Net return $ -> return with fees and commissions deducted
- * 11. createdBy -> ID of user who created this trade
- * 12. tags -> array of tags that are assigned to this trade
+ * 2. Option Type -> CALL, PUT
+ * 3. Strike Price
+ * 4. Lot Size
+ * 5. Expiration Date
+ * 6. Symbol
+ * 7. Side -> LONG, SHORT
+ * 8. Status -> OPEN, LOSS, WIN, BREAKEVEN
+ * 9. Open date
+ * 10. Average Entry Price -> based on FIRST execution (buy or sell). Then find average of all buys or sells
+ * 11. Average Exit Price -> based on opposite of first execution. Then find average of all buys or sells
+ * 12. Position size -> sum of all position sizes based on FIRST execution (buy or sell)
+ * 13. Return $ -> difference between sells and buys times position size
+ * 14. Return % -> difference between sells and buys times position size divided by buys times position size
+ * 15. Net return $ -> return with fees and commissions deducted
+ * 16. createdBy -> ID of user who created this trade
+ * 17. tags -> array of tags that are assigned to this trade
  *
  * -- ADD THESE LATER AFTER BASIC CALCULATION FUNCTIONALITIES HAVE BEEN IMPLEMENTED --
  * 11. Strategy
@@ -29,6 +33,23 @@ const TradeSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a market for this trade"],
     enum: ["STOCK", "FUTURES", "OPTIONS"],
+  },
+  // conditional requirement -> if trade market is 'options', require, otherwise don't require
+  option: {
+    type: String,
+    enum: ["CALL", "PUT"],
+  },
+  // conditional requirement -> if trade market is 'options', require, otherwise don't require
+  strikePrice: {
+    type: Number,
+  },
+  // conditional requirement -> if trade market is 'futures', require, otherwise don't require
+  lotSize: {
+    type: Number,
+  },
+  // conditional requirement -> if trade market is 'options' || 'futures', require, otherwise don't require
+  expDate: {
+    type: Date,
   },
   symbol: {
     type: String,

@@ -14,6 +14,10 @@ import { useAppContext } from "../context/appContext";
 // initially, the executions array will have 1 execution by default
 const initialState = {
   market: "STOCK",
+  option: "CALL",
+  strikePrice: 0,
+  lotSize: 0,
+  expDate: new Date().toISOString().slice(0, 10),
   symbol: "",
   executions: [
     {
@@ -23,8 +27,6 @@ const initialState = {
       price: 0,
       commissions: 0,
       fees: 0,
-      lotSize: 0,
-      expDate: new Date().toISOString().slice(0, 10),
     },
   ],
 };
@@ -59,8 +61,6 @@ function AddTradeModal() {
           price: 0,
           commissions: 0,
           fees: 0,
-          lotSize: 0,
-          expDate: new Date().toISOString().slice(0, 10),
         },
       ],
     });
@@ -210,6 +210,7 @@ function AddTradeModal() {
               handleChange={handleChange}
               value={state.market}
             />
+
             {/* Ticker symbol */}
             <FormRow
               name="symbol"
@@ -217,6 +218,61 @@ function AddTradeModal() {
               handleChange={handleChange}
               value={state.symbol}
             />
+
+            {/* Option Contract Type */}
+            {/* only show option contract type select input if the market type is options */}
+            {state.market.toLowerCase() === "options" && (
+              <FormRow
+                name="option"
+                labelText="option type"
+                type="select"
+                options={["CALL", "PUT"]}
+                handleChange={handleChange}
+                value={state.option}
+              />
+            )}
+
+            {/* Option Strike Price */}
+            {/* only show option contract strike price input if the market type is options */}
+            {state.market.toLowerCase() === "options" && (
+              <FormRow
+                name="strikePrice"
+                labelText="strike price"
+                type="number"
+                min="0.001"
+                step="0.001"
+                handleChange={handleChange}
+                handleScroll={handleScroll}
+                value={state.strikePrice}
+              />
+            )}
+
+            {/* If the market is futures, have a form row input for lot size as well */}
+            {state.market.toLowerCase() === "futures" && (
+              <FormRow
+                name="lotSize"
+                labelText="lot size multiplier"
+                type="number"
+                min="0.001"
+                step="0.001"
+                handleChange={handleChange}
+                handleScroll={handleScroll}
+                value={state.lotSize}
+              />
+            )}
+
+            {/* If the market is futures or options, have a form row input for expiration date as well */}
+            {(state.market.toLowerCase() === "futures" ||
+              state.market.toLowerCase() === "options") && (
+              <FormRow
+                name="expDate"
+                labelText="expiration date"
+                type="date"
+                handleChange={handleChange}
+                value={state.expDate}
+              />
+            )}
+
             {/* Tags */}
             {/* multi-select dropdown component */}
             <div className="multi-select-dropdown-container">
@@ -313,18 +369,6 @@ function AddTradeModal() {
                   value={state.executions[index]["execDate"]}
                 />
 
-                {/* If the market is futures or options, have a form row input for expiration date as well */}
-                {(state.market === "FUTURES" || state.market === "OPTIONS") && (
-                  <FormRow
-                    name="expDate"
-                    id={`expDate-${index}`}
-                    labelText="expiration date"
-                    type="date"
-                    handleChange={handleExecutionChange}
-                    value={state.executions[index]["expDate"]}
-                  />
-                )}
-
                 {/* Shares/contracts */}
                 <FormRow
                   name="positionSize"
@@ -337,21 +381,6 @@ function AddTradeModal() {
                   handleScroll={handleScroll}
                   value={state.executions[index]["positionSize"]}
                 />
-
-                {/* If the market is futures, have a form row input for lot size as well */}
-                {state.market === "FUTURES" && (
-                  <FormRow
-                    name="lotSize"
-                    id={`lotSize-${index}`}
-                    labelText="lot size multiplier"
-                    type="number"
-                    min="0.001"
-                    step="0.001"
-                    handleChange={handleExecutionChange}
-                    handleScroll={handleScroll}
-                    value={state.executions[index]["lotSize"]}
-                  />
-                )}
 
                 {/* Price */}
                 <FormRow
