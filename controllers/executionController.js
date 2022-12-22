@@ -17,6 +17,19 @@ const getExecutions = async (req, res) => {
   res.status(StatusCodes.OK).json({ executions });
 };
 
+const getExecution = async (req, res) => {
+  const { userId } = req.user;
+
+  const { executionId } = req.body;
+
+  const execution = await Execution.findOne({
+    createdBy: userId,
+    _id: executionId,
+  });
+
+  res.status(StatusCodes.OK).json(execution);
+};
+
 const createExecution = async (req, res) => {
   res.send("create execution");
 };
@@ -29,4 +42,10 @@ const deleteExecution = async (req, res) => {
   res.send("delete execution");
 };
 
-export { getExecutions, createExecution, editExecution, deleteExecution };
+export {
+  getExecutions,
+  getExecution,
+  createExecution,
+  editExecution,
+  deleteExecution,
+};

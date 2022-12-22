@@ -38,6 +38,9 @@ import {
   CREATE_TRADE_BEGIN,
   CREATE_TRADE_SUCCESS,
   CREATE_TRADE_ERROR,
+  UPDATE_TRADE_BEGIN,
+  UPDATE_TRADE_ERROR,
+  UPDATE_TRADE_SUCCESS,
   DELETE_TRADE_BEGIN,
   DELETE_TRADE_SUCCESS,
   DELETE_TRADE_ERROR,
@@ -487,6 +490,39 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // update trade
+  const updateTrade = async ({ value, executionInfo }) => {
+    try {
+      dispatch({ type: UPDATE_TRADE_BEGIN });
+
+      // get the executionId from executionInfo
+      const executionId = executionInfo.split("-")[1];
+
+      // get execution property name that was changed
+      const executionProp = executionInfo.split("-")[2];
+
+      // try and send a request to update the trade
+      const { data } = await authFetch.patch(`/trades/${executionId}`, {
+        value,
+        executionProp,
+      });
+      // get the updated executions, and updated trade from this patch request
+      const { executionDocs: executions, tradeUpdateMetrics: editTrade } = data;
+
+      // fetch all of the trades
+      const { data: tradesData } = await authFetch.get("/trades");
+      const { trades } = tradesData;
+
+      dispatch({
+        type: UPDATE_TRADE_SUCCESS,
+        payload: { trades, editTrade, executions },
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({ type: UPDATE_TRADE_ERROR });
+    }
+  };
+
   // set selectedTrades global state from tradelist table
   const setSelectedTrades = (selectedTrades) => {
     dispatch({ type: SET_SELECTED_TRADES, payload: { selectedTrades } });
@@ -764,6 +800,7 @@ function AppContextProvider({ children }) {
         toggleEditTradeModal,
         getTrades,
         createTrade,
+        updateTrade,
         deleteTrade,
         clearAlert,
         setSelectedTrades,

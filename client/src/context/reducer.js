@@ -33,6 +33,9 @@ import {
   CREATE_TRADE_BEGIN,
   CREATE_TRADE_ERROR,
   CREATE_TRADE_SUCCESS,
+  UPDATE_TRADE_BEGIN,
+  UPDATE_TRADE_ERROR,
+  UPDATE_TRADE_SUCCESS,
   DELETE_TRADE_BEGIN,
   DELETE_TRADE_SUCCESS,
   DELETE_TRADE_ERROR,
@@ -377,6 +380,27 @@ const reducer = (state, action) => {
       alertType: action.payload.type,
       alertText: action.payload.text,
     };
+  }
+
+  // -- UPDATE TRADE --
+  if (action.type === UPDATE_TRADE_BEGIN) {
+    console.log("update trade begin");
+    return { ...state };
+  }
+
+  if (action.type === UPDATE_TRADE_SUCCESS) {
+    console.log("update trade success");
+    return {
+      ...state,
+      trades: action.payload.trades,
+      editTrade: action.payload.editTrade,
+      executions: action.payload.executions,
+    };
+  }
+
+  if (action.type === UPDATE_TRADE_ERROR) {
+    console.log("update trade error");
+    return { ...state };
   }
 
   // -- DELETE TRADE --

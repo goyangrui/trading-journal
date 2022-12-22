@@ -202,7 +202,7 @@ function TradesComponent() {
       {showMainModal && <AddTradeModal />}
 
       {/* If the showEditTradeModal flag is set to true, show the EditTradeModal component */}
-      {showEditTradeModal && <EditTradeModal editTrade={editTrade} />}
+      {showEditTradeModal && <EditTradeModal />}
     </Wrapper>
   );
 }

@@ -8,12 +8,65 @@ import Wrapper from "../assets/wrappers/EditTradeModal";
 
 import { useAppContext } from "../context/appContext";
 
-function EditTradeModal({ editTrade: trade }) {
+function EditTradeModal() {
   // local state variables
   const [isLoading, setIsLoading] = useState(true);
 
+  // local state for keeping track of the state of the current cell being editted
+  const [cellState, setCellState] = useState({
+    value: "",
+    executionInfo: "",
+  });
+
+  // local state for keeping track of the cell that has been activated
+  const [activatedCell, setActivatedCell] = useState("");
+
   // global state variables and functions
-  const { toggleEditTradeModal, getExecutions, executions } = useAppContext();
+  const {
+    toggleEditTradeModal,
+    getExecutions,
+    executions,
+    updateTrade,
+    editTrade: trade,
+  } = useAppContext();
+
+  // handle edittable cell click
+  const handleCellClick = (e) => {
+    // only if the event target and event currentTarget are the same (prevent child element from triggering event)
+    if (e.target === e.currentTarget) {
+      // set the activatedCell to the id of the cell that was clicked
+      setActivatedCell(e.target.id);
+    }
+  };
+
+  // handle blur of edittable cell
+  const handleCellBlur = () => {
+    // send request to back end with edited cell information, and associated execution information
+    // if both the value and executionInfo state variables are not empty strings
+
+    const processData = async () => {
+      if (cellState.value && cellState.executionInfo) {
+        // send a request to edit the execution and trade
+        await updateTrade(cellState);
+      }
+
+      // clear cell state activation flag and cell state values
+      setActivatedCell("");
+      setCellState({ ...cellState, value: "", executionInfo: "" });
+    };
+
+    processData();
+  };
+
+  // handle change of state of form inputs in executions
+  const handleChange = (e) => {
+    console.log("input state changed");
+    setCellState({
+      ...cellState,
+      value: e.target.value,
+      executionInfo: activatedCell,
+    });
+  };
 
   // handle modal close button
   const closeButtonHandler = () => {
@@ -159,8 +212,7 @@ function EditTradeModal({ editTrade: trade }) {
                 <thead>
                   <tr>
                     <th>Action</th>
-                    <th>Market</th>
-                    <th>Option Type</th>
+                    <th>Type</th>
                     <th>Strike</th>
                     <th>Expire</th>
                     <th>Lot Size Multiplier</th>
@@ -176,9 +228,31 @@ function EditTradeModal({ editTrade: trade }) {
                   {executions.map((execution) => {
                     return (
                       <tr className="table-body-row" key={execution._id}>
-                        <td>{execution.action}</td>
-                        <td>{trade.market}</td>
-                        <td>{trade.option}</td>
+                        {/* when this cell is clicked, set local cell-activation state variable */}
+                        <td
+                          id={`execution-${execution._id}-action`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* if this cell is activated, display the form, otherwise display the original cell value */}
+                          {activatedCell ===
+                          `execution-${execution._id}-action` ? (
+                            <form>
+                              <select autoFocus onChange={handleChange}>
+                                <option value=""></option>
+                                <option value="BUY">BUY</option>
+                                <option value="SELL">SELL</option>
+                              </select>
+                            </form>
+                          ) : (
+                            <>{execution.action}</>
+                          )}
+                        </td>
+                        <td>
+                          {trade.market.toLowerCase() === "options"
+                            ? trade.option
+                            : trade.market}
+                        </td>
                         <td>
                           {/* only if strike price exists, display it */}
                           {trade.strikePrice && (
