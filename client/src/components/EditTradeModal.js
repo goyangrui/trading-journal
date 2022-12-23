@@ -40,10 +40,12 @@ function EditTradeModal() {
   };
 
   // handle blur of edittable cell
-  const handleCellBlur = () => {
+  const handleCellBlur = (e) => {
+    // if the user submits form by pressing enter, prevent default form submission
+    e.preventDefault();
+
     // send request to back end with edited cell information, and associated execution information
     // if both the value and executionInfo state variables are not empty strings
-
     const processData = async () => {
       if (cellState.value && cellState.executionInfo) {
         // send a request to edit the execution and trade
@@ -228,6 +230,7 @@ function EditTradeModal() {
                   {executions.map((execution) => {
                     return (
                       <tr className="table-body-row" key={execution._id}>
+                        {/* ACTION CELL */}
                         {/* when this cell is clicked, set local cell-activation state variable */}
                         <td
                           id={`execution-${execution._id}-action`}
@@ -237,7 +240,7 @@ function EditTradeModal() {
                           {/* if this cell is activated, display the form, otherwise display the original cell value */}
                           {activatedCell ===
                           `execution-${execution._id}-action` ? (
-                            <form>
+                            <form onSubmit={handleCellBlur}>
                               <select autoFocus onChange={handleChange}>
                                 <option value=""></option>
                                 <option value="BUY">BUY</option>
@@ -248,41 +251,218 @@ function EditTradeModal() {
                             <>{execution.action}</>
                           )}
                         </td>
-                        <td>
-                          {trade.market.toLowerCase() === "options"
-                            ? trade.option
-                            : trade.market}
+                        {/* ASSET TYPE CELL */}
+                        <td
+                          id={`execution-${execution._id}-option`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* if this cell is activated, display the form, otherwise display the original cell value */}
+                          {activatedCell ===
+                          `execution-${execution._id}-option` ? (
+                            <form onSubmit={handleCellBlur}>
+                              <select autoFocus onChange={handleChange}>
+                                <option value=""></option>
+                                <option value="STOCK">STOCK</option>
+                                <option value="CALL">CALL</option>
+                                <option value="PUT">PUT</option>
+                                <option value="FUTURES">FUTURES</option>
+                              </select>
+                            </form>
+                          ) : trade.market.toLowerCase() === "options" ? (
+                            trade.option
+                          ) : (
+                            trade.market
+                          )}
+                          {}
                         </td>
-                        <td>
-                          {/* only if strike price exists, display it */}
-                          {trade.strikePrice && (
-                            <span>{`$${
-                              Math.round(trade.strikePrice * 100) / 100
-                            }`}</span>
+                        {/* STRIKE PRICE CELL */}
+                        <td
+                          id={`execution-${execution._id}-strike`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* only if the market is options, and this cell is activated */}
+                          {activatedCell ===
+                            `execution-${execution._id}-strike` &&
+                          trade.market.toLowerCase() === "options" ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="number"
+                                min="0.001"
+                                step="0.001"
+                                autoFocus
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            // otherwise, display the strike price only if it exists
+                            trade.strikePrice && (
+                              <>${Math.round(trade.strikePrice * 100) / 100}</>
+                            )
                           )}
                         </td>
-                        <td>
-                          {/* only if the expiration date exists, display it */}
-                          {trade.expDate &&
-                            moment(execution.expDate)
+                        {/* EXPIRATION DATE CELL */}
+                        <td
+                          id={`execution-${execution._id}-expire`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* only if the market is options or futures, and the cell is activated */}
+                          {activatedCell ===
+                            `execution-${execution._id}-expire` &&
+                          (trade.market.toLowerCase() === "options" ||
+                            trade.market.toLowerCase() === "futures") ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="date"
+                                autoFocus
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            // otherwise, only if the expiration date exists, display it
+                            trade.expDate &&
+                            moment(trade.expDate).utc().format("MMM DD, YYYY")
+                          )}
+                        </td>
+                        {/* LOT SIZE CELL */}
+                        <td
+                          id={`execution-${execution._id}-lot`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* only if the market is futures, and the cell is activated */}
+                          {activatedCell === `execution-${execution._id}-lot` &&
+                          trade.market.toLowerCase() === "futures" ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="number"
+                                autoFocus
+                                min="0.001"
+                                step="0.001"
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            // otherwise, only if the lot size multiplier exists, display it
+                            trade.lotSize && trade.lotSize
+                          )}
+                        </td>
+                        {/* EXECUTION DATE CELL */}
+                        <td
+                          id={`execution-${execution._id}-exec`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* only if the cell is activated */}
+                          {activatedCell ===
+                          `execution-${execution._id}-exec` ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="date"
+                                autoFocus
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            // otherwise, display the execution date
+                            moment(execution.execDate)
                               .utc()
-                              .format("MMM DD, YYYY")}
+                              .format("MMM DD, YYYY")
+                          )}
                         </td>
-                        <td>
-                          {/* only if the lot size multiplier exists, display it */}
-                          {trade.lotSize && trade.lotSize}
+                        {/* POSITION SIZE CELL */}
+                        <td
+                          id={`execution-${execution._id}-position`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* if the cell is activated */}
+                          {activatedCell ===
+                          `execution-${execution._id}-position` ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="number"
+                                autoFocus
+                                min="0.001"
+                                step="0.001"
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            // otherwise, just show the position size
+                            execution.positionSize
+                          )}
                         </td>
-                        <td>
-                          {moment(execution.execDate)
-                            .utc()
-                            .format("MMM DD, YYYY")}
+                        {/* PRICE CELL */}
+                        <td
+                          id={`execution-${execution._id}-price`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* if the cell is activated */}
+                          {activatedCell ===
+                          `execution-${execution._id}-price` ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="number"
+                                autoFocus
+                                min="0.001"
+                                step="0.001"
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <>${Math.round(execution.price * 100) / 100}</>
+                          )}
                         </td>
-                        <td>{execution.positionSize}</td>
-                        <td>${Math.round(execution.price * 100) / 100}</td>
-                        <td>
-                          ${Math.round(execution.commissions * 100) / 100}
+                        {/* COMMISSIONS CELL */}
+                        <td
+                          id={`execution-${execution._id}-commissions`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* if the cell is activated */}
+                          {activatedCell ===
+                          `execution-${execution._id}-commissions` ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="number"
+                                autoFocus
+                                min="0"
+                                step="0.001"
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <>
+                              ${Math.round(execution.commissions * 100) / 100}
+                            </>
+                          )}
                         </td>
-                        <td>${Math.round(execution.fees * 100) / 100}</td>
+                        {/* FEES CELL */}
+                        <td
+                          id={`execution-${execution._id}-fees`}
+                          onClick={handleCellClick}
+                          onBlur={handleCellBlur}
+                        >
+                          {/* if the cell is activated */}
+                          {activatedCell ===
+                          `execution-${execution._id}-fees` ? (
+                            <form onSubmit={handleCellBlur}>
+                              <input
+                                type="number"
+                                autoFocus
+                                min="0"
+                                step="0.001"
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <>${Math.round(execution.fees * 100) / 100}</>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}

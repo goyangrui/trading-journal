@@ -84,7 +84,7 @@ function TradesList() {
   }, [selectedTrades]);
 
   // function for handling the checkbox which has been clicked
-  const handleCheckboxClick = (tradeId) => {
+  const handleCheckboxClick = (e, tradeId) => {
     // if the checkbox that was clicked was the 'check-all-box' checkbox
     if (tradeId === "check-all-box") {
       // the new state is whatever the opposite of the current allChecked state is (i.e. if the checkbox is currently checked, set to to unchecked, and vice versa)
@@ -119,8 +119,16 @@ function TradesList() {
   };
 
   // function for handling click of trade table row (to open edit trade modal)
-  const handleTradeRowClick = (trade) => {
-    toggleEditTradeModal(trade);
+  const handleTradeRowClick = (e, trade) => {
+    console.log(e.target.tagName);
+    // only toggle edit trade modal if the event target className is not 'check-box', and if it is not an SVG
+    if (
+      e.target.tagName !== "svg" &&
+      e.target.tagName !== "path" &&
+      e.target.className !== "check-box"
+    ) {
+      toggleEditTradeModal(trade);
+    }
   };
 
   // if getTrades is still loading
@@ -138,7 +146,7 @@ function TradesList() {
           {/* table header row with names of metrics and other information*/}
           <thead>
             <tr>
-              <th onClick={(e) => handleCheckboxClick("check-all-box")}>
+              <th onClick={(e) => handleCheckboxClick(e, "check-all-box")}>
                 {/* if the check all checkboxes checkbox is checked, display the checked checkbox svg */}
                 {allChecked ? <ImCheckboxChecked /> : <ImCheckboxUnchecked />}
               </th>
@@ -164,17 +172,20 @@ function TradesList() {
                   className="table-body-row"
                   key={trade._id}
                   onClick={(e) => {
-                    handleTradeRowClick(trade);
+                    handleTradeRowClick(e, trade);
                   }}
                 >
-                  <td onClick={(e) => handleCheckboxClick(trade._id)}>
+                  <td
+                    className="check-box"
+                    onClick={(e) => handleCheckboxClick(e, trade._id)}
+                  >
                     {/* if the state of the selectedTrade at tradeId is true (i.e. selected) */}
                     {selectedTrades[trade._id] ? (
                       // display the checked checkbox svg
-                      <ImCheckboxChecked />
+                      <ImCheckboxChecked className="check-box" />
                     ) : (
                       // otherwise display the unchecked checkbox svg
-                      <ImCheckboxUnchecked />
+                      <ImCheckboxUnchecked className="check-box" />
                     )}
                   </td>
                   <td>

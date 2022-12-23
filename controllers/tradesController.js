@@ -381,21 +381,222 @@ const updateTrade = async (req, res) => {
   // get execution property and value of that property (to be changed)
   const { value, executionProp } = req.body;
 
-  // edit execution document using execution info from user
-  const query = { _id: executionId, createdBy: userId };
-  const execution = await Execution.findOneAndUpdate(
-    query,
-    {
-      [executionProp]: value,
-    },
-    { returnDocument: "after" }
-  );
+  var trade = undefined;
+  var tradeId = undefined;
+  var execution = undefined;
 
-  // get the trade id associated with this execution
-  const tradeId = execution.tradeId;
+  // -- IF THE EXECUTIONPROP IS OPTION --
+  if (executionProp === "option") {
+    // get the trade id associated with this execution
+    execution = await Execution.findOne({
+      _id: executionId,
+      createdBy: userId,
+    });
+    tradeId = execution.tradeId;
 
-  // get the trade associated with this tradeId
-  const trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+    // if the value passed in is "CALL" or "PUT"
+    if (value === "CALL" || value === "PUT") {
+      // set the market to OPTIONS, and set the option to the value, set strike price to 100 by default, the lot size to undefined,
+      // and expiration date to current time by default for the trade
+      trade = await Trade.findOneAndUpdate(
+        { _id: tradeId, createdBy: userId },
+        {
+          market: "OPTIONS",
+          option: value,
+          strikePrice: 100,
+          expDate: new Date(new Date().setUTCHours(-24, 0, 0, 0)),
+        },
+        { returnDocument: "after" }
+      );
+      trade.lotSize = undefined;
+      await trade.save();
+    } else if (value === "FUTURES") {
+      // otherwise if the value passed in is "FUTURES"
+      // set the market to futures, the option to undefined, the strike price to undefined, the lotSize multiplier to 1 by default, and the expiration date to today by default
+      trade = await Trade.findOneAndUpdate(
+        { _id: tradeId, createdBy: userId },
+        {
+          market: value,
+          lotSize: 1,
+          expDate: new Date(new Date().setUTCHours(-24, 0, 0, 0)),
+        },
+        { returnDocument: "after" }
+      );
+      trade.option = undefined;
+      trade.strikePrice = undefined;
+      await trade.save();
+    } else {
+      // otherwise if the value passed in is "STOCK"
+      // set the market to stock, the option to undefined, the strike price to undefined, the lotsize to undefined, the expiration date to undefined for the current trade
+      trade = await Trade.findOneAndUpdate(
+        { _id: tradeId, createdBy: userId },
+        {
+          market: value,
+        },
+        { returnDocument: "after" }
+      );
+      trade.option = undefined;
+      trade.strikePrice = undefined;
+      trade.lotSize = undefined;
+      trade.expDate = undefined;
+      await trade.save();
+    }
+    console.log(trade);
+  }
+  // OTHERWISE, IF THE EXECUTIONPROP IS OPTION
+  else if (executionProp === "action") {
+    // edit execution document using execution info from user
+    const query = { _id: executionId, createdBy: userId };
+    execution = await Execution.findOneAndUpdate(
+      query,
+      {
+        [executionProp]: value,
+      },
+      { returnDocument: "after" }
+    );
+    // get the trade id associated with this execution
+    tradeId = execution.tradeId;
+
+    // get the trade associated with this tradeId
+    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+  }
+  // OTHERWISE, IF THE EXECUTIONPROP IS STRIKE
+  else if (executionProp === "strike") {
+    // get the trade id associated with this execution
+    execution = await Execution.findOne({
+      _id: executionId,
+      createdBy: userId,
+    });
+    tradeId = execution.tradeId;
+
+    // change the strikePrice property of the associated trade to the strike price given by the user
+    trade = await Trade.findOneAndUpdate(
+      { _id: tradeId, createdBy: userId },
+      { strikePrice: value },
+      { returnDocument: "after" }
+    );
+  }
+  // OTHERWISE, IF THE EXECUTIONPROP IS EXPIRE
+  else if (executionProp === "expire") {
+    // get the trade id associated with this execution
+    execution = await Execution.findOne({
+      _id: executionId,
+      createdBy: userId,
+    });
+    tradeId = execution.tradeId;
+
+    // change the expDate property of the associated trade to the date given by the user
+    trade = await Trade.findOneAndUpdate(
+      { _id: tradeId, createdBy: userId },
+      { expDate: value },
+      { returnDocument: "after" }
+    );
+  }
+  // OTHERWISE, IF THE EXECUTIONPROP IS LOT
+  else if (executionProp === "lot") {
+    // get the trade id associated with this execution
+    execution = await Execution.findOne({
+      _id: executionId,
+      createdBy: userId,
+    });
+    tradeId = execution.tradeId;
+
+    // change the expDate property of the associated trade to the date given by the user
+    trade = await Trade.findOneAndUpdate(
+      { _id: tradeId, createdBy: userId },
+      { lotSize: value },
+      { returnDocument: "after" }
+    );
+  }
+  // OTHERWISE, IF THE EXECUTIONPROP IS EXECUTION DATE
+  else if (executionProp === "exec") {
+    // edit execution document using execution info from user
+    const query = { _id: executionId, createdBy: userId };
+    execution = await Execution.findOneAndUpdate(
+      query,
+      {
+        execDate: value,
+      },
+      { returnDocument: "after" }
+    );
+    // get the trade id associated with this execution
+    tradeId = execution.tradeId;
+
+    // get the trade associated with this tradeId
+    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+  }
+
+  // OTHERWISE, IF THE EXECUTIONPROP IS POSITION SIZE
+  else if (executionProp === "position") {
+    // edit execution document using execution info from user
+    const query = { _id: executionId, createdBy: userId };
+    execution = await Execution.findOneAndUpdate(
+      query,
+      {
+        positionSize: value,
+      },
+      { returnDocument: "after" }
+    );
+    // get the trade id associated with this execution
+    tradeId = execution.tradeId;
+
+    // get the trade associated with this tradeId
+    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+  }
+
+  // OTHERWISE, IF THE EXECUTIONPROP IS PRICE
+  else if (executionProp === "price") {
+    // edit execution document using execution info from user
+    const query = { _id: executionId, createdBy: userId };
+    execution = await Execution.findOneAndUpdate(
+      query,
+      {
+        price: value,
+      },
+      { returnDocument: "after" }
+    );
+    // get the trade id associated with this execution
+    tradeId = execution.tradeId;
+
+    // get the trade associated with this tradeId
+    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+  }
+
+  // OTHERWISE, IF THE EXECUTIONPROP IS COMMISSIONS
+  else if (executionProp === "commissions") {
+    // edit execution document using execution info from user
+    const query = { _id: executionId, createdBy: userId };
+    execution = await Execution.findOneAndUpdate(
+      query,
+      {
+        commissions: value,
+      },
+      { returnDocument: "after" }
+    );
+    // get the trade id associated with this execution
+    tradeId = execution.tradeId;
+
+    // get the trade associated with this tradeId
+    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+  }
+
+  // OTHERWISE, IF THE EXECUTIONPROP IS FEES
+  else {
+    // edit execution document using execution info from user
+    const query = { _id: executionId, createdBy: userId };
+    execution = await Execution.findOneAndUpdate(
+      query,
+      {
+        fees: value,
+      },
+      { returnDocument: "after" }
+    );
+    // get the trade id associated with this execution
+    tradeId = execution.tradeId;
+
+    // get the trade associated with this tradeId
+    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+  }
 
   // destructure relevant trade properties for computing other trade metrics
   const { market, lotSize } = trade;
@@ -403,7 +604,7 @@ const updateTrade = async (req, res) => {
   // get all of the executions with the relevant trade id
   const executionDocs = await Execution.find({ tradeId, createdBy: userId });
 
-  // recompute all of the trade metrics based on new executions data
+  // RECOMPUTE ALL OF THE TRADE METRICS BASED ON UPDATED EXECUTIONS
 
   // -- SIDE --
   // the side depends on the action of the first execution - buy means long, and sell means short
