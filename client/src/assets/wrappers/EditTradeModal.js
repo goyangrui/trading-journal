@@ -168,6 +168,25 @@ const EditTradeModal = styled.div`
     border: 2px solid var(--primary-600);
     background-color: var(--primary-600);
   }
+
+  /* Remove execution button styles */
+  .remove-button-cell {
+    height: 100%;
+    /* display: flex; */
+  }
+
+  .remove-button-cell svg {
+    height: 25px;
+    width: 25px;
+    color: var(--gray-600);
+    background-color: var(--gray-300);
+    border-radius: 5px;
+    transition: var(--transition);
+  }
+
+  .remove-button-cell svg:hover {
+    color: var(--gray-500);
+  }
 `;
 
 export default EditTradeModal;

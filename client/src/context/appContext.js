@@ -48,6 +48,9 @@ import {
   FETCH_EXECUTIONS_BEGIN,
   FETCH_EXECUTIONS_SUCCESS,
   FETCH_EXECUTIONS_ERROR,
+  DELETE_EXECUTION_BEGIN,
+  DELETE_EXECUTION_SUCCESS,
+  DELETE_EXECUTION_ERROR,
   FETCH_JOURNALS_BEGIN,
   FETCH_JOURNALS_SUCCESS,
   FETCH_JOURNALS_ERROR,
@@ -570,6 +573,49 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // delete execution
+  const deleteExecution = async (executionId) => {
+    try {
+      dispatch({ type: DELETE_EXECUTION_BEGIN });
+      // try to send request to delete execution
+      const { data } = await authFetch.delete(`/executions/${executionId}`);
+      // destructure the data to get the newly updated trade metrics, and executions after deleting the selected execution
+      const {
+        executionDocs: executions,
+        tradeUpdateMetrics: editTrade,
+        msg,
+      } = data;
+
+      // fetch all of the trades
+      const { data: tradesData } = await authFetch.get("/trades");
+      const { trades } = tradesData;
+
+      // if the msg returned from backend is "trade removed" (meaning the execution that was deleted was the last execution for the trade)
+      if (msg === "trade removed") {
+        // update the trades, executions, and editTrade global properties to be empty arrays and objects respectively, and also toggle showEditTradeModal (close the edit trade modal)
+        dispatch({
+          type: DELETE_EXECUTION_SUCCESS,
+          payload: {
+            executions: [],
+            editTrade: {},
+            trades,
+            showEditTradeModal: false,
+          },
+        });
+      } else {
+        // otherwise
+        // update global state trades, executions, and editTrade variables
+        dispatch({
+          type: DELETE_EXECUTION_SUCCESS,
+          payload: { executions, editTrade, trades, showEditTradeModal: true },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      dispatch({ type: DELETE_EXECUTION_ERROR });
+    }
+  };
+
   // -- JOURNALS FUNCTIONS --
 
   // get journal entries
@@ -805,6 +851,7 @@ function AppContextProvider({ children }) {
         clearAlert,
         setSelectedTrades,
         getExecutions,
+        deleteExecution,
         getJournals,
         editJournal,
         createJournal,

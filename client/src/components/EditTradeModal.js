@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 import { FaTimes } from "react-icons/fa";
+import { AiFillMinusSquare } from "react-icons/ai";
 
 import { Loading } from ".";
 import Wrapper from "../assets/wrappers/EditTradeModal";
@@ -25,6 +26,7 @@ function EditTradeModal() {
   const {
     toggleEditTradeModal,
     getExecutions,
+    deleteExecution,
     executions,
     updateTrade,
     editTrade: trade,
@@ -68,6 +70,17 @@ function EditTradeModal() {
       value: e.target.value,
       executionInfo: activatedCell,
     });
+  };
+
+  // handle click of execution delete button
+  const handleExecDelete = (e, executionId) => {
+    // send a request to delete the execution that was clicked
+
+    const processData = async (executionId) => {
+      await deleteExecution(executionId);
+    };
+
+    processData(executionId);
   };
 
   // handle modal close button
@@ -223,6 +236,7 @@ function EditTradeModal() {
                     <th>Price</th>
                     <th>Commissions</th>
                     <th>Fees</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -462,6 +476,13 @@ function EditTradeModal() {
                           ) : (
                             <>${Math.round(execution.fees * 100) / 100}</>
                           )}
+                        </td>
+                        <td className="remove-button-cell">
+                          <AiFillMinusSquare
+                            onClick={(e) => {
+                              handleExecDelete(e, execution._id);
+                            }}
+                          />
                         </td>
                       </tr>
                     );

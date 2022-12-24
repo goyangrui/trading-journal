@@ -27,6 +27,7 @@ import {
   TOGGLE_MODAL_SUCCESS,
   TOGGLE_TAGMODAL_SUCCESS,
   TOGGLE_EDIT_TRADEMODAL_SUCCESS,
+  DELETE_EXECUTION_ERROR,
   FETCH_TRADES_BEGIN,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
@@ -42,6 +43,8 @@ import {
   FETCH_EXECUTIONS_BEGIN,
   FETCH_EXECUTIONS_SUCCESS,
   FETCH_EXECUTIONS_ERROR,
+  DELETE_EXECUTION_BEGIN,
+  DELETE_EXECUTION_SUCCESS,
   SET_SELECTED_TRADES,
   FETCH_JOURNALS_BEGIN,
   FETCH_JOURNALS_SUCCESS,
@@ -333,6 +336,45 @@ const reducer = (state, action) => {
       ...state,
       showEditTradeModal: !state.showEditTradeModal,
       editTrade: action.payload.trade,
+    };
+  }
+
+  // -- DELETE EXECUTIONS --
+  if (action.type === DELETE_EXECUTION_BEGIN) {
+    console.log("delete execution begin");
+    return {
+      ...state,
+    };
+  }
+
+  if (action.type === DELETE_EXECUTION_SUCCESS) {
+    console.log("delete execution success");
+
+    // if showEditTradeModal is false
+    if (action.payload.showEditTradeModal === false) {
+      // set the executions, editTrade, and trades arrays/objects to empty arrays/object, and also toggle off the edit trade modal
+      return {
+        ...state,
+        showEditTradeModal: action.payload.showEditTradeModal,
+        executions: action.payload.executions,
+        editTrade: action.payload.editTrade,
+        trades: action.payload.trades,
+      };
+    } else {
+      // otherwise, just update the executions, editTrade, and trades global variables
+      return {
+        ...state,
+        executions: action.payload.executions,
+        editTrade: action.payload.editTrade,
+        trades: action.payload.trades,
+      };
+    }
+  }
+
+  if (action.type === DELETE_EXECUTION_ERROR) {
+    console.log("delete execution error");
+    return {
+      ...state,
     };
   }
 
