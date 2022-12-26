@@ -104,10 +104,14 @@ const EditTradeModal = styled.div`
   /* table body row data specific styles */
 
   /* make status, market, symbol, and side columns uppercase */
-  .trades-table td:nth-child(1),
+  /* .trades-table td:nth-child(1),
   .trades-table td:nth-child(3),
   .trades-table td:nth-child(4),
   .trades-table td:last-child {
+    text-transform: uppercase;
+  } */
+
+  .trades-table td {
     text-transform: uppercase;
   }
 
@@ -170,12 +174,12 @@ const EditTradeModal = styled.div`
   }
 
   /* Remove execution button styles */
-  .remove-button-cell {
+  .button-cell {
     height: 100%;
     /* display: flex; */
   }
 
-  .remove-button-cell svg {
+  .button-cell svg {
     height: 25px;
     width: 25px;
     color: var(--gray-600);
@@ -184,8 +188,14 @@ const EditTradeModal = styled.div`
     transition: var(--transition);
   }
 
-  .remove-button-cell svg:hover {
+  .button-cell svg:hover {
     color: var(--gray-500);
+  }
+
+  /* Add execution row styles */
+  .trades-table .table-body-row .add-cell-empty {
+    color: var(--primary-600);
+    font-weight: bold;
   }
 `;
 

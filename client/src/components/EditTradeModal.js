@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 import { FaTimes } from "react-icons/fa";
-import { AiFillMinusSquare } from "react-icons/ai";
+import { AiFillMinusSquare, AiFillPlusSquare } from "react-icons/ai";
 
-import { Loading } from ".";
+import { Loading, Alert } from ".";
 import Wrapper from "../assets/wrappers/EditTradeModal";
 
 import { useAppContext } from "../context/appContext";
@@ -26,10 +26,15 @@ function EditTradeModal() {
   const {
     toggleEditTradeModal,
     getExecutions,
+    createExecution,
+    addExecCellState,
+    setAddExecCellState,
     deleteExecution,
     executions,
     updateTrade,
     editTrade: trade,
+    showAlert,
+    clearAlert,
   } = useAppContext();
 
   // handle edittable cell click
@@ -62,6 +67,14 @@ function EditTradeModal() {
     processData();
   };
 
+  // handle blur of add execution property cell
+  const handleAddCellBlur = (e) => {
+    e.preventDefault();
+
+    // deactivate the activated cell
+    setActivatedCell("");
+  };
+
   // handle change of state of form inputs in executions
   const handleChange = (e) => {
     console.log("input state changed");
@@ -70,6 +83,13 @@ function EditTradeModal() {
       value: e.target.value,
       executionInfo: activatedCell,
     });
+  };
+
+  // handle change of state of form inputs in add executions forms
+  const handleAddExecChange = (e, execProp) => {
+    console.log(execProp);
+    console.log(e.target.value);
+    setAddExecCellState({ ...addExecCellState, [execProp]: e.target.value });
   };
 
   // handle click of execution delete button
@@ -83,9 +103,29 @@ function EditTradeModal() {
     processData(executionId);
   };
 
+  // handle click of execution add button
+  const handleExecAdd = (e) => {
+    // send request to backend to add new execution
+    const processData = async () => {
+      await createExecution(addExecCellState, trade._id);
+    };
+
+    processData();
+  };
+
   // handle modal close button
   const closeButtonHandler = () => {
+    // toggle the modal, clear any alerts, and set the add execution global state to the initial state
     toggleEditTradeModal({});
+    clearAlert();
+    setAddExecCellState({
+      action: "",
+      execDate: "",
+      positionSize: "",
+      price: "",
+      commissions: "",
+      fees: "",
+    });
   };
 
   // on initial render, fetch all executions
@@ -116,6 +156,9 @@ function EditTradeModal() {
             <FaTimes />
           </button>
         </div>
+
+        {/* Show alert if there is an alert */}
+        {showAlert && <Alert />}
 
         {/* display modal body once necessary data is loaded */}
         {isLoading ? (
@@ -228,9 +271,19 @@ function EditTradeModal() {
                   <tr>
                     <th>Action</th>
                     <th>Type</th>
-                    <th>Strike</th>
-                    <th>Expire</th>
-                    <th>Lot Size Multiplier</th>
+                    {/* only display strike price header if the trade market is options */}
+                    {trade.market.toLowerCase() === "options" && (
+                      <th>Strike</th>
+                    )}
+                    {/* Only display expiration date cell if the trade market is either options or futures */}
+                    {(trade.market.toLowerCase() === "options" ||
+                      trade.market.toLowerCase() === "futures") && (
+                      <th>Expire</th>
+                    )}
+                    {/* Only display lot size multiplier cell if the trade market is futures */}
+                    {trade.market.toLowerCase() === "futures" && (
+                      <th>Lot Size Multiplier</th>
+                    )}
                     <th>Execution Date</th>
                     <th>Position Size</th>
                     <th>Price</th>
@@ -291,78 +344,91 @@ function EditTradeModal() {
                           {}
                         </td>
                         {/* STRIKE PRICE CELL */}
-                        <td
-                          id={`execution-${execution._id}-strike`}
-                          onClick={handleCellClick}
-                          onBlur={handleCellBlur}
-                        >
-                          {/* only if the market is options, and this cell is activated */}
-                          {activatedCell ===
-                            `execution-${execution._id}-strike` &&
-                          trade.market.toLowerCase() === "options" ? (
-                            <form onSubmit={handleCellBlur}>
-                              <input
-                                type="number"
-                                min="0.001"
-                                step="0.001"
-                                autoFocus
-                                onChange={handleChange}
-                              />
-                            </form>
-                          ) : (
-                            // otherwise, display the strike price only if it exists
-                            trade.strikePrice && (
-                              <>${Math.round(trade.strikePrice * 100) / 100}</>
-                            )
-                          )}
-                        </td>
+                        {/* only display this stirke price cell if the trade market is options */}
+                        {trade.market.toLowerCase() === "options" && (
+                          <td
+                            id={`execution-${execution._id}-strike`}
+                            onClick={handleCellClick}
+                            onBlur={handleCellBlur}
+                          >
+                            {/* only if the market is options, and this cell is activated */}
+                            {activatedCell ===
+                              `execution-${execution._id}-strike` &&
+                            trade.market.toLowerCase() === "options" ? (
+                              <form onSubmit={handleCellBlur}>
+                                <input
+                                  type="number"
+                                  min="0.001"
+                                  step="0.001"
+                                  autoFocus
+                                  onChange={handleChange}
+                                />
+                              </form>
+                            ) : (
+                              // otherwise, display the strike price only if it exists
+                              trade.strikePrice && (
+                                <>
+                                  ${Math.round(trade.strikePrice * 100) / 100}
+                                </>
+                              )
+                            )}
+                          </td>
+                        )}
                         {/* EXPIRATION DATE CELL */}
-                        <td
-                          id={`execution-${execution._id}-expire`}
-                          onClick={handleCellClick}
-                          onBlur={handleCellBlur}
-                        >
-                          {/* only if the market is options or futures, and the cell is activated */}
-                          {activatedCell ===
-                            `execution-${execution._id}-expire` &&
-                          (trade.market.toLowerCase() === "options" ||
-                            trade.market.toLowerCase() === "futures") ? (
-                            <form onSubmit={handleCellBlur}>
-                              <input
-                                type="date"
-                                autoFocus
-                                onChange={handleChange}
-                              />
-                            </form>
-                          ) : (
-                            // otherwise, only if the expiration date exists, display it
-                            trade.expDate &&
-                            moment(trade.expDate).utc().format("MMM DD, YYYY")
-                          )}
-                        </td>
+                        {/* Only display expiration date cell if the trade market is either options or futures */}
+                        {(trade.market.toLowerCase() === "options" ||
+                          trade.market.toLowerCase() === "futures") && (
+                          <td
+                            id={`execution-${execution._id}-expire`}
+                            onClick={handleCellClick}
+                            onBlur={handleCellBlur}
+                          >
+                            {/* only if the market is options or futures, and the cell is activated */}
+                            {activatedCell ===
+                              `execution-${execution._id}-expire` &&
+                            (trade.market.toLowerCase() === "options" ||
+                              trade.market.toLowerCase() === "futures") ? (
+                              <form onSubmit={handleCellBlur}>
+                                <input
+                                  type="date"
+                                  autoFocus
+                                  onChange={handleChange}
+                                />
+                              </form>
+                            ) : (
+                              // otherwise, only if the expiration date exists, display it
+                              trade.expDate &&
+                              moment(trade.expDate).utc().format("MMM DD, YYYY")
+                            )}
+                          </td>
+                        )}
                         {/* LOT SIZE CELL */}
-                        <td
-                          id={`execution-${execution._id}-lot`}
-                          onClick={handleCellClick}
-                          onBlur={handleCellBlur}
-                        >
-                          {/* only if the market is futures, and the cell is activated */}
-                          {activatedCell === `execution-${execution._id}-lot` &&
-                          trade.market.toLowerCase() === "futures" ? (
-                            <form onSubmit={handleCellBlur}>
-                              <input
-                                type="number"
-                                autoFocus
-                                min="0.001"
-                                step="0.001"
-                                onChange={handleChange}
-                              />
-                            </form>
-                          ) : (
-                            // otherwise, only if the lot size multiplier exists, display it
-                            trade.lotSize && trade.lotSize
-                          )}
-                        </td>
+                        {/* Only display lot size multiplier cell if the trade market is futures */}
+                        {trade.market.toLowerCase() === "futures" && (
+                          <td
+                            id={`execution-${execution._id}-lot`}
+                            onClick={handleCellClick}
+                            onBlur={handleCellBlur}
+                          >
+                            {/* only if the market is futures, and the cell is activated */}
+                            {activatedCell ===
+                              `execution-${execution._id}-lot` &&
+                            trade.market.toLowerCase() === "futures" ? (
+                              <form onSubmit={handleCellBlur}>
+                                <input
+                                  type="number"
+                                  autoFocus
+                                  min="0.001"
+                                  step="0.001"
+                                  onChange={handleChange}
+                                />
+                              </form>
+                            ) : (
+                              // otherwise, only if the lot size multiplier exists, display it
+                              trade.lotSize && trade.lotSize
+                            )}
+                          </td>
+                        )}
                         {/* EXECUTION DATE CELL */}
                         <td
                           id={`execution-${execution._id}-exec`}
@@ -477,7 +543,8 @@ function EditTradeModal() {
                             <>${Math.round(execution.fees * 100) / 100}</>
                           )}
                         </td>
-                        <td className="remove-button-cell">
+                        {/* REMOVE EXECUTION BUTTON CELL */}
+                        <td className="button-cell">
                           <AiFillMinusSquare
                             onClick={(e) => {
                               handleExecDelete(e, execution._id);
@@ -487,6 +554,226 @@ function EditTradeModal() {
                       </tr>
                     );
                   })}
+
+                  {/* ADD EXECUTION TABLE ROW */}
+                  <tr className="table-body-row">
+                    {/* ADD ACTION CELL */}
+                    <td
+                      id="add-execution-action"
+                      className={
+                        addExecCellState["action"] === ""
+                          ? "add-cell-empty"
+                          : "add-cell"
+                      }
+                      onClick={handleCellClick}
+                      onBlur={handleAddCellBlur}
+                    >
+                      {/* Show drop down for action only if this add execution cell is activated */}
+                      {activatedCell === "add-execution-action" ? (
+                        <form onSubmit={handleAddCellBlur}>
+                          <select
+                            autoFocus
+                            onChange={(e) => {
+                              handleAddExecChange(e, "action");
+                            }}
+                          >
+                            <option value=""></option>
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                          </select>
+                        </form>
+                      ) : addExecCellState["action"] === "" ? (
+                        "Add"
+                      ) : (
+                        addExecCellState["action"]
+                      )}
+                    </td>
+                    {/* ADD TYPE CELL */}
+                    <td id="add-execution-market">
+                      {trade.market.toLowerCase() === "options"
+                        ? trade.option
+                        : trade.market}
+                    </td>
+                    {/* ADD STRIKE PRICE CELL */}
+                    {/* only display strike price cell if the trade market is options */}
+                    {trade.market.toLowerCase() === "options" && (
+                      <td id="add-execution-strikePrice">
+                        {trade.strikePrice && (
+                          <>${Math.round(trade.strikePrice * 100) / 100}</>
+                        )}
+                      </td>
+                    )}
+                    {/* ADD EXPIRATION DATE CELL */}
+                    {/* Only display expiration date cell if the trade market is either options or futures */}
+                    {(trade.market.toLowerCase() === "options" ||
+                      trade.market.toLowerCase() === "futures") && (
+                      <td id="add-execution-expDate">
+                        {trade.expDate &&
+                          moment(trade.expDate).utc().format("MMM DD, YYYY")}
+                      </td>
+                    )}
+                    {/* ADD LOT SIZE CELL */}
+                    {/* Only display lot size multiplier cell if the trade market is futures */}
+                    {trade.market.toLowerCase() === "futures" && (
+                      <td id="add-execution-lotSize">
+                        {trade.lotSize && trade.lotSize}
+                      </td>
+                    )}
+                    {/* ADD EXECUTION DATE CELL */}
+                    <td
+                      id="add-execution-execDate"
+                      className={
+                        addExecCellState["execDate"] === ""
+                          ? "add-cell-empty"
+                          : "add-cell"
+                      }
+                      onClick={handleCellClick}
+                      onBlur={handleAddCellBlur}
+                    >
+                      {/* Only display execution date form if this cell is activated */}
+                      {activatedCell === "add-execution-execDate" ? (
+                        <form>
+                          <input
+                            autoFocus
+                            type="date"
+                            onChange={(e) => {
+                              handleAddExecChange(e, "execDate");
+                            }}
+                          />
+                        </form>
+                      ) : addExecCellState["execDate"] === "" ? (
+                        "Add"
+                      ) : (
+                        moment(addExecCellState["execDate"])
+                          .utc()
+                          .format("MMM DD, YYYY")
+                      )}
+                    </td>
+                    {/* ADD POSITION SIZE CELL */}
+                    <td
+                      id="add-execution-positionSize"
+                      className={
+                        addExecCellState["positionSize"] === ""
+                          ? "add-cell-empty"
+                          : "add-cell"
+                      }
+                      onClick={handleCellClick}
+                      onBlur={handleAddCellBlur}
+                    >
+                      {/* Only display position size form if this cell is activated */}
+                      {activatedCell === "add-execution-positionSize" ? (
+                        <form onSubmit={handleAddCellBlur}>
+                          <input
+                            type="number"
+                            autoFocus
+                            min="0.001"
+                            step="0.001"
+                            onChange={(e) => {
+                              handleAddExecChange(e, "positionSize");
+                            }}
+                          />
+                        </form>
+                      ) : addExecCellState["positionSize"] === "" ? (
+                        "Add"
+                      ) : (
+                        addExecCellState["positionSize"]
+                      )}
+                    </td>
+                    {/* ADD PRICE CELL */}
+                    <td
+                      id="add-execution-price"
+                      className={
+                        addExecCellState["price"] === ""
+                          ? "add-cell-empty"
+                          : "add-cell"
+                      }
+                      onClick={handleCellClick}
+                      onBlur={handleAddCellBlur}
+                    >
+                      {/* Only display execution price form if this cell is activated */}
+                      {activatedCell === "add-execution-price" ? (
+                        <form onSubmit={handleAddCellBlur}>
+                          <input
+                            type="number"
+                            autoFocus
+                            min="0.001"
+                            step="0.001"
+                            onChange={(e) => {
+                              handleAddExecChange(e, "price");
+                            }}
+                          />
+                        </form>
+                      ) : addExecCellState["price"] === "" ? (
+                        "Add"
+                      ) : (
+                        `$${addExecCellState["price"]}`
+                      )}
+                    </td>
+                    {/* ADD COMMISSIONS CELL */}
+                    <td
+                      id="add-execution-commissions"
+                      className={
+                        addExecCellState["commissions"] === ""
+                          ? "add-cell-empty"
+                          : "add-cell"
+                      }
+                      onClick={handleCellClick}
+                      onBlur={handleAddCellBlur}
+                    >
+                      {/* Only display commissions form if this cell is activated */}
+                      {activatedCell === "add-execution-commissions" ? (
+                        <form onSubmit={handleAddCellBlur}>
+                          <input
+                            type="number"
+                            autoFocus
+                            min="0"
+                            step="0.001"
+                            onChange={(e) => {
+                              handleAddExecChange(e, "commissions");
+                            }}
+                          />
+                        </form>
+                      ) : addExecCellState["commissions"] === "" ? (
+                        "Add"
+                      ) : (
+                        `$${addExecCellState["commissions"]}`
+                      )}
+                    </td>
+                    {/* ADD FEES CELL */}
+                    <td
+                      id="add-execution-fees"
+                      className={
+                        addExecCellState["fees"] === ""
+                          ? "add-cell-empty"
+                          : "add-cell"
+                      }
+                      onClick={handleCellClick}
+                      onBlur={handleAddCellBlur}
+                    >
+                      {/* Only display fees form if this cell is activated */}
+                      {activatedCell === "add-execution-fees" ? (
+                        <form onSubmit={handleAddCellBlur}>
+                          <input
+                            type="number"
+                            autoFocus
+                            min="0"
+                            step="0.001"
+                            onChange={(e) => {
+                              handleAddExecChange(e, "fees");
+                            }}
+                          />
+                        </form>
+                      ) : addExecCellState["fees"] === "" ? (
+                        "Add"
+                      ) : (
+                        `$${addExecCellState["fees"]}`
+                      )}
+                    </td>
+                    {/* ADD EXECUTION CELL */}
+                    <td className="button-cell">
+                      <AiFillPlusSquare onClick={handleExecAdd} />
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>

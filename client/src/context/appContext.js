@@ -48,6 +48,10 @@ import {
   FETCH_EXECUTIONS_BEGIN,
   FETCH_EXECUTIONS_SUCCESS,
   FETCH_EXECUTIONS_ERROR,
+  CREATE_EXECUTION_BEGIN,
+  CREATE_EXECUTION_SUCCESS,
+  CREATE_EXECUTION_ERROR,
+  SET_ADDEXECSTATE_SUCCESS,
   DELETE_EXECUTION_BEGIN,
   DELETE_EXECUTION_SUCCESS,
   DELETE_EXECUTION_ERROR,
@@ -98,6 +102,14 @@ const initialState = {
   tags: [],
   selectedTags: {},
   chartData: {},
+  addExecCellState: {
+    action: "",
+    execDate: "",
+    positionSize: "",
+    price: "",
+    commissions: "",
+    fees: "",
+  },
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -616,6 +628,57 @@ function AppContextProvider({ children }) {
     }
   };
 
+  // create execution
+  const createExecution = async (execution, tradeId) => {
+    try {
+      dispatch({ type: CREATE_EXECUTION_BEGIN });
+
+      // send post request to executions endpoint to create execution, and update the trade
+      const { data } = await authFetch.post("/executions", {
+        execution,
+        tradeId,
+      });
+
+      // get updated executions and trade from the response
+      const { tradeUpdateMetrics: editTrade, executionDocs: executions } = data;
+
+      // fetch all of the trades
+      const { data: tradesData } = await authFetch.get("/trades");
+      const { trades } = tradesData;
+
+      // update the global state edit trade, executions, and trades variable, and clear and alerts, and also clear the add execution state variables
+      dispatch({
+        type: CREATE_EXECUTION_SUCCESS,
+        payload: {
+          editTrade,
+          executions,
+          trades,
+          addExecCellState: {
+            action: "",
+            execDate: "",
+            positionSize: "",
+            price: "",
+            commissions: "",
+            fees: "",
+          },
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: CREATE_EXECUTION_ERROR,
+        payload: { alertText: error.response.data.msg },
+      });
+    }
+  };
+
+  // function to set global state add execution state variables
+  const setAddExecCellState = async (newAddExecState) => {
+    dispatch({
+      type: SET_ADDEXECSTATE_SUCCESS,
+      payload: { newAddExecState },
+    });
+  };
+
   // -- JOURNALS FUNCTIONS --
 
   // get journal entries
@@ -851,6 +914,8 @@ function AppContextProvider({ children }) {
         clearAlert,
         setSelectedTrades,
         getExecutions,
+        createExecution,
+        setAddExecCellState,
         deleteExecution,
         getJournals,
         editJournal,

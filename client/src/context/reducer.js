@@ -43,6 +43,10 @@ import {
   FETCH_EXECUTIONS_BEGIN,
   FETCH_EXECUTIONS_SUCCESS,
   FETCH_EXECUTIONS_ERROR,
+  CREATE_EXECUTION_BEGIN,
+  CREATE_EXECUTION_SUCCESS,
+  CREATE_EXECUTION_ERROR,
+  SET_ADDEXECSTATE_SUCCESS,
   DELETE_EXECUTION_BEGIN,
   DELETE_EXECUTION_SUCCESS,
   SET_SELECTED_TRADES,
@@ -490,6 +494,46 @@ const reducer = (state, action) => {
     console.log("fetch executions error");
     return {
       ...state,
+    };
+  }
+
+  // -- CREATE EXECUTION --
+  if (action.type === CREATE_EXECUTION_BEGIN) {
+    console.log("create execution begin");
+    return {
+      ...state,
+    };
+  }
+
+  if (action.type === CREATE_EXECUTION_SUCCESS) {
+    console.log("create execution success");
+    return {
+      ...state,
+      editTrade: action.payload.editTrade,
+      executions: action.payload.executions,
+      trades: action.payload.trades,
+      addExecCellState: action.payload.addExecCellState,
+      showAlert: false,
+      alertType: "",
+      alertText: "",
+    };
+  }
+
+  if (action.type === CREATE_EXECUTION_ERROR) {
+    console.log("create execution error");
+    return {
+      ...state,
+      showAlert: true,
+      alertType: "danger",
+      alertText: action.payload.alertText,
+    };
+  }
+
+  if (action.type === SET_ADDEXECSTATE_SUCCESS) {
+    console.log("set add execution state success");
+    return {
+      ...state,
+      addExecCellState: action.payload.newAddExecState,
     };
   }
 

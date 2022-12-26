@@ -120,7 +120,6 @@ function TradesList() {
 
   // function for handling click of trade table row (to open edit trade modal)
   const handleTradeRowClick = (e, trade) => {
-    console.log(e.target.tagName);
     // only toggle edit trade modal if the event target className is not 'check-box', and if it is not an SVG
     if (
       e.target.tagName !== "svg" &&
