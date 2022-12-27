@@ -375,455 +375,455 @@ const updateTrade = async (req, res) => {
   // get userId from req.user
   const { userId } = req.user;
 
-  // get execution id from request url params
-  const executionId = req.params.id;
+  // get trade id from request url params
+  const tradeId = req.params.id;
 
-  // get execution property and value of that property (to be changed)
-  const { value, executionProp } = req.body;
+  // get execution info and value of that execution (to be changed)
+  const { value, executionInfo } = req.body;
+
+  // get the tag info from the request body
+  const { tagInfo } = req.body;
 
   var trade = undefined;
-  var tradeId = undefined;
   var execution = undefined;
 
-  // -- IF THE EXECUTIONPROP IS OPTION --
-  if (executionProp === "option") {
-    // get the trade id associated with this execution
-    execution = await Execution.findOne({
-      _id: executionId,
-      createdBy: userId,
-    });
-    tradeId = execution.tradeId;
+  // If the tag info exists
+  if (tagInfo) {
+    // get the tagId associated with this tag
+    const tagId = Object.keys(tagInfo)[0];
 
-    // if the value passed in is "CALL" or "PUT"
-    if (value === "CALL" || value === "PUT") {
-      // set the market to OPTIONS, and set the option to the value, set strike price to 100 by default, the lot size to undefined,
-      // and expiration date to current time by default for the trade
-      trade = await Trade.findOneAndUpdate(
-        { _id: tradeId, createdBy: userId },
-        {
-          market: "OPTIONS",
-          option: value,
-          strikePrice: 100,
-          expDate: new Date(new Date().setUTCHours(-24, 0, 0, 0)),
-        },
-        { returnDocument: "after" }
-      );
-      trade.lotSize = undefined;
-      await trade.save();
-    } else if (value === "FUTURES") {
-      // otherwise if the value passed in is "FUTURES"
-      // set the market to futures, the option to undefined, the strike price to undefined, the lotSize multiplier to 1 by default, and the expiration date to today by default
-      trade = await Trade.findOneAndUpdate(
-        { _id: tradeId, createdBy: userId },
-        {
-          market: value,
-          lotSize: 1,
-          expDate: new Date(new Date().setUTCHours(-24, 0, 0, 0)),
-        },
-        { returnDocument: "after" }
-      );
-      trade.option = undefined;
-      trade.strikePrice = undefined;
+    // if the value of the tagInfo is true
+    if (Object.values(tagInfo)[0]) {
+      // add this tag to this trade
+      // first find the tag associated with this tagId
+      const tagDoc = await Tag.findOne({ createdBy: userId, _id: tagId });
+
+      // get the trade associated with this tradeId
+      trade = await Trade.findOne({ createdBy: userId, _id: tradeId });
+
+      // add the tag to this trade
+      trade.tags.set(tagDoc._id, tagDoc.text);
       await trade.save();
     } else {
-      // otherwise if the value passed in is "STOCK"
-      // set the market to stock, the option to undefined, the strike price to undefined, the lotsize to undefined, the expiration date to undefined for the current trade
-      trade = await Trade.findOneAndUpdate(
-        { _id: tradeId, createdBy: userId },
-        {
-          market: value,
-        },
-        { returnDocument: "after" }
-      );
-      trade.option = undefined;
-      trade.strikePrice = undefined;
-      trade.lotSize = undefined;
-      trade.expDate = undefined;
+      // otherwise if the value of tagInfo is false
+      // remove this tag from this trade
+
+      // first find the tag associated with this tagId
+      const tagDoc = await Tag.findOne({ createdBy: userId, _id: tagId });
+
+      // then find the trade
+      trade = await Trade.findOne({ createdBy: userId, _id: tradeId });
+
+      // remove the tag from this trade
+      trade.tags.delete(tagDoc._id);
       await trade.save();
     }
-    console.log(trade);
-  }
-  // OTHERWISE, IF THE EXECUTIONPROP IS OPTION
-  else if (executionProp === "action") {
-    // edit execution document using execution info from user
-    const query = { _id: executionId, createdBy: userId };
-    execution = await Execution.findOneAndUpdate(
-      query,
-      {
-        [executionProp]: value,
-      },
-      { returnDocument: "after" }
-    );
-    // get the trade id associated with this execution
-    tradeId = execution.tradeId;
-
-    // get the trade associated with this tradeId
-    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
-  }
-  // OTHERWISE, IF THE EXECUTIONPROP IS STRIKE
-  else if (executionProp === "strike") {
-    // get the trade id associated with this execution
-    execution = await Execution.findOne({
-      _id: executionId,
-      createdBy: userId,
-    });
-    tradeId = execution.tradeId;
-
-    // change the strikePrice property of the associated trade to the strike price given by the user
-    trade = await Trade.findOneAndUpdate(
-      { _id: tradeId, createdBy: userId },
-      { strikePrice: value },
-      { returnDocument: "after" }
-    );
-  }
-  // OTHERWISE, IF THE EXECUTIONPROP IS EXPIRE
-  else if (executionProp === "expire") {
-    // get the trade id associated with this execution
-    execution = await Execution.findOne({
-      _id: executionId,
-      createdBy: userId,
-    });
-    tradeId = execution.tradeId;
-
-    // change the expDate property of the associated trade to the date given by the user
-    trade = await Trade.findOneAndUpdate(
-      { _id: tradeId, createdBy: userId },
-      { expDate: value },
-      { returnDocument: "after" }
-    );
-  }
-  // OTHERWISE, IF THE EXECUTIONPROP IS LOT
-  else if (executionProp === "lot") {
-    // get the trade id associated with this execution
-    execution = await Execution.findOne({
-      _id: executionId,
-      createdBy: userId,
-    });
-    tradeId = execution.tradeId;
-
-    // change the expDate property of the associated trade to the date given by the user
-    trade = await Trade.findOneAndUpdate(
-      { _id: tradeId, createdBy: userId },
-      { lotSize: value },
-      { returnDocument: "after" }
-    );
-  }
-  // OTHERWISE, IF THE EXECUTIONPROP IS EXECUTION DATE
-  else if (executionProp === "exec") {
-    // edit execution document using execution info from user
-    const query = { _id: executionId, createdBy: userId };
-    execution = await Execution.findOneAndUpdate(
-      query,
-      {
-        execDate: value,
-      },
-      { returnDocument: "after" }
-    );
-    // get the trade id associated with this execution
-    tradeId = execution.tradeId;
-
-    // get the trade associated with this tradeId
-    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
-  }
-
-  // OTHERWISE, IF THE EXECUTIONPROP IS POSITION SIZE
-  else if (executionProp === "position") {
-    // edit execution document using execution info from user
-    const query = { _id: executionId, createdBy: userId };
-    execution = await Execution.findOneAndUpdate(
-      query,
-      {
-        positionSize: value,
-      },
-      { returnDocument: "after" }
-    );
-    // get the trade id associated with this execution
-    tradeId = execution.tradeId;
-
-    // get the trade associated with this tradeId
-    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
-  }
-
-  // OTHERWISE, IF THE EXECUTIONPROP IS PRICE
-  else if (executionProp === "price") {
-    // edit execution document using execution info from user
-    const query = { _id: executionId, createdBy: userId };
-    execution = await Execution.findOneAndUpdate(
-      query,
-      {
-        price: value,
-      },
-      { returnDocument: "after" }
-    );
-    // get the trade id associated with this execution
-    tradeId = execution.tradeId;
-
-    // get the trade associated with this tradeId
-    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
-  }
-
-  // OTHERWISE, IF THE EXECUTIONPROP IS COMMISSIONS
-  else if (executionProp === "commissions") {
-    // edit execution document using execution info from user
-    const query = { _id: executionId, createdBy: userId };
-    execution = await Execution.findOneAndUpdate(
-      query,
-      {
-        commissions: value,
-      },
-      { returnDocument: "after" }
-    );
-    // get the trade id associated with this execution
-    tradeId = execution.tradeId;
-
-    // get the trade associated with this tradeId
-    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
-  }
-
-  // OTHERWISE, IF THE EXECUTIONPROP IS FEES
-  else {
-    // edit execution document using execution info from user
-    const query = { _id: executionId, createdBy: userId };
-    execution = await Execution.findOneAndUpdate(
-      query,
-      {
-        fees: value,
-      },
-      { returnDocument: "after" }
-    );
-    // get the trade id associated with this execution
-    tradeId = execution.tradeId;
-
-    // get the trade associated with this tradeId
-    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
-  }
-
-  // destructure relevant trade properties for computing other trade metrics
-  const { market, lotSize } = trade;
-
-  // get all of the executions with the relevant trade id
-  const executionDocs = await Execution.find({ tradeId, createdBy: userId });
-
-  // RECOMPUTE ALL OF THE TRADE METRICS BASED ON UPDATED EXECUTIONS
-
-  // -- SIDE --
-  // the side depends on the action of the first execution - buy means long, and sell means short
-  if (executionDocs[0].action.toLowerCase() === "buy") {
-    var side = "LONG";
+    return res.status(StatusCodes.OK).json({ trade });
   } else {
-    var side = "SHORT";
-  }
+    // otherwise, if tag info doesn't exist, edit execution properties of trade
+    // get the executionId from executionInfo
+    const executionId = executionInfo.split("-")[1];
 
-  console.log("side:", side);
+    // get execution property name that was changed
+    const executionProp = executionInfo.split("-")[2];
 
-  // -- OPEN DATE --
-  // the open date is just the execution date of the first execution
-  const openDate = executionDocs[0].execDate;
-
-  console.log("openDate:", openDate);
-
-  // -- AVERAGE ENTRY AND EXIT --
-  // average entry price is the average of the buy prices if the first execution is a buy action, and average of sell prices if the first execution is a sell action
-  // average exit price is the same, but is the average of sell prices if the first execution is a buy action, etc.
-
-  // first, organize all of the total position sizes and total prices for entries and exits
-  var sizeAndPriceTotals = executionDocs.reduce(
-    (previousValue, currentExecution, currentIndex, executions) => {
-      // if the first execution is a buy
-      if (executions[0].action.toLowerCase() === "buy") {
-        // if the current execution's action is a buy
-        if (currentExecution.action.toLowerCase() === "buy") {
-          // add its entry position size and price to the previousValue (initially 0)
-          previousValue["entry"]["entryPositionTotal"] +=
-            currentExecution.positionSize;
-          previousValue["entry"]["entryPriceTotal"] +=
-            currentExecution.price * currentExecution.positionSize;
-        } else {
-          // otherwise if the current execution's action is a sell
-          previousValue["exit"]["exitPositionTotal"] +=
-            currentExecution.positionSize;
-          previousValue["exit"]["exitPriceTotal"] +=
-            currentExecution.price * currentExecution.positionSize;
-        }
+    // -- IF THE EXECUTIONPROP IS OPTION --
+    if (executionProp === "option") {
+      // if the value passed in is "CALL" or "PUT"
+      if (value === "CALL" || value === "PUT") {
+        // set the market to OPTIONS, and set the option to the value, set strike price to 100 by default, the lot size to undefined,
+        // and expiration date to current time by default for the trade
+        trade = await Trade.findOneAndUpdate(
+          { _id: tradeId, createdBy: userId },
+          {
+            market: "OPTIONS",
+            option: value,
+            strikePrice: 100,
+            expDate: new Date(new Date().setUTCHours(-24, 0, 0, 0)),
+          },
+          { returnDocument: "after" }
+        );
+        trade.lotSize = undefined;
+        await trade.save();
+      } else if (value === "FUTURES") {
+        // otherwise if the value passed in is "FUTURES"
+        // set the market to futures, the option to undefined, the strike price to undefined, the lotSize multiplier to 1 by default, and the expiration date to today by default
+        trade = await Trade.findOneAndUpdate(
+          { _id: tradeId, createdBy: userId },
+          {
+            market: value,
+            lotSize: 1,
+            expDate: new Date(new Date().setUTCHours(-24, 0, 0, 0)),
+          },
+          { returnDocument: "after" }
+        );
+        trade.option = undefined;
+        trade.strikePrice = undefined;
+        await trade.save();
       } else {
-        // otherwise if the first execution is a sell
-        // if the current execution's action is a sell
-        if (currentExecution.action.toLowerCase() === "sell") {
-          // add its position size to the previousValue (initially 0);
-          previousValue["entry"]["entryPositionTotal"] +=
-            currentExecution.positionSize;
-          previousValue["entry"]["entryPriceTotal"] +=
-            currentExecution.price * currentExecution.positionSize;
-        } else {
-          // otherwise if the current execution's action is a buy
-          previousValue["exit"]["exitPositionTotal"] +=
-            currentExecution.positionSize;
-          previousValue["exit"]["exitPriceTotal"] +=
-            currentExecution.price * currentExecution.positionSize;
-        }
+        // otherwise if the value passed in is "STOCK"
+        // set the market to stock, the option to undefined, the strike price to undefined, the lotsize to undefined, the expiration date to undefined for the current trade
+        trade = await Trade.findOneAndUpdate(
+          { _id: tradeId, createdBy: userId },
+          {
+            market: value,
+          },
+          { returnDocument: "after" }
+        );
+        trade.option = undefined;
+        trade.strikePrice = undefined;
+        trade.lotSize = undefined;
+        trade.expDate = undefined;
+        await trade.save();
       }
-      return previousValue;
-    },
-    {
-      entry: { entryPositionTotal: 0, entryPriceTotal: 0 },
-      exit: { exitPositionTotal: 0, exitPriceTotal: 0 },
+      console.log(trade);
     }
-  );
+    // OTHERWISE, IF THE EXECUTIONPROP IS ACTION
+    else if (executionProp === "action") {
+      // edit execution document using execution info from user
+      const query = { _id: executionId, createdBy: userId };
+      execution = await Execution.findOneAndUpdate(
+        query,
+        {
+          [executionProp]: value,
+        },
+        { returnDocument: "after" }
+      );
 
-  console.log(sizeAndPriceTotals);
+      // get the trade associated with this tradeId
+      trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+    }
+    // OTHERWISE, IF THE EXECUTIONPROP IS STRIKE
+    else if (executionProp === "strike") {
+      // change the strikePrice property of the associated trade to the strike price given by the user
+      trade = await Trade.findOneAndUpdate(
+        { _id: tradeId, createdBy: userId },
+        { strikePrice: value },
+        { returnDocument: "after" }
+      );
+    }
+    // OTHERWISE, IF THE EXECUTIONPROP IS EXPIRE
+    else if (executionProp === "expire") {
+      // change the expDate property of the associated trade to the date given by the user
+      trade = await Trade.findOneAndUpdate(
+        { _id: tradeId, createdBy: userId },
+        { expDate: value },
+        { returnDocument: "after" }
+      );
+    }
+    // OTHERWISE, IF THE EXECUTIONPROP IS LOT
+    else if (executionProp === "lot") {
+      // change the expDate property of the associated trade to the date given by the user
+      trade = await Trade.findOneAndUpdate(
+        { _id: tradeId, createdBy: userId },
+        { lotSize: value },
+        { returnDocument: "after" }
+      );
+    }
+    // OTHERWISE, IF THE EXECUTIONPROP IS EXECUTION DATE
+    else if (executionProp === "exec") {
+      // edit execution document using execution info from user
+      const query = { _id: executionId, createdBy: userId };
+      execution = await Execution.findOneAndUpdate(
+        query,
+        {
+          execDate: value,
+        },
+        { returnDocument: "after" }
+      );
 
-  // calculate averageEntry and averageExit
-  let averageEntry =
-    sizeAndPriceTotals["entry"]["entryPriceTotal"] /
-    sizeAndPriceTotals["entry"]["entryPositionTotal"];
+      // get the trade associated with this tradeId
+      trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+    }
 
-  // if exitPositionTotal is NOT 0
-  if (sizeAndPriceTotals["exit"]["exitPositionTotal"] !== 0) {
-    // calculate averageExit
-    var averageExit =
-      sizeAndPriceTotals["exit"]["exitPriceTotal"] /
-      sizeAndPriceTotals["exit"]["exitPositionTotal"];
-  } else {
-    // otherwise just set averageExit to 0
-    var averageExit = 0;
-  }
+    // OTHERWISE, IF THE EXECUTIONPROP IS POSITION SIZE
+    else if (executionProp === "position") {
+      // edit execution document using execution info from user
+      const query = { _id: executionId, createdBy: userId };
+      execution = await Execution.findOneAndUpdate(
+        query,
+        {
+          positionSize: value,
+        },
+        { returnDocument: "after" }
+      );
+    }
 
-  console.log("averageEntry:", averageEntry);
-  console.log("averageExit:", averageExit);
+    // OTHERWISE, IF THE EXECUTIONPROP IS PRICE
+    else if (executionProp === "price") {
+      // edit execution document using execution info from user
+      const query = { _id: executionId, createdBy: userId };
+      execution = await Execution.findOneAndUpdate(
+        query,
+        {
+          price: value,
+        },
+        { returnDocument: "after" }
+      );
 
-  // -- POSITION SIZE --
-  // position size is just the total position size of the entry
-  const positionSize = sizeAndPriceTotals["entry"]["entryPositionTotal"];
+      // get the trade associated with this tradeId
+      trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+    }
 
-  console.log("positionSize:", positionSize);
+    // OTHERWISE, IF THE EXECUTIONPROP IS COMMISSIONS
+    else if (executionProp === "commissions") {
+      // edit execution document using execution info from user
+      const query = { _id: executionId, createdBy: userId };
+      execution = await Execution.findOneAndUpdate(
+        query,
+        {
+          commissions: value,
+        },
+        { returnDocument: "after" }
+      );
 
-  // -- DOLLAR RETURN --
-  // dollar return is the difference between the average exit price and average entry price times the exit position total
-  let dollarReturn =
-    sizeAndPriceTotals["exit"]["exitPositionTotal"] *
-    (averageExit - averageEntry);
+      // get the trade associated with this tradeId
+      trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+    }
 
-  // if the first execution was a sell (short position)
-  if (executionDocs[0].action.toLowerCase() === "sell") {
-    // multiply the dollar return buy -1 because to make money in short selling, the exit price needs to be lower than the entry price!
-    dollarReturn *= -1;
-  }
+    // OTHERWISE, IF THE EXECUTIONPROP IS FEES
+    else {
+      // edit execution document using execution info from user
+      const query = { _id: executionId, createdBy: userId };
+      execution = await Execution.findOneAndUpdate(
+        query,
+        {
+          fees: value,
+        },
+        { returnDocument: "after" }
+      );
 
-  // if the market is options
-  // multiply the dollar return by 100
-  if (market.toLowerCase() === "options") {
-    dollarReturn *= 100;
-  }
+      // get the trade associated with this tradeId
+      trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+    }
 
-  // if the market is futures
-  // multiply the dollar return by lot size
-  if (market.toLowerCase() === "futures") {
-    dollarReturn *= lotSize;
-  }
+    // destructure relevant trade properties for computing other trade metrics
+    const { market, lotSize } = trade;
 
-  console.log("dollarReturn:", dollarReturn);
+    // get all of the executions with the relevant trade id
+    const executionDocs = await Execution.find({ tradeId, createdBy: userId });
 
-  // -- STATUS --
+    // RECOMPUTE ALL OF THE TRADE METRICS BASED ON UPDATED EXECUTIONS
 
-  // if entry and exit positions are NOT equal
-  if (
-    sizeAndPriceTotals["entry"]["entryPositionTotal"] !==
-    sizeAndPriceTotals["exit"]["exitPositionTotal"]
-  ) {
-    // position is still open
-    var status = "OPEN";
-  } else {
-    // otherwise, the position must be closed
-    // if the dollar return is positive
-    if (dollarReturn > 0) {
-      var status = "WIN";
-    } else if (dollarReturn < 0) {
-      // otherwise if the dollar return is negative
-      var status = "LOSS";
+    // -- SIDE --
+    // the side depends on the action of the first execution - buy means long, and sell means short
+    if (executionDocs[0].action.toLowerCase() === "buy") {
+      var side = "LONG";
     } else {
-      // otherwise, if the dollar return is 0
-      var status = "BREAKEVEN";
+      var side = "SHORT";
     }
-  }
 
-  console.log("status:", status);
+    console.log("side:", side);
 
-  // -- PERCENT RETURN --
-  // percent return is the quotient between the dollar return and the total entry price
-  // if the position is closed
-  if (status === "WIN" || status === "LOSS" || status === "BREAKEVEN") {
-    // calculate the percent return accordingly
-    var percentReturn =
-      (dollarReturn / sizeAndPriceTotals["entry"]["entryPriceTotal"]) * 100;
+    // -- OPEN DATE --
+    // the open date is just the execution date of the first execution
+    const openDate = executionDocs[0].execDate;
+
+    console.log("openDate:", openDate);
+
+    // -- AVERAGE ENTRY AND EXIT --
+    // average entry price is the average of the buy prices if the first execution is a buy action, and average of sell prices if the first execution is a sell action
+    // average exit price is the same, but is the average of sell prices if the first execution is a buy action, etc.
+
+    // first, organize all of the total position sizes and total prices for entries and exits
+    var sizeAndPriceTotals = executionDocs.reduce(
+      (previousValue, currentExecution, currentIndex, executions) => {
+        // if the first execution is a buy
+        if (executions[0].action.toLowerCase() === "buy") {
+          // if the current execution's action is a buy
+          if (currentExecution.action.toLowerCase() === "buy") {
+            // add its entry position size and price to the previousValue (initially 0)
+            previousValue["entry"]["entryPositionTotal"] +=
+              currentExecution.positionSize;
+            previousValue["entry"]["entryPriceTotal"] +=
+              currentExecution.price * currentExecution.positionSize;
+          } else {
+            // otherwise if the current execution's action is a sell
+            previousValue["exit"]["exitPositionTotal"] +=
+              currentExecution.positionSize;
+            previousValue["exit"]["exitPriceTotal"] +=
+              currentExecution.price * currentExecution.positionSize;
+          }
+        } else {
+          // otherwise if the first execution is a sell
+          // if the current execution's action is a sell
+          if (currentExecution.action.toLowerCase() === "sell") {
+            // add its position size to the previousValue (initially 0);
+            previousValue["entry"]["entryPositionTotal"] +=
+              currentExecution.positionSize;
+            previousValue["entry"]["entryPriceTotal"] +=
+              currentExecution.price * currentExecution.positionSize;
+          } else {
+            // otherwise if the current execution's action is a buy
+            previousValue["exit"]["exitPositionTotal"] +=
+              currentExecution.positionSize;
+            previousValue["exit"]["exitPriceTotal"] +=
+              currentExecution.price * currentExecution.positionSize;
+          }
+        }
+        return previousValue;
+      },
+      {
+        entry: { entryPositionTotal: 0, entryPriceTotal: 0 },
+        exit: { exitPositionTotal: 0, exitPriceTotal: 0 },
+      }
+    );
+
+    console.log(sizeAndPriceTotals);
+
+    // calculate averageEntry and averageExit
+    let averageEntry =
+      sizeAndPriceTotals["entry"]["entryPriceTotal"] /
+      sizeAndPriceTotals["entry"]["entryPositionTotal"];
+
+    // if exitPositionTotal is NOT 0
+    if (sizeAndPriceTotals["exit"]["exitPositionTotal"] !== 0) {
+      // calculate averageExit
+      var averageExit =
+        sizeAndPriceTotals["exit"]["exitPriceTotal"] /
+        sizeAndPriceTotals["exit"]["exitPositionTotal"];
+    } else {
+      // otherwise just set averageExit to 0
+      var averageExit = 0;
+    }
+
+    console.log("averageEntry:", averageEntry);
+    console.log("averageExit:", averageExit);
+
+    // -- POSITION SIZE --
+    // position size is just the total position size of the entry
+    const positionSize = sizeAndPriceTotals["entry"]["entryPositionTotal"];
+
+    console.log("positionSize:", positionSize);
+
+    // -- DOLLAR RETURN --
+    // dollar return is the difference between the average exit price and average entry price times the exit position total
+    let dollarReturn =
+      sizeAndPriceTotals["exit"]["exitPositionTotal"] *
+      (averageExit - averageEntry);
+
+    // if the first execution was a sell (short position)
+    if (executionDocs[0].action.toLowerCase() === "sell") {
+      // multiply the dollar return buy -1 because to make money in short selling, the exit price needs to be lower than the entry price!
+      dollarReturn *= -1;
+    }
 
     // if the market is options
+    // multiply the dollar return by 100
     if (market.toLowerCase() === "options") {
-      // divide percent return by 100 to neglect the 100x factor of the dollar return calculation
-      percentReturn /= 100;
+      dollarReturn *= 100;
     }
 
     // if the market is futures
+    // multiply the dollar return by lot size
     if (market.toLowerCase() === "futures") {
-      // divide percent return by lotSize to neglect the lotSize multiplier factor of the dollar return calculation
-      percentReturn /= lotSize;
+      dollarReturn *= lotSize;
     }
 
-    percentReturn = parseFloat(percentReturn.toFixed(2)); // round to 2 decimal places
-  } else {
-    // otherwise, just set percent return at zero
-    var percentReturn = 0;
-  }
+    console.log("dollarReturn:", dollarReturn);
 
-  console.log("percentReturn:", percentReturn);
+    // -- STATUS --
 
-  // -- NET RETURN --
-  // dollar return with fees and commissions deducted
-  // if the exit position total is NOT zero
-  if (sizeAndPriceTotals["exit"]["exitPositionTotal"] !== 0) {
-    // calculate to the total fees and commissions from all executions
-    var feesAndComm = executionDocs.reduce(
-      (previousValue, currentExecution) => {
-        previousValue += currentExecution.commissions + currentExecution.fees;
-        return previousValue;
+    // if entry and exit positions are NOT equal
+    if (
+      sizeAndPriceTotals["entry"]["entryPositionTotal"] !==
+      sizeAndPriceTotals["exit"]["exitPositionTotal"]
+    ) {
+      // position is still open
+      var status = "OPEN";
+    } else {
+      // otherwise, the position must be closed
+      // if the dollar return is positive
+      if (dollarReturn > 0) {
+        var status = "WIN";
+      } else if (dollarReturn < 0) {
+        // otherwise if the dollar return is negative
+        var status = "LOSS";
+      } else {
+        // otherwise, if the dollar return is 0
+        var status = "BREAKEVEN";
+      }
+    }
+
+    console.log("status:", status);
+
+    // -- PERCENT RETURN --
+    // percent return is the quotient between the dollar return and the total entry price
+    // if the position is closed
+    if (status === "WIN" || status === "LOSS" || status === "BREAKEVEN") {
+      // calculate the percent return accordingly
+      var percentReturn =
+        (dollarReturn / sizeAndPriceTotals["entry"]["entryPriceTotal"]) * 100;
+
+      // if the market is options
+      if (market.toLowerCase() === "options") {
+        // divide percent return by 100 to neglect the 100x factor of the dollar return calculation
+        percentReturn /= 100;
+      }
+
+      // if the market is futures
+      if (market.toLowerCase() === "futures") {
+        // divide percent return by lotSize to neglect the lotSize multiplier factor of the dollar return calculation
+        percentReturn /= lotSize;
+      }
+
+      percentReturn = parseFloat(percentReturn.toFixed(2)); // round to 2 decimal places
+    } else {
+      // otherwise, just set percent return at zero
+      var percentReturn = 0;
+    }
+
+    console.log("percentReturn:", percentReturn);
+
+    // -- NET RETURN --
+    // dollar return with fees and commissions deducted
+    // if the exit position total is NOT zero
+    if (sizeAndPriceTotals["exit"]["exitPositionTotal"] !== 0) {
+      // calculate to the total fees and commissions from all executions
+      var feesAndComm = executionDocs.reduce(
+        (previousValue, currentExecution) => {
+          previousValue += currentExecution.commissions + currentExecution.fees;
+          return previousValue;
+        },
+        0
+      );
+      var netReturn = dollarReturn - feesAndComm;
+    } else {
+      // otherwise, set the net return to 0
+      var netReturn = 0;
+    }
+
+    console.log("netReturn:", netReturn);
+
+    // -- UPDATE TRADE DOCUMENT WITH NEWLY UPDATED TRADE METRICS --
+
+    const tradeUpdateMetrics = await Trade.findByIdAndUpdate(
+      tradeId,
+      {
+        side,
+        status,
+        openDate,
+        averageEntry,
+        averageExit,
+        positionSize,
+        dollarReturn,
+        percentReturn,
+        netReturn,
       },
-      0
+      { new: true }
     );
-    var netReturn = dollarReturn - feesAndComm;
-  } else {
-    // otherwise, set the net return to 0
-    var netReturn = 0;
+
+    // update trade metrics with newly computed trade metrics
+
+    res.status(StatusCodes.OK).json({
+      tradeUpdateMetrics,
+      execution,
+      executionDocs,
+      executionId,
+      executionProp,
+      value,
+    });
   }
-
-  console.log("netReturn:", netReturn);
-
-  // -- UPDATE TRADE DOCUMENT WITH NEWLY UPDATED TRADE METRICS --
-
-  const tradeUpdateMetrics = await Trade.findByIdAndUpdate(
-    tradeId,
-    {
-      side,
-      status,
-      openDate,
-      averageEntry,
-      averageExit,
-      positionSize,
-      dollarReturn,
-      percentReturn,
-      netReturn,
-    },
-    { new: true }
-  );
-
-  // update trade metrics with newly computed trade metrics
-
-  res.status(StatusCodes.OK).json({
-    tradeUpdateMetrics,
-    execution,
-    executionDocs,
-    executionId,
-    executionProp,
-    value,
-  });
 };
 
 const deleteTrade = async (req, res) => {

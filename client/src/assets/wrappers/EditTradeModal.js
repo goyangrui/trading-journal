@@ -197,6 +197,85 @@ const EditTradeModal = styled.div`
     color: var(--primary-600);
     font-weight: bold;
   }
+
+  /* tag multi-select styles */
+  /* multi-select container styles */
+  .multi-select-dropdown-container {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  /* multi-select dropdown styles */
+  .multi-select-dropdown {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 0.25rem;
+    width: 100%;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+    padding-left: 0.75rem;
+    min-height: 2.25rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--borderRadius-2);
+    user-select: none;
+  }
+
+  /* tag multi-select dropdown button container styles */
+  .dropdown-button-container {
+    position: absolute;
+    right: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .dropdown-button-container svg {
+    color: var(--gray-500);
+  }
+
+  .selected-tag-item {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.3rem;
+    margin-right: 0.5rem;
+    background-color: var(--primary-500);
+    color: var(--gray-100);
+    border-radius: var(--borderRadius-2);
+    border: 2px solid var(--primary-600);
+    box-shadow: var(--shadow-1);
+    white-space: nowrap;
+  }
+
+  /* dropdown tag options list */
+  .tag-options-list {
+    position: absolute;
+    top: 27px;
+    width: 100%;
+    border: 1px solid var(--gray-500);
+    box-shadow: var(--shadow-3);
+    background-color: var(--backgroundColor);
+  }
+
+  .tag-item {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    column-gap: 0.35rem;
+  }
+
+  .tag-item:hover {
+    background-color: var(--gray-300);
+  }
+
+  .disable {
+    pointer-events: none;
+  }
 `;
 
 export default EditTradeModal;

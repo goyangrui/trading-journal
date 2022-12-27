@@ -436,12 +436,21 @@ const reducer = (state, action) => {
 
   if (action.type === UPDATE_TRADE_SUCCESS) {
     console.log("update trade success");
-    return {
-      ...state,
-      trades: action.payload.trades,
-      editTrade: action.payload.editTrade,
-      executions: action.payload.executions,
-    };
+    // if there is no execution in payload
+    if (!action.payload.executions) {
+      return {
+        ...state,
+        trades: action.payload.trades,
+        editTrade: action.payload.editTrade,
+      };
+    } else {
+      return {
+        ...state,
+        trades: action.payload.trades,
+        editTrade: action.payload.editTrade,
+        executions: action.payload.executions,
+      };
+    }
   }
 
   if (action.type === UPDATE_TRADE_ERROR) {

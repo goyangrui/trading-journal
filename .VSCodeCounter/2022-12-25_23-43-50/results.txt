@@ -1,0 +1,160 @@
+Date : 2022-12-25 23:43:50
+Directory : /home/tiger-go/projects/portfolio-projects/trading-journal
+Total : 112 files,  43320 codes, 1352 comments, 1602 blanks, all 46274 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JSON       |          5 |     35,099 |          0 |          5 |     35,104 |
+| JavaScript |        101 |      7,916 |      1,310 |      1,505 |     10,731 |
+| CSS        |          1 |        244 |         19 |         57 |        320 |
+| Markdown   |          2 |         39 |          0 |         34 |         73 |
+| HTML       |          1 |         20 |         23 |          1 |         44 |
+| XML        |          2 |          2 |          0 |          0 |          2 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                         | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                            |        112 |     43,320 |      1,352 |      1,602 |     46,274 |
+| aws                                                                                                          |          2 |         48 |         18 |         21 |         87 |
+| client                                                                                                       |         77 |     35,670 |        697 |      1,087 |     37,454 |
+| client/public                                                                                                |          2 |         45 |         23 |          2 |         70 |
+| client/src                                                                                                   |         72 |      6,259 |        674 |      1,050 |      7,983 |
+| client/src/assets                                                                                            |         25 |      1,359 |        152 |        291 |      1,802 |
+| client/src/assets/images                                                                                     |          2 |          2 |          0 |          0 |          2 |
+| client/src/assets/wrappers                                                                                   |         23 |      1,357 |        152 |        291 |      1,800 |
+| client/src/components                                                                                        |         22 |      2,630 |        208 |        303 |      3,141 |
+| client/src/context                                                                                           |          3 |      1,317 |        193 |        222 |      1,732 |
+| client/src/pages                                                                                             |         17 |        580 |        101 |        161 |        842 |
+| client/src/pages/protected-routes                                                                            |          8 |        288 |         44 |         83 |        415 |
+| client/src/utils                                                                                             |          2 |         51 |          1 |          5 |         57 |
+| controllers                                                                                                  |          7 |      1,371 |        487 |        351 |      2,209 |
+| errors                                                                                                       |          4 |         27 |          0 |         10 |         37 |
+| helpers                                                                                                      |          1 |         21 |          5 |          7 |         33 |
+| middleware                                                                                                   |          4 |         80 |         35 |         31 |        146 |
+| models                                                                                                       |          5 |        222 |         72 |         28 |        322 |
+| routes                                                                                                       |          7 |         87 |         14 |         35 |        136 |
+| utils                                                                                                        |          1 |          3 |          1 |          2 |          6 |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                     | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /home/tiger-go/projects/portfolio-projects/trading-journal/README.md                                         | Markdown   |          1 |          0 |          1 |          2 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/aws/s3Service.js                                  | JavaScript |         45 |         18 |         18 |         81 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/aws/s3client.js                                   | JavaScript |          3 |          0 |          3 |          6 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/README.md                                  | Markdown   |         38 |          0 |         33 |         71 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/package-lock.json                          | JSON       |     29,277 |          0 |          1 |     29,278 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/package.json                               | JSON       |         51 |          0 |          1 |         52 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/public/index.html                          | HTML       |         20 |         23 |          1 |         44 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/public/manifest.json                       | JSON       |         25 |          0 |          1 |         26 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/App.js                                 | JavaScript |         64 |          0 |          9 |         73 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/images/404_image.svg            | XML        |          1 |          0 |          0 |          1 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/images/hero-image.svg           | XML        |          1 |          0 |          0 |          1 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/AddJournalModal.js     | JavaScript |         43 |          5 |          9 |         57 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/AddTradeModal.js       | JavaScript |        114 |         12 |         19 |        145 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Alert.js               | JavaScript |         31 |          3 |          9 |         43 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Avatar.js              | JavaScript |         25 |          3 |          6 |         34 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/DashboardComponent.js  | JavaScript |         77 |          4 |         15 |         96 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/EditTradeModal.js      | JavaScript |        208 |         30 |         40 |        278 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Error.js               | JavaScript |         18 |          0 |          6 |         24 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Features.js            | JavaScript |          3 |          0 |          3 |          6 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/JournalEntry.js        | JavaScript |        182 |         20 |         36 |        238 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/JournalsComponent.js   | JavaScript |         15 |          2 |          4 |         21 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/JournalsList.js        | JavaScript |         58 |          3 |          9 |         70 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Landing.js             | JavaScript |         28 |          6 |          8 |         42 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/MainNavbar.js          | JavaScript |         77 |          8 |         15 |        100 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Navbar.js              | JavaScript |        105 |         11 |         25 |        141 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Pricing.js             | JavaScript |         21 |          4 |          6 |         31 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/PricingCard.js         | JavaScript |         33 |          3 |          7 |         43 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Profile.js             | JavaScript |         13 |          3 |          5 |         21 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Register.js            | JavaScript |         28 |          6 |          9 |         43 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/SharedMain.js          | JavaScript |         22 |          4 |          7 |         33 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Sidebar.js             | JavaScript |         36 |          3 |         11 |         50 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/Subscription.js        | JavaScript |          6 |          0 |          3 |          9 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/TradesComponent.js     | JavaScript |        109 |          7 |         16 |        132 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/assets/wrappers/TradesList.js          | JavaScript |        105 |         15 |         23 |        143 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/AddJournalModal.js          | JavaScript |         82 |          7 |         20 |        109 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/AddTradeModal.js            | JavaScript |        365 |         30 |         50 |        445 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/Alert.js                    | JavaScript |         47 |          2 |          8 |         57 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/Avatar.js                   | JavaScript |         13 |          8 |          1 |         22 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/DashboardComponent.js       | JavaScript |        246 |          6 |         12 |        264 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/EditTradeModal.js           | JavaScript |        812 |         43 |         41 |        896 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/FormRow.js                  | JavaScript |         54 |          2 |          2 |         58 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/JournalEntry.js             | JavaScript |        237 |         20 |         29 |        286 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/JournalsComponent.js        | JavaScript |         29 |          2 |         11 |         42 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/JournalsList.js             | JavaScript |         68 |         12 |         15 |         95 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/Loading.js                  | JavaScript |          4 |          0 |          2 |          6 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/Locked.js                   | JavaScript |          4 |          0 |          2 |          6 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/Logo.js                     | JavaScript |         18 |          2 |          4 |         24 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/MainNavbar.js               | JavaScript |         69 |          3 |         12 |         84 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/Navbar.js                   | JavaScript |         49 |          2 |         13 |         64 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/PricingCard.js              | JavaScript |         47 |          6 |         10 |         63 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/ScrollToTop.js              | JavaScript |         10 |          3 |          5 |         18 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/Sidebar.js                  | JavaScript |         33 |          1 |          6 |         40 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/ToggleMenu.js               | JavaScript |         21 |          0 |          5 |         26 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/TradesComponent.js          | JavaScript |        160 |         20 |         31 |        211 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/TradesList.js               | JavaScript |        218 |         39 |         22 |        279 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/components/index.js                    | JavaScript |         44 |          0 |          2 |         46 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/context/actions.js                     | JavaScript |         74 |          0 |         28 |        102 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/context/appContext.js                  | JavaScript |        656 |        162 |        123 |        941 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/context/reducer.js                     | JavaScript |        587 |         31 |         71 |        689 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/index.css                              | CSS        |        244 |         19 |         57 |        320 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/index.js                               | JavaScript |         14 |          0 |          2 |         16 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/Error.js                         | JavaScript |         13 |          0 |          4 |         17 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/Features.js                      | JavaScript |         11 |          0 |          3 |         14 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/Landing.js                       | JavaScript |         29 |          0 |          5 |         34 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/Login.js                         | JavaScript |         68 |         13 |         19 |        100 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/Pricing.js                       | JavaScript |         37 |         15 |          9 |         61 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/ProtectedRoute.js                | JavaScript |         11 |         14 |          8 |         33 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/Register.js                      | JavaScript |         87 |         14 |         21 |        122 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/SharedLanding.js                 | JavaScript |         16 |          0 |          6 |         22 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/index.js                         | JavaScript |         20 |          1 |          3 |         24 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/Dashboard.js    | JavaScript |         19 |          4 |          7 |         30 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/Journal.js      | JavaScript |         19 |          4 |          7 |         30 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/Profile.js      | JavaScript |        136 |         17 |         30 |        183 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/Rules.js        | JavaScript |         19 |          4 |          7 |         30 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/SharedMain.js   | JavaScript |         34 |          3 |         11 |         48 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/Subscription.js | JavaScript |         34 |          7 |         12 |         53 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/Trades.js       | JavaScript |         19 |          5 |          7 |         31 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/pages/protected-routes/index.js        | JavaScript |          8 |          0 |          2 |         10 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/utils/links.js                         | JavaScript |         18 |          0 |          2 |         20 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/client/src/utils/main-links.js                    | JavaScript |         33 |          1 |          3 |         37 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/controllers/authController.js                     | JavaScript |        132 |         41 |         44 |        217 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/controllers/executionController.js                | JavaScript |        346 |        129 |         93 |        568 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/controllers/journalsController.js                 | JavaScript |         78 |         38 |         32 |        148 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/controllers/stripeController.js                   | JavaScript |         93 |         29 |         22 |        144 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/controllers/tagController.js                      | JavaScript |         26 |         12 |         14 |         52 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/controllers/tradesController.js                   | JavaScript |        678 |        234 |        139 |      1,051 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/controllers/userInfoController.js                 | JavaScript |         18 |          4 |          7 |         29 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/errors/bad-request.js                             | JavaScript |          9 |          0 |          3 |         12 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/errors/custom-error.js                            | JavaScript |          6 |          0 |          2 |          8 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/errors/index.js                                   | JavaScript |          3 |          0 |          2 |          5 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/errors/unauthenticated.js                         | JavaScript |          9 |          0 |          3 |         12 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/helpers/createExecutions.js                       | JavaScript |         21 |          5 |          7 |         33 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/middleware/auth.js                                | JavaScript |         17 |          5 |          9 |         31 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/middleware/error-handler.js                       | JavaScript |         36 |          6 |          9 |         51 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/middleware/multer.js                              | JavaScript |         22 |         24 |         10 |         56 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/middleware/not-found.js                           | JavaScript |          5 |          0 |          3 |          8 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/models/Execution.js                               | JavaScript |         42 |         13 |          4 |         59 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/models/Journal.js                                 | JavaScript |         30 |         10 |          5 |         45 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/models/Tag.js                                     | JavaScript |         24 |          9 |          6 |         39 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/models/Trade.js                                   | JavaScript |         67 |         31 |          4 |        102 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/models/User.js                                    | JavaScript |         59 |          9 |          9 |         77 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/package-lock.json                                 | JSON       |      5,704 |          0 |          1 |      5,705 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/package.json                                      | JSON       |         42 |          0 |          1 |         43 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/routes/authRoutes.js                              | JavaScript |         17 |          4 |          7 |         28 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/routes/executionRoutes.js                         | JavaScript |         13 |          1 |          4 |         18 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/routes/journalsRoutes.js                          | JavaScript |         16 |          2 |          5 |         23 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/routes/stripeRoutes.js                            | JavaScript |         16 |          4 |          7 |         27 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/routes/tagRoutes.js                               | JavaScript |          6 |          1 |          4 |         11 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/routes/tradesRoutes.js                            | JavaScript |         14 |          1 |          4 |         19 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/routes/userInfoRoutes.js                          | JavaScript |          5 |          1 |          4 |         10 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/server.js                                         | JavaScript |         44 |         23 |         27 |         94 |
+| /home/tiger-go/projects/portfolio-projects/trading-journal/utils/stripe.js                                   | JavaScript |          3 |          1 |          2 |          6 |
+| Total                                                                                                        |            |     43,320 |      1,352 |      1,602 |     46,274 |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

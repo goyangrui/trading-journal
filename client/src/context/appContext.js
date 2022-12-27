@@ -506,32 +506,48 @@ function AppContextProvider({ children }) {
   };
 
   // update trade
-  const updateTrade = async ({ value, executionInfo }) => {
+  const updateTrade = async ({ value, executionInfo, tradeId, tagInfo }) => {
     try {
       dispatch({ type: UPDATE_TRADE_BEGIN });
 
-      // get the executionId from executionInfo
-      const executionId = executionInfo.split("-")[1];
+      // if neither value nor executionInfo are provided
+      if (value === undefined && executionInfo === undefined) {
+        // send patch request to trades with the selectedTags in the request body
+        const { data } = await authFetch.patch(`/trades/${tradeId}`, {
+          tagInfo,
+        });
+        // extract the edited trade from data
+        const { trade: editTrade } = data;
 
-      // get execution property name that was changed
-      const executionProp = executionInfo.split("-")[2];
+        // fetch all of the trades
+        const { data: tradesData } = await authFetch.get("/trades");
+        const { trades } = tradesData;
 
-      // try and send a request to update the trade
-      const { data } = await authFetch.patch(`/trades/${executionId}`, {
-        value,
-        executionProp,
-      });
-      // get the updated executions, and updated trade from this patch request
-      const { executionDocs: executions, tradeUpdateMetrics: editTrade } = data;
+        dispatch({
+          type: UPDATE_TRADE_SUCCESS,
+          payload: { trades, editTrade },
+        });
+      } else {
+        // otherwise if both value and executionInfo are provided
 
-      // fetch all of the trades
-      const { data: tradesData } = await authFetch.get("/trades");
-      const { trades } = tradesData;
+        // try and send a request to update the trade
+        const { data } = await authFetch.patch(`/trades/${tradeId}`, {
+          value,
+          executionInfo,
+        });
+        // get the updated executions, and updated trade from this patch request
+        const { executionDocs: executions, tradeUpdateMetrics: editTrade } =
+          data;
 
-      dispatch({
-        type: UPDATE_TRADE_SUCCESS,
-        payload: { trades, editTrade, executions },
-      });
+        // fetch all of the trades
+        const { data: tradesData } = await authFetch.get("/trades");
+        const { trades } = tradesData;
+
+        dispatch({
+          type: UPDATE_TRADE_SUCCESS,
+          payload: { trades, editTrade, executions },
+        });
+      }
     } catch (error) {
       console.log(error);
       dispatch({ type: UPDATE_TRADE_ERROR });

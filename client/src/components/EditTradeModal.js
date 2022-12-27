@@ -3,6 +3,8 @@ import moment from "moment";
 
 import { FaTimes } from "react-icons/fa";
 import { AiFillMinusSquare, AiFillPlusSquare } from "react-icons/ai";
+import { IoIosArrowDropdownCircle } from "react-icons/io";
+import { ImCheckboxChecked, ImCheckboxUnchecked } from "react-icons/im";
 
 import { Loading, Alert } from ".";
 import Wrapper from "../assets/wrappers/EditTradeModal";
@@ -22,6 +24,12 @@ function EditTradeModal() {
   // local state for keeping track of the cell that has been activated
   const [activatedCell, setActivatedCell] = useState("");
 
+  // local state variable for keeping track of the tag dropdown
+  const [toggleDropdown, setToggleDropdown] = useState(false);
+
+  // local state variable for tracking whether a trade edit request is still being processed
+  const [tradeProcess, setTradeProcess] = useState(false);
+
   // global state variables and functions
   const {
     toggleEditTradeModal,
@@ -33,6 +41,9 @@ function EditTradeModal() {
     executions,
     updateTrade,
     editTrade: trade,
+    tags,
+    selectedTags,
+    setSelectedTags,
     showAlert,
     clearAlert,
   } = useAppContext();
@@ -56,7 +67,7 @@ function EditTradeModal() {
     const processData = async () => {
       if (cellState.value && cellState.executionInfo) {
         // send a request to edit the execution and trade
-        await updateTrade(cellState);
+        await updateTrade({ ...cellState });
       }
 
       // clear cell state activation flag and cell state values
@@ -127,6 +138,63 @@ function EditTradeModal() {
       fees: "",
     });
   };
+
+  // Tag functions
+  const handleTagDropdown = (e) => {
+    setToggleDropdown(!toggleDropdown);
+  };
+
+  // handle tag select
+  const handleTagSelect = (tagId, tradeId) => {
+    const processData = async () => {
+      // set trade process state to true (prevent user from sending request when these update trade requests are still being processed)
+      setTradeProcess(true);
+
+      // send request to edit this trade (add or remove tags based on selectedTags state variable)
+      await updateTrade({
+        value: undefined,
+        executionInfo: undefined,
+        tradeId,
+        tagInfo: { [tagId]: !selectedTags[tagId] },
+      });
+
+      // after trade has been edited, set id of selected tag to be the opposite state (true or false) of what it was originally
+      // update selected tags first
+      await setSelectedTags({
+        ...selectedTags,
+        [tagId]: !selectedTags[tagId],
+      });
+
+      setTradeProcess(false);
+    };
+    processData();
+  };
+
+  // on initial render
+  useEffect(() => {
+    // if there are any tags, loop through each tag, and set the selected tags to all false (except the ones that exist in the trade)
+    if (tags.length !== 0) {
+      // map the tags array to a map of tag id's as the key, and true/false as the value depending on whether or not the tag exists in the trade
+      const tagIdMap = new Map(
+        tags.map((tag) => {
+          // if the current tag in the loop exists in the trade's tags
+          if (trade.tags[tag._id]) {
+            // set this tag as being selected by default (set value of this tag id to true)
+            return [tag._id, true];
+          } else {
+            // otherwise, set this tag as being not selected by default (set value of this tag id to false)
+            return [tag._id, false];
+          }
+        })
+      );
+
+      // convert the Map to an object
+      const tagIdObject = Object.fromEntries(tagIdMap);
+
+      // set the global selectedTags state
+      setSelectedTags({ ...tagIdObject });
+    }
+  }, []);
 
   // on initial render, fetch all executions
   useEffect(() => {
@@ -776,6 +844,82 @@ function EditTradeModal() {
                   </tr>
                 </tbody>
               </table>
+            </div>
+            {/* TAGS CONTAINER FOR ADDING AND REMOVING TAGS */}
+            <div className="tags-container">
+              {/* header */}
+              <div className="tags-container-header">
+                <h4 className="gradient-heading">Tags</h4>
+              </div>
+
+              {/* tag dropdown container */}
+              <div className="multi-select-dropdown-container">
+                <div
+                  className="multi-select-dropdown"
+                  onClick={handleTagDropdown}
+                >
+                  {/* tags for this trade will be displayed */}
+                  {tags.map((tag) => {
+                    // only show tag if it is selected
+                    if (selectedTags[tag._id]) {
+                      return (
+                        <div key={tag._id} className="selected-tag-item">
+                          {tag.text}
+                        </div>
+                      );
+                    }
+                  })}
+
+                  {/* dropdown icon */}
+                  <div className="dropdown-button-container">
+                    <IoIosArrowDropdownCircle />
+                  </div>
+                </div>
+                {/* list of options */}
+                {/* only show list of options if dropdown is toggled */}
+                {toggleDropdown && (
+                  <ul className="tag-options-list">
+                    {tags.map((tag) => {
+                      return (
+                        <li
+                          id={tag._id}
+                          key={tag._id}
+                          className={
+                            tradeProcess ? "tag-item disable" : "tag-item"
+                          }
+                          onClick={(e) => {
+                            handleTagSelect(tag._id, trade._id);
+                          }}
+                        >
+                          {/* if this tag has been selected, show the checked box, otherwise show the unchecked box */}
+                          {selectedTags[tag._id] ? (
+                            <ImCheckboxChecked />
+                          ) : (
+                            <ImCheckboxUnchecked />
+                          )}
+                          {tag.text}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* SCREENSHOT NOTES CONTAINER FOR ADDING/REMOVING SCREENSHOTS */}
+            <div className="screenshots-container">
+              {/* header */}
+              <div className="screenshots-container-header">
+                <h4 className="gradient-heading">Screenshots</h4>
+              </div>
+            </div>
+
+            {/* NOTES CONTAINER FOR EDITING NOTES */}
+            <div className="notes-container">
+              {/* header */}
+              <div className="notes-container-header">
+                <h4 className="gradient-heading">Notes</h4>
+              </div>
             </div>
           </div>
         )}
