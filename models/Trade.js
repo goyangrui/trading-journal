@@ -96,6 +96,29 @@ const TradeSchema = new mongoose.Schema({
     type: Map,
     of: String,
   },
+  notes: {
+    type: String,
+    default: "",
+  },
+  screenshots: {
+    type: Map,
+    of: String,
+    validate: {
+      validator: mapLimit,
+      message: "You can only have 2 screenshots per trade entry",
+    },
+  },
+  height: {
+    type: Number,
+    default: 40,
+  },
 });
+
+// custom validator function for making sure the length of the screenshots array is less than or equal to 2
+function mapLimit() {
+  // if adding the screenshot makes the length of the screenshots array greater than 2, return false (validator failed)
+  // otherwise, add the screenshot
+  return this.screenshots.size <= 2;
+}
 
 export default mongoose.model("Trade", TradeSchema);

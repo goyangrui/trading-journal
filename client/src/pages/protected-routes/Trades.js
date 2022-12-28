@@ -6,11 +6,13 @@ import { Loading, TradesComponent } from "../../components";
 
 function Trades() {
   // global state variables and functions
-  const { getSubscriptions, hasSubscription, isLoading } = useAppContext();
+  const { getSubscriptions, hasSubscription, isLoading, clearAlert } =
+    useAppContext();
 
   // on initial render, getSubscriptions
   useEffect(() => {
     getSubscriptions();
+    clearAlert();
   }, []);
 
   // if is loading

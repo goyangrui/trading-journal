@@ -7,6 +7,8 @@ import { BadRequestError } from "../errors/index.js";
 
 import createExecutions from "../helpers/createExecutions.js";
 
+import { s3UploadScreenshot, s3DeleteScreenshot } from "../aws/s3Service.js";
+
 const createTrade = async (req, res) => {
   // get user id
   const { userId } = req.user;
@@ -334,6 +336,7 @@ const createTrade = async (req, res) => {
       percentReturn,
       netReturn,
       tags: {},
+      screenshots: new Map(),
     },
     { new: true }
   );
@@ -378,48 +381,26 @@ const updateTrade = async (req, res) => {
   // get trade id from request url params
   const tradeId = req.params.id;
 
-  // get execution info and value of that execution (to be changed)
+  // get execution info and value of that execution (to be changed if they exist)
   const { value, executionInfo } = req.body;
 
-  // get the tag info from the request body
+  // get the tag info from the request body (to be added/removed if they exist)
   const { tagInfo } = req.body;
+
+  // get screenshot file from req.file from multer (to be added/removed if they exist)
+  const screenshotFile = req.file;
+
+  // get screenshot doc key and screenshot link if they exist
+  const { screenshotDocKey, screenshotLink } = req.body;
+
+  // get notes from the request body
+  const { notes } = req.body;
 
   var trade = undefined;
   var execution = undefined;
 
-  // If the tag info exists
-  if (tagInfo) {
-    // get the tagId associated with this tag
-    const tagId = Object.keys(tagInfo)[0];
-
-    // if the value of the tagInfo is true
-    if (Object.values(tagInfo)[0]) {
-      // add this tag to this trade
-      // first find the tag associated with this tagId
-      const tagDoc = await Tag.findOne({ createdBy: userId, _id: tagId });
-
-      // get the trade associated with this tradeId
-      trade = await Trade.findOne({ createdBy: userId, _id: tradeId });
-
-      // add the tag to this trade
-      trade.tags.set(tagDoc._id, tagDoc.text);
-      await trade.save();
-    } else {
-      // otherwise if the value of tagInfo is false
-      // remove this tag from this trade
-
-      // first find the tag associated with this tagId
-      const tagDoc = await Tag.findOne({ createdBy: userId, _id: tagId });
-
-      // then find the trade
-      trade = await Trade.findOne({ createdBy: userId, _id: tradeId });
-
-      // remove the tag from this trade
-      trade.tags.delete(tagDoc._id);
-      await trade.save();
-    }
-    return res.status(StatusCodes.OK).json({ trade });
-  } else {
+  // If value and executionInfo are not undefined
+  if (value !== undefined && executionInfo !== undefined) {
     // otherwise, if tag info doesn't exist, edit execution properties of trade
     // get the executionId from executionInfo
     const executionId = executionInfo.split("-")[1];
@@ -823,6 +804,89 @@ const updateTrade = async (req, res) => {
       executionProp,
       value,
     });
+  } else if (tagInfo !== undefined) {
+    // otherwise if the tagInfo exists
+    // get the tagId associated with this tag
+    const tagId = Object.keys(tagInfo)[0];
+
+    // if the value of the tagInfo is true
+    if (Object.values(tagInfo)[0]) {
+      // add this tag to this trade
+      // first find the tag associated with this tagId
+      const tagDoc = await Tag.findOne({ createdBy: userId, _id: tagId });
+
+      // get the trade associated with this tradeId
+      trade = await Trade.findOne({ createdBy: userId, _id: tradeId });
+
+      // add the tag to this trade
+      trade.tags.set(tagDoc._id, tagDoc.text);
+      await trade.save();
+    } else {
+      // otherwise if the value of tagInfo is false
+      // remove this tag from this trade
+
+      // first find the tag associated with this tagId
+      const tagDoc = await Tag.findOne({ createdBy: userId, _id: tagId });
+
+      // then find the trade
+      trade = await Trade.findOne({ createdBy: userId, _id: tradeId });
+
+      // remove the tag from this trade
+      trade.tags.delete(tagDoc._id);
+      await trade.save();
+    }
+    return res.status(StatusCodes.OK).json({ trade });
+  } else if (notes !== undefined) {
+    // otherwise if notes is provided
+    // update trade document's notes property
+
+    trade = await Trade.findOneAndUpdate(
+      { createdBy: userId, _id: tradeId },
+      { notes }
+    );
+
+    return res.status(StatusCodes.OK).json({ trade });
+  } else {
+    // get the trade associated with this tradeId
+    trade = await Trade.findOne({ _id: tradeId, createdBy: userId });
+
+    // -- ADD SCREENSHOT --
+    // only add screenshot to S3 bucket and trade screenshots map
+    // if the number of screenshots in the trades is less than 2, and the screenshotFile exists from the user request
+    if (trade.screenshots.size < 2 && screenshotFile) {
+      // store the file in AWS S3 screenshots bucket
+      let { key: screenshotKey, imageURL: screenshotLink } =
+        await s3UploadScreenshot(screenshotFile);
+
+      // get the uuid key from the screenshotKey (for Trade document)
+      const screenshotDocKey = screenshotKey.split("::")[0];
+
+      // set the screenshot key to the screenshot link in the screenshots map in trade document
+      trade.screenshots.set(screenshotDocKey, screenshotLink);
+
+      console.log(trade);
+    }
+
+    // -- REMOVE SCREENSHOT --
+    // only if the user provided the screenshot link and doc key, delete the screenshot
+    if (screenshotLink && screenshotDocKey) {
+      // extrapolate the screenshot key for the S3 bucket from the screenshotLink
+      const screenshotKey = screenshotLink.split(
+        process.env.AWS_SCREENSHOT_URL
+      )[1];
+
+      // if the screenshot key (from the link spliting) exists
+      if (screenshotKey) {
+        // delete the screenshot from S3
+        await s3DeleteScreenshot(screenshotKey);
+
+        // remove the screenshot from the journal list of screenshots
+        trade.screenshots.delete(screenshotDocKey);
+      }
+    }
+
+    await trade.save();
+    res.status(StatusCodes.OK).json({ trade });
   }
 };
 

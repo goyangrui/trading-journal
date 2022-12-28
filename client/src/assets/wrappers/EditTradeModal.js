@@ -198,15 +198,32 @@ const EditTradeModal = styled.div`
     font-weight: bold;
   }
 
-  /* tag multi-select styles */
+  /* edit trade container styles */
+  .edit-trade-container {
+    position: relative;
+    background-color: var(--gray-600);
+    margin-bottom: 1rem;
+  }
+
+  /* edit trade container header styles */
+  .container-header {
+    background-color: var(--gray-700);
+    padding: 0.75rem 0.5rem;
+  }
+
+  .container-header .gradient-heading {
+    margin: 0;
+  }
+
   /* multi-select container styles */
   .multi-select-dropdown-container {
     position: relative;
-    margin-bottom: 1rem;
+    padding: 0.75rem 0.5rem;
   }
 
   /* multi-select dropdown styles */
   .multi-select-dropdown {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -218,13 +235,15 @@ const EditTradeModal = styled.div`
     min-height: 2.25rem;
     border: 1px solid var(--gray-200);
     border-radius: var(--borderRadius-2);
+    padding-right: 3rem;
+    background-color: var(--gray-200);
     user-select: none;
   }
 
   /* tag multi-select dropdown button container styles */
   .dropdown-button-container {
     position: absolute;
-    right: 0.25rem;
+    right: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -235,6 +254,7 @@ const EditTradeModal = styled.div`
     color: var(--gray-500);
   }
 
+  /* selected tag item styles (show up in dropdown button) */
   .selected-tag-item {
     display: flex;
     height: 100%;
@@ -255,13 +275,14 @@ const EditTradeModal = styled.div`
   /* dropdown tag options list */
   .tag-options-list {
     position: absolute;
-    top: 27px;
+    top: 95px;
     width: 100%;
     border: 1px solid var(--gray-500);
     box-shadow: var(--shadow-3);
     background-color: var(--backgroundColor);
   }
 
+  /* dropdown tag options list item */
   .tag-item {
     display: flex;
     align-items: center;
@@ -275,6 +296,95 @@ const EditTradeModal = styled.div`
 
   .disable {
     pointer-events: none;
+  }
+
+  /* Add/edit screenshot styles */
+  /* screenshots container */
+  .screenshots-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 3rem;
+    padding-bottom: 2rem;
+  }
+
+  .screenshot-container,
+  .add-image-box {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    width: 45%;
+    height: 250px;
+  }
+
+  .add-image-box {
+    color: var(--primary-500);
+    border: 2px dotted var(--gray-300);
+  }
+
+  /* screenshot */
+  .screenshot-container img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .screenshot-container img:hover {
+    cursor: pointer;
+  }
+
+  /* remove image button */
+  .remove-button-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .remove-image-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: var(--gray-300);
+    height: 25px;
+    width: 25px;
+  }
+
+  .remove-image-button:hover {
+    background-color: var(--gray-400);
+    cursor: pointer;
+  }
+
+  /* hide file input button */
+  .file-input {
+    display: none;
+  }
+
+  input:disabled {
+    cursor: not-allowed;
+    pointer-events: all !important;
+  }
+
+  /* journal notes styles */
+  .journal-notes {
+    display: flex;
+    resize: none;
+    padding: 0.5rem;
+    border-radius: var(--borderRadius-2);
+    border: 2px solid var(--gray-700);
+    outline: none;
+    margin: 1rem 0;
+    height: 40px;
+    max-height: 100px;
+    width: 100%;
+  }
+
+  .journal-notes:focus {
+    border-color: var(--primary-500);
+  }
+
+  .journal-notes::-webkit-scrollbar {
+    width: 0px;
   }
 `;
 

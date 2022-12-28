@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import moment from "moment";
 
 import { FaTimes } from "react-icons/fa";
@@ -48,6 +48,12 @@ function EditTradeModal() {
     clearAlert,
   } = useAppContext();
 
+  // local state variable for keeping track of notes
+  const [notes, setNotes] = useState(trade.notes);
+
+  // local state for the height of the notes textarea
+  const [height, setHeight] = useState(trade.height);
+
   // handle edittable cell click
   const handleCellClick = (e) => {
     // only if the event target and event currentTarget are the same (prevent child element from triggering event)
@@ -88,7 +94,6 @@ function EditTradeModal() {
 
   // handle change of state of form inputs in executions
   const handleChange = (e) => {
-    console.log("input state changed");
     setCellState({
       ...cellState,
       value: e.target.value,
@@ -124,21 +129,6 @@ function EditTradeModal() {
     processData();
   };
 
-  // handle modal close button
-  const closeButtonHandler = () => {
-    // toggle the modal, clear any alerts, and set the add execution global state to the initial state
-    toggleEditTradeModal({});
-    clearAlert();
-    setAddExecCellState({
-      action: "",
-      execDate: "",
-      positionSize: "",
-      price: "",
-      commissions: "",
-      fees: "",
-    });
-  };
-
   // Tag functions
   const handleTagDropdown = (e) => {
     setToggleDropdown(!toggleDropdown);
@@ -167,6 +157,86 @@ function EditTradeModal() {
 
       setTradeProcess(false);
     };
+    processData();
+  };
+
+  // Screenshot functions
+  const handleDeleteImage = async ({
+    e,
+    tradeId,
+    screenshotDocKey,
+    screenshotLink,
+  }) => {
+    setTradeProcess(true);
+
+    // call updateTrade function with tradeId, the screenshot doc key, and the screenshot link
+    await updateTrade({ tradeId, screenshotDocKey, screenshotLink });
+
+    setTradeProcess(false);
+  };
+
+  const handleClickImage = async () => {
+    console.log("image clicked");
+  };
+
+  const handleImageChange = async (e, tradeId) => {
+    // if the event id is file-input
+    if (e.target.className === "file-input") {
+      // set trade process state to true (prevent user from sending request when these update trade requests are still being processed)
+      setTradeProcess(true);
+
+      // call updateTrade function with tradeId, the screenshot file, and the action type (create)
+      await updateTrade({ tradeId, screenshotFile: e.target.files[0] });
+
+      setTradeProcess(false);
+    }
+  };
+
+  // handle modal close button
+  const closeButtonHandler = () => {
+    // toggle the modal, clear any alerts, and set the add execution global state to the initial state
+    toggleEditTradeModal({});
+    clearAlert();
+    setAddExecCellState({
+      action: "",
+      execDate: "",
+      positionSize: "",
+      price: "",
+      commissions: "",
+      fees: "",
+    });
+  };
+
+  // handle change of notes state
+  const handleNotesChange = (e) => {
+    setNotes(e.target.value);
+
+    // set the height of text area to 44px first so that the scroll height
+    textAreaEl.current.style.height = "44px";
+
+    // get the scroll height from the event target (text area)
+    const scrollHeight = e.target.scrollHeight;
+    console.log(scrollHeight);
+
+    // set the height property of the text area element to the scrollheight
+    textAreaEl.current.style.height = `${scrollHeight}px`;
+
+    // store the scroll height in the local state height variable
+    setHeight(scrollHeight);
+  };
+
+  // handle blur of notes text box
+  const handleNotesBlur = (e, tradeId) => {
+    const processData = async () => {
+      // set trade process state to true (prevent user from sending request when these update trade requests are still being processed)
+      setTradeProcess(true);
+
+      // call updateTrade function with tradeId, and notes
+      await updateTrade({ tradeId, notes });
+
+      setTradeProcess(false);
+    };
+
     processData();
   };
 
@@ -207,6 +277,9 @@ function EditTradeModal() {
 
     loadData();
   }, []);
+
+  // useRef hook to reference text area DOM element
+  const textAreaEl = useRef(null);
 
   return (
     <Wrapper>
@@ -846,9 +919,9 @@ function EditTradeModal() {
               </table>
             </div>
             {/* TAGS CONTAINER FOR ADDING AND REMOVING TAGS */}
-            <div className="tags-container">
+            <div className="edit-trade-container">
               {/* header */}
-              <div className="tags-container-header">
+              <div className="container-header">
                 <h4 className="gradient-heading">Tags</h4>
               </div>
 
@@ -875,50 +948,119 @@ function EditTradeModal() {
                     <IoIosArrowDropdownCircle />
                   </div>
                 </div>
-                {/* list of options */}
-                {/* only show list of options if dropdown is toggled */}
-                {toggleDropdown && (
-                  <ul className="tag-options-list">
-                    {tags.map((tag) => {
-                      return (
-                        <li
-                          id={tag._id}
-                          key={tag._id}
-                          className={
-                            tradeProcess ? "tag-item disable" : "tag-item"
-                          }
+              </div>
+              {/* list of options */}
+              {/* only show list of options if dropdown is toggled */}
+              {toggleDropdown && (
+                <ul className="tag-options-list">
+                  {tags.map((tag) => {
+                    return (
+                      <li
+                        id={tag._id}
+                        key={tag._id}
+                        className={
+                          tradeProcess ? "tag-item disable" : "tag-item"
+                        }
+                        onClick={(e) => {
+                          handleTagSelect(tag._id, trade._id);
+                        }}
+                      >
+                        {/* if this tag has been selected, show the checked box, otherwise show the unchecked box */}
+                        {selectedTags[tag._id] ? (
+                          <ImCheckboxChecked />
+                        ) : (
+                          <ImCheckboxUnchecked />
+                        )}
+                        {tag.text}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            {/* SCREENSHOT NOTES CONTAINER FOR ADDING/REMOVING SCREENSHOTS */}
+            <div className="edit-trade-container">
+              {/* header */}
+              <div className="container-header">
+                <h4 className="gradient-heading">Screenshots</h4>
+              </div>
+
+              {/* screenshots */}
+              <div className="screenshots-container">
+                {/* display screenshots */}
+                {Object.entries(trade.screenshots).map((screenshot, index) => {
+                  return (
+                    <div key={index} className="screenshot-container">
+                      {/* remove button with handler which passes screenshot link and key */}
+                      <div className="remove-button-container">
+                        <button
+                          type="button"
+                          className="remove-image-button"
                           onClick={(e) => {
-                            handleTagSelect(tag._id, trade._id);
+                            handleDeleteImage({
+                              e,
+                              tradeId: trade._id,
+                              screenshotDocKey: screenshot[0],
+                              screenshotLink: screenshot[1],
+                            });
                           }}
                         >
-                          {/* if this tag has been selected, show the checked box, otherwise show the unchecked box */}
-                          {selectedTags[tag._id] ? (
-                            <ImCheckboxChecked />
-                          ) : (
-                            <ImCheckboxUnchecked />
-                          )}
-                          {tag.text}
-                        </li>
-                      );
-                    })}
-                  </ul>
+                          <FaTimes />
+                        </button>
+                      </div>
+                      <img
+                        onClick={handleClickImage}
+                        src={screenshot[1]}
+                        alt="screenshot"
+                      />
+                    </div>
+                  );
+                })}
+                {/* only display a file-input box if the screenshots objects length is less than 2 */}
+                {Object.keys(trade.screenshots).length < 2 && (
+                  <>
+                    <label
+                      htmlFor={`file-input-${trade._id}`}
+                      className="add-image-box"
+                    >
+                      Add Image
+                    </label>
+                    <input
+                      className="file-input"
+                      id={`file-input-${trade._id}`}
+                      type="file"
+                      disabled={tradeProcess}
+                      onChange={(e) => {
+                        handleImageChange(e, trade._id);
+                      }}
+                      onClick={(e) => {
+                        e.target.value = null;
+                      }}
+                    />
+                  </>
                 )}
               </div>
             </div>
 
-            {/* SCREENSHOT NOTES CONTAINER FOR ADDING/REMOVING SCREENSHOTS */}
-            <div className="screenshots-container">
-              {/* header */}
-              <div className="screenshots-container-header">
-                <h4 className="gradient-heading">Screenshots</h4>
-              </div>
-            </div>
-
             {/* NOTES CONTAINER FOR EDITING NOTES */}
-            <div className="notes-container">
+            <div className="edit-trade-container">
               {/* header */}
-              <div className="notes-container-header">
+              <div className="container-header">
                 <h4 className="gradient-heading">Notes</h4>
+                {/* notes text box */}
+                <textarea
+                  id={`notes-${trade._id}`}
+                  className="journal-notes"
+                  type="text"
+                  value={notes}
+                  placeholder="Enter notes here..."
+                  onChange={handleNotesChange}
+                  onBlur={(e) => {
+                    handleNotesBlur(e, trade._id);
+                  }}
+                  ref={textAreaEl}
+                />
               </div>
             </div>
           </div>

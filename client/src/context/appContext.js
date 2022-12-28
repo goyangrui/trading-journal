@@ -506,12 +506,21 @@ function AppContextProvider({ children }) {
   };
 
   // update trade
-  const updateTrade = async ({ value, executionInfo, tradeId, tagInfo }) => {
+  const updateTrade = async ({
+    value,
+    executionInfo,
+    tradeId,
+    tagInfo,
+    screenshotFile,
+    screenshotDocKey,
+    screenshotLink,
+    notes,
+  }) => {
     try {
       dispatch({ type: UPDATE_TRADE_BEGIN });
 
-      // if neither value nor executionInfo are provided
-      if (value === undefined && executionInfo === undefined) {
+      // if neither value nor executionInfo are provided and the tagInfo exists
+      if (value === undefined && executionInfo === undefined && tagInfo) {
         // send patch request to trades with the selectedTags in the request body
         const { data } = await authFetch.patch(`/trades/${tradeId}`, {
           tagInfo,
@@ -527,9 +536,51 @@ function AppContextProvider({ children }) {
           type: UPDATE_TRADE_SUCCESS,
           payload: { trades, editTrade },
         });
+      } else if (
+        value === undefined &&
+        executionInfo === undefined &&
+        (screenshotFile || (screenshotDocKey && screenshotLink))
+      ) {
+        // otherwise if neither value nor executionInfo are provided and the screenshotFile exists or the screenshot doc key and screenshot link exist
+
+        // create formdata with screenshot file, screenshot doc key and screenshot link
+        const formdata = new FormData();
+        formdata.append("screenshotFile", screenshotFile);
+        formdata.append("screenshotDocKey", screenshotDocKey);
+        formdata.append("screenshotLink", screenshotLink);
+
+        // send patch request to add screenshot to trade
+        const { data } = await authFetch.patch(`/trades/${tradeId}`, formdata);
+        const { trade: editTrade } = data;
+
+        // fetch all of the trades
+        const { data: tradesData } = await authFetch.get("/trades");
+        const { trades } = tradesData;
+
+        dispatch({
+          type: UPDATE_TRADE_SUCCESS,
+          payload: { trades, editTrade },
+        });
+      } else if (
+        value === undefined &&
+        executionInfo === undefined &&
+        notes !== undefined
+      ) {
+        // otherwise if neither value nor execution info are provided and notes is provided
+        // send patch request to add notes to trade
+        const { data } = await authFetch.patch(`/trades/${tradeId}`, { notes });
+        const { trade: editTrade } = data;
+
+        // fetch all of the trades
+        const { data: tradesData } = await authFetch.get("/trades");
+        const { trades } = tradesData;
+
+        dispatch({
+          type: UPDATE_TRADE_SUCCESS,
+          payload: { trades, editTrade },
+        });
       } else {
         // otherwise if both value and executionInfo are provided
-
         // try and send a request to update the trade
         const { data } = await authFetch.patch(`/trades/${tradeId}`, {
           value,
@@ -549,8 +600,11 @@ function AppContextProvider({ children }) {
         });
       }
     } catch (error) {
-      console.log(error);
-      dispatch({ type: UPDATE_TRADE_ERROR });
+      console.log(error.response);
+      dispatch({
+        type: UPDATE_TRADE_ERROR,
+        payload: { alertText: error.response.data.msg, alertType: "danger" },
+      });
     }
   };
 

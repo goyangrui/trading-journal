@@ -442,12 +442,18 @@ const reducer = (state, action) => {
         ...state,
         trades: action.payload.trades,
         editTrade: action.payload.editTrade,
+        showAlert: false,
+        alertType: "",
+        alertText: "",
       };
     } else {
       return {
         ...state,
         trades: action.payload.trades,
         editTrade: action.payload.editTrade,
+        showAlert: false,
+        alertType: "",
+        alertText: "",
         executions: action.payload.executions,
       };
     }
@@ -455,7 +461,12 @@ const reducer = (state, action) => {
 
   if (action.type === UPDATE_TRADE_ERROR) {
     console.log("update trade error");
-    return { ...state };
+    return {
+      ...state,
+      showAlert: true,
+      alertText: action.payload.alertText,
+      alertType: action.payload.alertType,
+    };
   }
 
   // -- DELETE TRADE --

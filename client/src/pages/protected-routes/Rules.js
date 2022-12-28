@@ -6,10 +6,12 @@ import { Loading } from "../../components";
 
 function Rules() {
   // global state variables and functions
-  const { getSubscriptions, hasSubscription, isLoading } = useAppContext();
+  const { getSubscriptions, hasSubscription, isLoading, clearAlert } =
+    useAppContext();
 
   useEffect(() => {
     getSubscriptions();
+    clearAlert();
   }, []);
 
   // if is loading
