@@ -276,6 +276,7 @@ const EditTradeModal = styled.div`
   /* dropdown tag options list */
   .tag-options-list {
     position: absolute;
+    z-index: 20;
     top: 95px;
     width: 100%;
     border: 1px solid var(--gray-500);
