@@ -30,6 +30,12 @@ function EditTradeModal() {
   // local state variable for tracking whether a trade edit request is still being processed
   const [tradeProcess, setTradeProcess] = useState(false);
 
+  // local state variable for large image modal toggle
+  const [imageModal, setImageModal] = useState({
+    display: false,
+    src: "",
+  });
+
   // global state variables and functions
   const {
     toggleEditTradeModal,
@@ -64,7 +70,7 @@ function EditTradeModal() {
   };
 
   // handle blur of edittable cell
-  const handleCellBlur = (e) => {
+  const handleCellBlur = (e, tradeId) => {
     // if the user submits form by pressing enter, prevent default form submission
     e.preventDefault();
 
@@ -73,7 +79,7 @@ function EditTradeModal() {
     const processData = async () => {
       if (cellState.value && cellState.executionInfo) {
         // send a request to edit the execution and trade
-        await updateTrade({ ...cellState });
+        await updateTrade({ ...cellState, tradeId });
       }
 
       // clear cell state activation flag and cell state values
@@ -175,8 +181,14 @@ function EditTradeModal() {
     setTradeProcess(false);
   };
 
-  const handleClickImage = async () => {
-    console.log("image clicked");
+  const handleClickImage = async (e) => {
+    // toggle large image modal on
+    setImageModal({ display: true, src: e.target.src });
+  };
+
+  const handleCloseImage = async () => {
+    // toggle large image modal off
+    setImageModal({ display: false, src: "" });
   };
 
   const handleImageChange = async (e, tradeId) => {
@@ -443,12 +455,18 @@ function EditTradeModal() {
                         <td
                           id={`execution-${execution._id}-action`}
                           onClick={handleCellClick}
-                          onBlur={handleCellBlur}
+                          onBlur={(e) => {
+                            handleCellBlur(e, trade._id);
+                          }}
                         >
                           {/* if this cell is activated, display the form, otherwise display the original cell value */}
                           {activatedCell ===
                           `execution-${execution._id}-action` ? (
-                            <form onSubmit={handleCellBlur}>
+                            <form
+                              onSubmit={(e) => {
+                                handleCellBlur(e, trade._id);
+                              }}
+                            >
                               <select autoFocus onChange={handleChange}>
                                 <option value=""></option>
                                 <option value="BUY">BUY</option>
@@ -463,12 +481,18 @@ function EditTradeModal() {
                         <td
                           id={`execution-${execution._id}-option`}
                           onClick={handleCellClick}
-                          onBlur={handleCellBlur}
+                          onBlur={(e) => {
+                            handleCellBlur(e, trade._id);
+                          }}
                         >
                           {/* if this cell is activated, display the form, otherwise display the original cell value */}
                           {activatedCell ===
                           `execution-${execution._id}-option` ? (
-                            <form onSubmit={handleCellBlur}>
+                            <form
+                              onSubmit={(e) => {
+                                handleCellBlur(e, trade._id);
+                              }}
+                            >
                               <select autoFocus onChange={handleChange}>
                                 <option value=""></option>
                                 <option value="STOCK">STOCK</option>
@@ -490,13 +514,19 @@ function EditTradeModal() {
                           <td
                             id={`execution-${execution._id}-strike`}
                             onClick={handleCellClick}
-                            onBlur={handleCellBlur}
+                            onBlur={(e) => {
+                              handleCellBlur(e, trade._id);
+                            }}
                           >
                             {/* only if the market is options, and this cell is activated */}
                             {activatedCell ===
                               `execution-${execution._id}-strike` &&
                             trade.market.toLowerCase() === "options" ? (
-                              <form onSubmit={handleCellBlur}>
+                              <form
+                                onSubmit={(e) => {
+                                  handleCellBlur(e, trade._id);
+                                }}
+                              >
                                 <input
                                   type="number"
                                   min="0.001"
@@ -522,14 +552,20 @@ function EditTradeModal() {
                           <td
                             id={`execution-${execution._id}-expire`}
                             onClick={handleCellClick}
-                            onBlur={handleCellBlur}
+                            onBlur={(e) => {
+                              handleCellBlur(e, trade._id);
+                            }}
                           >
                             {/* only if the market is options or futures, and the cell is activated */}
                             {activatedCell ===
                               `execution-${execution._id}-expire` &&
                             (trade.market.toLowerCase() === "options" ||
                               trade.market.toLowerCase() === "futures") ? (
-                              <form onSubmit={handleCellBlur}>
+                              <form
+                                onSubmit={(e) => {
+                                  handleCellBlur(e, trade._id);
+                                }}
+                              >
                                 <input
                                   type="date"
                                   autoFocus
@@ -549,13 +585,19 @@ function EditTradeModal() {
                           <td
                             id={`execution-${execution._id}-lot`}
                             onClick={handleCellClick}
-                            onBlur={handleCellBlur}
+                            onBlur={(e) => {
+                              handleCellBlur(e, trade._id);
+                            }}
                           >
                             {/* only if the market is futures, and the cell is activated */}
                             {activatedCell ===
                               `execution-${execution._id}-lot` &&
                             trade.market.toLowerCase() === "futures" ? (
-                              <form onSubmit={handleCellBlur}>
+                              <form
+                                onSubmit={(e) => {
+                                  handleCellBlur(e, trade._id);
+                                }}
+                              >
                                 <input
                                   type="number"
                                   autoFocus
@@ -574,12 +616,18 @@ function EditTradeModal() {
                         <td
                           id={`execution-${execution._id}-exec`}
                           onClick={handleCellClick}
-                          onBlur={handleCellBlur}
+                          onBlur={(e) => {
+                            handleCellBlur(e, trade._id);
+                          }}
                         >
                           {/* only if the cell is activated */}
                           {activatedCell ===
                           `execution-${execution._id}-exec` ? (
-                            <form onSubmit={handleCellBlur}>
+                            <form
+                              onSubmit={(e) => {
+                                handleCellBlur(e, trade._id);
+                              }}
+                            >
                               <input
                                 type="date"
                                 autoFocus
@@ -597,12 +645,18 @@ function EditTradeModal() {
                         <td
                           id={`execution-${execution._id}-position`}
                           onClick={handleCellClick}
-                          onBlur={handleCellBlur}
+                          onBlur={(e) => {
+                            handleCellBlur(e, trade._id);
+                          }}
                         >
                           {/* if the cell is activated */}
                           {activatedCell ===
                           `execution-${execution._id}-position` ? (
-                            <form onSubmit={handleCellBlur}>
+                            <form
+                              onSubmit={(e) => {
+                                handleCellBlur(e, trade._id);
+                              }}
+                            >
                               <input
                                 type="number"
                                 autoFocus
@@ -620,12 +674,18 @@ function EditTradeModal() {
                         <td
                           id={`execution-${execution._id}-price`}
                           onClick={handleCellClick}
-                          onBlur={handleCellBlur}
+                          onBlur={(e) => {
+                            handleCellBlur(e, trade._id);
+                          }}
                         >
                           {/* if the cell is activated */}
                           {activatedCell ===
                           `execution-${execution._id}-price` ? (
-                            <form onSubmit={handleCellBlur}>
+                            <form
+                              onSubmit={(e) => {
+                                handleCellBlur(e, trade._id);
+                              }}
+                            >
                               <input
                                 type="number"
                                 autoFocus
@@ -642,12 +702,18 @@ function EditTradeModal() {
                         <td
                           id={`execution-${execution._id}-commissions`}
                           onClick={handleCellClick}
-                          onBlur={handleCellBlur}
+                          onBlur={(e) => {
+                            handleCellBlur(e, trade._id);
+                          }}
                         >
                           {/* if the cell is activated */}
                           {activatedCell ===
                           `execution-${execution._id}-commissions` ? (
-                            <form onSubmit={handleCellBlur}>
+                            <form
+                              onSubmit={(e) => {
+                                handleCellBlur(e, trade._id);
+                              }}
+                            >
                               <input
                                 type="number"
                                 autoFocus
@@ -666,12 +732,18 @@ function EditTradeModal() {
                         <td
                           id={`execution-${execution._id}-fees`}
                           onClick={handleCellClick}
-                          onBlur={handleCellBlur}
+                          onBlur={(e) => {
+                            handleCellBlur(e, trade._id);
+                          }}
                         >
                           {/* if the cell is activated */}
                           {activatedCell ===
                           `execution-${execution._id}-fees` ? (
-                            <form onSubmit={handleCellBlur}>
+                            <form
+                              onSubmit={(e) => {
+                                handleCellBlur(e, trade._id);
+                              }}
+                            >
                               <input
                                 type="number"
                                 autoFocus
@@ -1051,7 +1123,7 @@ function EditTradeModal() {
                 {/* notes text box */}
                 <textarea
                   id={`notes-${trade._id}`}
-                  className="journal-notes"
+                  className="trade-notes"
                   type="text"
                   value={notes}
                   placeholder="Enter notes here..."
@@ -1063,6 +1135,27 @@ function EditTradeModal() {
                 />
               </div>
             </div>
+
+            {/* LARGE IMAGE MODAL */}
+            {/* only show large image modal if toggleLargeImage state is true */}
+            {imageModal.display && (
+              <div className="image-modal">
+                <div className="image-modal-content">
+                  {/* close modal button */}
+                  <div className="modal-button-container">
+                    <button
+                      onClick={handleCloseImage}
+                      type="button"
+                      className="modal-close-btn"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                  {/* image */}
+                  <img className="img" src={imageModal.src} alt="image modal" />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

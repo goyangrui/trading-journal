@@ -18,6 +18,7 @@ const EditTradeModal = styled.div`
     margin: 2rem auto;
     padding: 1rem;
     width: var(--fluid-width);
+    max-width: 1000px;
     background-color: var(--gray-100);
   }
 
@@ -365,8 +366,56 @@ const EditTradeModal = styled.div`
     pointer-events: all !important;
   }
 
-  /* journal notes styles */
-  .journal-notes {
+  /* large image modal styles */
+  .image-modal {
+    position: fixed;
+    z-index: 20;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+    overflow-y: scroll;
+  }
+
+  .image-modal-content {
+    width: var(--fluid-width);
+    min-width: 1500px;
+    background-color: var(--gray-200);
+    padding: 1rem;
+    margin: 1rem auto;
+    border-radius: var(--borderRadius-2);
+  }
+
+  /* modal close button styles */
+  .modal-button-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+
+  .modal-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    width: 25px;
+    border: none;
+    background-color: var(--gray-200);
+    color: var(--gray-900);
+    font-size: 1.5rem;
+    transition: var(--transition);
+  }
+
+  .modal-close-btn:hover {
+    cursor: pointer;
+    color: var(--gray-500);
+  }
+
+  /* trade notes styles */
+  .trade-notes {
     display: flex;
     resize: none;
     padding: 0.5rem;
@@ -379,11 +428,11 @@ const EditTradeModal = styled.div`
     width: 100%;
   }
 
-  .journal-notes:focus {
+  .trade-notes:focus {
     border-color: var(--primary-500);
   }
 
-  .journal-notes::-webkit-scrollbar {
+  .trade-notes::-webkit-scrollbar {
     width: 0px;
   }
 `;

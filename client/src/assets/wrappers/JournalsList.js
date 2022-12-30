@@ -20,19 +20,18 @@ const JournalsList = styled.div`
   /* journal image modal styles */
   .image-modal {
     position: fixed;
-    z-index: 10;
+    z-index: 20;
     width: 100%;
     height: 100%;
     left: 0;
     top: 0;
     background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
-    overflow: auto;
   }
 
   .image-modal-content {
     width: var(--fluid-width);
-    min-width: 1000px;
+    min-width: 1500px;
     background-color: var(--gray-200);
     padding: 1rem;
     margin: 1rem auto;
