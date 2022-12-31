@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import moment from "moment";
 
 import { useAppContext } from "../context/appContext";
@@ -24,6 +24,13 @@ function TradesList() {
 
   // local state variable for tracking if the 'check-all-box' has been checked or not
   const [allChecked, setAllChecked] = useState(false);
+
+  // local state variable for tag display on hover
+  const [showTags, setShowTags] = useState({
+    display: false,
+    tags: undefined,
+    tradeId: undefined,
+  });
 
   // useEffect
   // on initial render, send get request to get trades from server. Set isLoading to false once getTrades proccess has been completed.
@@ -130,6 +137,57 @@ function TradesList() {
     }
   };
 
+  // function for handling hover of tag cell
+  const handleTagHover = async (e, tags, display, tradeId, index) => {
+    // only show pop-out tags if the scrollWidth of the tag cell is greater than its clientWidth (indicating overflow of tags), and that the display property is true
+    if (
+      display &&
+      tagCells.current[index].scrollWidth > tagCells.current[index].clientWidth
+    ) {
+      // set the position of the pop-out tags to be right next to the hovered element
+      // first, get the y position of the hovered element
+      const y = e.target.getBoundingClientRect().y;
+
+      // get the width of the tags header element
+      const width = tagsHeader.current.getBoundingClientRect().width;
+
+      // set the position of the pop-out tag at the given index
+      popOutTags.current[index].style.top = `${y - 5}px`;
+      popOutTags.current[index].style.right = `${width + 15}px`;
+
+      // set display property to be whatever is passed in, and tags to be whatever is passed in
+      setShowTags({
+        ...showTags,
+        display,
+        tags,
+        tradeId,
+      });
+    } else {
+      // otherwise, do nothing (set the showTags state variable to default state)
+      setShowTags({
+        ...showTags,
+        display: false,
+        tags: undefined,
+        tradeId: undefined,
+      });
+    }
+  };
+
+  // reference to the pop-out tag elements
+  const popOutTags = useRef([]);
+
+  // reference to individual tag cells
+  const tagCells = useRef([]);
+
+  // reference to tags header element (width used as reference for determining offset of pop-out tags)
+  const tagsHeader = useRef();
+
+  // everytime the trades array changes, update the popOutTags reference array to be the new trades array (i.e. update the length of the popOutTags array)
+  useEffect(() => {
+    popOutTags.current = popOutTags.current.slice(0, trades.length);
+    tagCells.current = tagCells.current.slice(0, trades.length);
+  }, [trades]);
+
   // if getTrades is still loading
   if (isLoading) {
     return (
@@ -160,12 +218,12 @@ function TradesList() {
               <th>% Return</th>
               <th>Net Return</th>
               <th>Side</th>
-              <th>Tags</th>
+              <th ref={tagsHeader}>Tags</th>
             </tr>
           </thead>
           {/* for each trade in trades global state variable array, display the trades and their relevant trade metrics information as a row in the table body */}
           <tbody>
-            {trades.map((trade) => {
+            {trades.map((trade, i) => {
               return (
                 <tr
                   className="table-body-row"
@@ -254,7 +312,23 @@ function TradesList() {
                       {trade.side}
                     </span>
                   </td>
-                  <td className="tag-cell">
+
+                  <td
+                    className="tag-cell"
+                    onMouseEnter={(e) => {
+                      handleTagHover(
+                        e,
+                        trade.tags,
+                        true,
+                        `tag-cell-${trade._id}`,
+                        i
+                      );
+                    }}
+                    onMouseLeave={(e) => {
+                      handleTagHover(e, trade.tags, false);
+                    }}
+                    ref={(el) => (tagCells.current[i] = el)}
+                  >
                     {Object.entries(trade.tags).map((tag) => {
                       return (
                         <span key={tag[0]} className="label tag">
@@ -262,13 +336,36 @@ function TradesList() {
                         </span>
                       );
                     })}
+
+                    {/* Tag pop-out cell */}
+                    {/* only show pop-out tags if showTags display is set and that the hovered cell id is the same as the one that is set */}
+                    <div
+                      className={
+                        showTags.display &&
+                        showTags.tradeId === `tag-cell-${trade._id}`
+                          ? `pop-out-tags`
+                          : `pop-out-tags hidden`
+                      }
+                      ref={(el) => (popOutTags.current[i] = el)}
+                    >
+                      {/* if showTags.tags array length is not undefined*/}
+                      {showTags.tags &&
+                        // for every tag in showTags state variable
+                        Object.entries(showTags.tags).map((tag) => {
+                          // show the pop out tags
+                          return (
+                            <span key={tag[0]} className="label tag">
+                              {tag[1]}
+                            </span>
+                          );
+                        })}
+                    </div>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-
         {!trades.length && <h5 className="no-trades">no trades</h5>}
       </Wrapper>
     );

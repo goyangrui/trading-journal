@@ -3,6 +3,7 @@ import styled from "styled-components";
 const TradesList = styled.div`
   /* general styles */
   display: flex;
+  position: relative;
   flex-direction: column;
   justify-content: center;
   overflow: scroll;
@@ -136,6 +137,30 @@ const TradesList = styled.div`
   .tag {
     border: 2px solid var(--primary-600);
     background-color: var(--primary-600);
+    color: var(--gray-100);
+    text-transform: uppercase;
+  }
+
+  /* pop-out tag styles */
+  .pop-out-tags {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+    column-gap: 0.25rem;
+    position: fixed;
+    z-index: 10;
+    max-width: 300px;
+    padding: 1rem;
+    border: 1px solid var(--gray-400);
+    border-radius: var(--borderRadius-2);
+    box-shadow: var(--shadow-3);
+    background-color: var(--gray-800);
+    font-size: 0.75rem;
+    transition: var(--transition);
+  }
+
+  .hidden {
+    display: none !important;
   }
 `;
 
