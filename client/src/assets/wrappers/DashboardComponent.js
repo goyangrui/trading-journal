@@ -8,6 +8,22 @@ const DashboardComponent = styled.div`
   width: 100%;
   margin: 0 1.5rem;
 
+  /* button styles */
+  .timeframe-button-container {
+    display: flex;
+    column-gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn:disabled {
+    cursor: not-allowed;
+  }
+
+  .btn-set {
+    color: var(--primary-500);
+    background: var(--white);
+  }
+
   /* charts container styles */
   .charts-container {
     display: flex;

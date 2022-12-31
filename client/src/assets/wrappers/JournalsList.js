@@ -31,7 +31,7 @@ const JournalsList = styled.div`
 
   .image-modal-content {
     width: var(--fluid-width);
-    min-width: 1500px;
+    min-width: 1000px;
     background-color: var(--gray-200);
     padding: 1rem;
     margin: 1rem auto;

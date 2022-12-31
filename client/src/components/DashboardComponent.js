@@ -39,8 +39,34 @@ function DashboardComponent() {
   // local isLoading for loading trades
   const [isLoading, setIsLoading] = useState(true);
 
+  // local state variable for determining which timeframe button is currently set (by default, the value will be 1 (for all time))
+  const [timeframe, setTimeframe] = useState(1);
+
+  // local state variable to determine if a request is still being processed
+  const [process, setProcess] = useState(false);
+
   // local and global state variables
   const { chartData, getChartData } = useAppContext();
+
+  // handle timeframe button click
+  const handleTimeframeClick = async (e, timeframeNew, days) => {
+    setProcess(true);
+    setIsLoading(true);
+
+    // set the timeframe value to what is passed in
+    setTimeframe(timeframeNew);
+
+    // if the timeframe value is different than the one that is already set
+    if (timeframeNew !== timeframe) {
+      // send a request to get chart data within the given timeframe
+      await getChartData(days);
+    }
+
+    setTimeout(() => {
+      setProcess(false);
+      setIsLoading(false);
+    }, 500);
+  };
 
   // useEffect
   // on initial render, send get request to get trades from server. Set isLoading to false once getTrades proccess has been completed.
@@ -62,157 +88,204 @@ function DashboardComponent() {
         {/* CHARTS AND GRAPHS CONTAINER */}
         {/* ONLY SHOW CHARTS AND GRAPHS IF THERE ARE ANY TRADES DATA TO DISPLAY */}
         {chartData.numDaysTraded > 0 && (
-          <div className="charts-container">
-            {/*CUMULATIVE P&L STATS BLOCK */}
-            <div className="chart-stat-container cumulative">
-              {/* cumulative P&L stat */}
-              <div className="chart-stat">
-                <span>Cumulative P&L $</span>
-                <span>{`$ ${chartData.stats.cumulativePL.toFixed(2)}`}</span>
+          // button container for user to switch timeframes
+          <>
+            <div className="timeframe-button-container">
+              <button
+                type="button"
+                className={timeframe === 1 ? `btn btn-set` : `btn`}
+                onClick={(e) => {
+                  handleTimeframeClick(e, 1);
+                }}
+                disabled={process}
+              >
+                All time
+              </button>
+              <button
+                type="button"
+                className={timeframe === 2 ? `btn btn-set` : `btn`}
+                onClick={(e) => {
+                  handleTimeframeClick(e, 2, 365);
+                }}
+                disabled={process}
+              >
+                Past year
+              </button>
+              <button
+                type="button"
+                className={timeframe === 3 ? `btn btn-set` : `btn`}
+                onClick={(e) => {
+                  handleTimeframeClick(e, 3, 30);
+                }}
+                disabled={process}
+              >
+                Past month
+              </button>
+              <button
+                type="button"
+                className={timeframe === 4 ? `btn btn-set` : `btn`}
+                onClick={(e) => {
+                  handleTimeframeClick(e, 4, 7);
+                }}
+                disabled={process}
+              >
+                Past week
+              </button>
+            </div>
+            <div className="charts-container">
+              {/*CUMULATIVE P&L STATS BLOCK */}
+              <div className="chart-stat-container cumulative">
+                {/* cumulative P&L stat */}
+                <div className="chart-stat">
+                  <span>Cumulative P&L $</span>
+                  <span>{`$ ${chartData.stats.cumulativePL.toFixed(2)}`}</span>
+                </div>
+
+                {/* area graph of cumulative P&L */}
+                {/* only show the graph if there are more than 1 days traded */}
+                {chartData.numDaysTraded > 1 && (
+                  <div className="chart-container">
+                    <Line
+                      options={{
+                        ...lineChartOptions,
+                        plugins: {
+                          ...lineChartOptions.plugins,
+                          title: {
+                            ...lineChartOptions.plugins.title,
+                            text: "Cumulative P&L",
+                          },
+                        },
+                      }}
+                      data={{
+                        labels: Object.keys(chartData.cumulativePLObject),
+                        datasets: [
+                          {
+                            fill: true,
+                            label: "Cumulative P&L",
+                            data: Object.values(chartData.cumulativePLObject),
+                            borderColor: "#ff8906",
+                            backgroundColor: "#ff890670",
+                          },
+                        ],
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* area graph of cumulative P&L */}
-              {/* only show the graph if there are more than 1 days traded */}
-              {chartData.numDaysTraded > 1 && (
+              {/* DAILY AVERAGE P&L STATS BLOCK */}
+              <div className="chart-stat-container daily-avg">
+                {/* daily average P&L stat */}
+                <div className="chart-stat">
+                  <span>Daily Average P&L $</span>
+                  <span>{`$ ${chartData.stats.dailyAvgPL.toFixed(2)}`}</span>
+                </div>
+                {/* area graph of daily average P&L */}
+                {/* only show the graph if there are more than 1 days traded */}
+                {chartData.numDaysTraded > 1 && (
+                  <div className="chart-container">
+                    <Line
+                      options={{
+                        ...lineChartOptions,
+                        plugins: {
+                          ...lineChartOptions.plugins,
+                          title: {
+                            ...lineChartOptions.plugins.title,
+                            text: "Daily Average P&L",
+                          },
+                        },
+                      }}
+                      data={{
+                        labels: Object.keys(chartData.averagePLObject),
+                        datasets: [
+                          {
+                            fill: true,
+                            label: "Daily Average P&L",
+                            data: Object.values(chartData.averagePLObject),
+                            borderColor: "#ff8906",
+                            backgroundColor: "#ff890670",
+                          },
+                        ],
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              {/* PROFIT FACTOR STATS BLOCK */}
+              <div className="chart-stat-container profit-factor">
+                {/* overall profit factor */}
+                <div className="chart-stat">
+                  <span>Profit Factor</span>
+                  <span>{`${chartData.stats.profitFactor.toFixed(2)}`}</span>
+                </div>
+                {/* area graph of daily average P&L */}
+                {/* only show the graph if there are more than 1 days traded */}
+                {chartData.numDaysTraded > 1 && (
+                  <div className="chart-container">
+                    <Line
+                      options={{
+                        ...lineChartOptions,
+                        plugins: {
+                          ...lineChartOptions.plugins,
+                          title: {
+                            ...lineChartOptions.plugins.title,
+                            text: "Profit Factor",
+                          },
+                        },
+                      }}
+                      data={{
+                        labels: Object.keys(chartData.profitFactorObject),
+                        datasets: [
+                          {
+                            fill: true,
+                            label: "Profit Factor",
+                            data: Object.values(chartData.profitFactorObject),
+                            borderColor: "#ff8906",
+                            backgroundColor: "#ff890670",
+                          },
+                        ],
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              {/* WIN LOSS PERCENTAGE STATS BLOCK */}
+              <div className="chart-stat-container win-loss-percent">
+                {/* win percentage */}
+                <div className="chart-stat">
+                  <span>Win %</span>
+                  <span>{`${chartData.WLObject.winPercentage.toFixed(
+                    2
+                  )}`}</span>
+                </div>
+                {/* pie chart of win percentage */}
                 <div className="chart-container">
-                  <Line
+                  <Pie
                     options={{
-                      ...lineChartOptions,
+                      responsive: true,
                       plugins: {
-                        ...lineChartOptions.plugins,
+                        legend: {
+                          display: false,
+                        },
                         title: {
-                          ...lineChartOptions.plugins.title,
-                          text: "Cumulative P&L",
+                          display: false,
                         },
                       },
                     }}
                     data={{
-                      labels: Object.keys(chartData.cumulativePLObject),
+                      labels: ["Win percentage", "Loss percentage"],
                       datasets: [
                         {
-                          fill: true,
-                          label: "Cumulative P&L",
-                          data: Object.values(chartData.cumulativePLObject),
-                          borderColor: "#ff8906",
-                          backgroundColor: "#ff890670",
+                          data: Object.values(chartData.WLObject),
+                          backgroundColor: ["#3ad398", "#e45d5d"],
                         },
                       ],
                     }}
                   />
                 </div>
-              )}
-            </div>
-
-            {/* DAILY AVERAGE P&L STATS BLOCK */}
-            <div className="chart-stat-container daily-avg">
-              {/* daily average P&L stat */}
-              <div className="chart-stat">
-                <span>Daily Average P&L $</span>
-                <span>{`$ ${chartData.stats.dailyAvgPL.toFixed(2)}`}</span>
-              </div>
-              {/* area graph of daily average P&L */}
-              {/* only show the graph if there are more than 1 days traded */}
-              {chartData.numDaysTraded > 1 && (
-                <div className="chart-container">
-                  <Line
-                    options={{
-                      ...lineChartOptions,
-                      plugins: {
-                        ...lineChartOptions.plugins,
-                        title: {
-                          ...lineChartOptions.plugins.title,
-                          text: "Daily Average P&L",
-                        },
-                      },
-                    }}
-                    data={{
-                      labels: Object.keys(chartData.averagePLObject),
-                      datasets: [
-                        {
-                          fill: true,
-                          label: "Daily Average P&L",
-                          data: Object.values(chartData.averagePLObject),
-                          borderColor: "#ff8906",
-                          backgroundColor: "#ff890670",
-                        },
-                      ],
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-            {/* PROFIT FACTOR STATS BLOCK */}
-            <div className="chart-stat-container profit-factor">
-              {/* overall profit factor */}
-              <div className="chart-stat">
-                <span>Profit Factor</span>
-                <span>{`${chartData.stats.profitFactor.toFixed(2)}`}</span>
-              </div>
-              {/* area graph of daily average P&L */}
-              {/* only show the graph if there are more than 1 days traded */}
-              {chartData.numDaysTraded > 1 && (
-                <div className="chart-container">
-                  <Line
-                    options={{
-                      ...lineChartOptions,
-                      plugins: {
-                        ...lineChartOptions.plugins,
-                        title: {
-                          ...lineChartOptions.plugins.title,
-                          text: "Profit Factor",
-                        },
-                      },
-                    }}
-                    data={{
-                      labels: Object.keys(chartData.profitFactorObject),
-                      datasets: [
-                        {
-                          fill: true,
-                          label: "Profit Factor",
-                          data: Object.values(chartData.profitFactorObject),
-                          borderColor: "#ff8906",
-                          backgroundColor: "#ff890670",
-                        },
-                      ],
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-            {/* WIN LOSS PERCENTAGE STATS BLOCK */}
-            <div className="chart-stat-container win-loss-percent">
-              {/* win percentage */}
-              <div className="chart-stat">
-                <span>Win %</span>
-                <span>{`${chartData.WLObject.winPercentage.toFixed(2)}`}</span>
-              </div>
-              {/* pie chart of win percentage */}
-              <div className="chart-container">
-                <Pie
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      title: {
-                        display: false,
-                      },
-                    },
-                  }}
-                  data={{
-                    labels: ["Win percentage", "Loss percentage"],
-                    datasets: [
-                      {
-                        data: Object.values(chartData.WLObject),
-                        backgroundColor: ["#3ad398", "#e45d5d"],
-                      },
-                    ],
-                  }}
-                />
               </div>
             </div>
-          </div>
+          </>
         )}
         {/* STATS TABLE */}
         {/* ONLY SHOW STATS TABLE IF THERE ARE ANY TRADES DATA TO DISPLAY */}
