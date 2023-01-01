@@ -41,6 +41,10 @@ const TradesList = styled.div`
     font-size: 1rem;
   }
 
+  .trades-table th:hover {
+    cursor: pointer;
+  }
+
   /* table body row styles */
   .trades-table .table-body-row {
     transition: var(--transition);
@@ -161,6 +165,10 @@ const TradesList = styled.div`
 
   .hidden {
     display: none !important;
+  }
+
+  .disabled {
+    pointer-events: none;
   }
 `;
 

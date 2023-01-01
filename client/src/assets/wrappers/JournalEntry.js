@@ -140,6 +140,10 @@ const JournalEntry = styled.div`
     background-color: var(--gray-700);
   }
 
+  .trades-table th:hover {
+    cursor: pointer;
+  }
+
   /* table body row styles */
   .trades-table .table-body-row {
     transition: var(--transition);

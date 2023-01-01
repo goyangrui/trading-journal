@@ -5,6 +5,7 @@ import { useAppContext } from "../context/appContext";
 
 import { Loading } from ".";
 import { ImCheckboxUnchecked, ImCheckboxChecked } from "react-icons/im";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 import Wrapper from "../assets/wrappers/TradesList";
 
@@ -31,6 +32,15 @@ function TradesList() {
     tags: undefined,
     tradeId: undefined,
   });
+
+  // local state variable to determine which header has been set, and whether it should be sorted in reverse order or not
+  const [headerSet, setHeaderSet] = useState({
+    header: "",
+    reverse: false,
+  });
+
+  // local state variable for determining if a request is still being processed
+  const [process, setProcess] = useState(false);
 
   // useEffect
   // on initial render, send get request to get trades from server. Set isLoading to false once getTrades proccess has been completed.
@@ -173,6 +183,37 @@ function TradesList() {
     }
   };
 
+  // handle header click (for sorting trades on backend, and fetching them)
+  const handleSort = async (e, header) => {
+    setProcess(true);
+
+    // if the passed in header is the same as the header that is set
+    if (header === headerSet.header) {
+      // preserve the reverse value for the set header
+      const reverse = headerSet.reverse;
+
+      // send request to backend to sort the trades according to header, and reverse state
+      await getTrades(header, reverse);
+
+      // reverse the headerSet reverse state variable
+      setHeaderSet({ ...headerSet, reverse: !headerSet.reverse });
+    } else {
+      // otherwise, if the passed in header is different
+      // set reverse back to false (default)
+      const reverse = false;
+
+      // send request to backend to sort the trades according to header, and reverse state
+      await getTrades(header, reverse);
+
+      // set the headerSet header to the passed in header, and set reverse to true
+      setHeaderSet({ ...headerSet, header, reverse: true });
+    }
+
+    setTimeout(() => {
+      setProcess(false);
+    }, 500);
+  };
+
   // reference to the pop-out tag elements
   const popOutTags = useRef([]);
 
@@ -207,17 +248,189 @@ function TradesList() {
                 {/* if the check all checkboxes checkbox is checked, display the checked checkbox svg */}
                 {allChecked ? <ImCheckboxChecked /> : <ImCheckboxUnchecked />}
               </th>
-              <th>Status</th>
-              <th>Open Date</th>
-              <th>Market</th>
-              <th>Symbol</th>
-              <th>Entry</th>
-              <th>Exit</th>
-              <th>Position Size</th>
-              <th>$ Return</th>
-              <th>% Return</th>
-              <th>Net Return</th>
-              <th>Side</th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "status");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Status
+                {headerSet.reverse === true && headerSet.header === "status" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "status" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "openDate");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Open Date
+                {headerSet.reverse === true &&
+                headerSet.header === "openDate" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "openDate" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "market");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Market
+                {headerSet.reverse === true && headerSet.header === "market" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "market" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "symbol");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Symbol
+                {headerSet.reverse === true && headerSet.header === "symbol" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "symbol" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "averageEntry");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Entry
+                {headerSet.reverse === true &&
+                headerSet.header === "averageEntry" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "averageEntry" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "averageExit");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Exit
+                {headerSet.reverse === true &&
+                headerSet.header === "averageExit" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "averageExit" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "positionSize");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Position Size
+                {headerSet.reverse === true &&
+                headerSet.header === "positionSize" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "positionSize" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "dollarReturn");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                $ Return
+                {headerSet.reverse === true &&
+                headerSet.header === "dollarReturn" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "dollarReturn" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "percentReturn");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                % Return
+                {headerSet.reverse === true &&
+                headerSet.header === "percentReturn" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "percentReturn" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "netReturn");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Net Return
+                {headerSet.reverse === true &&
+                headerSet.header === "netReturn" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "netReturn" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
+              <th
+                onClick={(e) => {
+                  handleSort(e, "side");
+                }}
+                className={process ? "table-header disabled" : "table-header"}
+              >
+                Side
+                {headerSet.reverse === true && headerSet.header === "side" ? (
+                  <IoMdArrowDropdown />
+                ) : headerSet.reverse === false &&
+                  headerSet.header === "side" ? (
+                  <IoMdArrowDropup />
+                ) : (
+                  ""
+                )}
+              </th>
               <th ref={tagsHeader}>Tags</th>
             </tr>
           </thead>

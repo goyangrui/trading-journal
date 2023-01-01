@@ -368,8 +368,45 @@ const getAllTrades = async (req, res) => {
   // get userId from authentication middleware
   const { userId } = req.user;
 
+  // get url parameters
+  const { header, reverse } = req.query;
+
   // get all trades with the userId
-  const trades = await Trade.find({ createdBy: userId });
+  let trades = await Trade.find({ createdBy: userId });
+
+  // sort the trades in chronological order by their open date (default) if the url query parameters don't exist
+  if (!header || !reverse) {
+    trades.sort((trade1, trade2) => {
+      return trade1.openDate > trade2.openDate
+        ? -1
+        : trade1.openDate < trade2.openDate
+        ? 1
+        : 0;
+    });
+  } else {
+    // otherwise, if the url parameters do exist
+    // sort the trades based on given header to sort by, and whether to sort them in reverse order or not
+    // if reverse is false
+    if (reverse === "false") {
+      // sort trades based on header in normal order
+      trades.sort((trade1, trade2) => {
+        return trade1[header] > trade2[header]
+          ? -1
+          : trade1[header] < trade2[header]
+          ? 1
+          : 0;
+      });
+    } else {
+      // otherwise if reverse is true, sort trades based on header in reverse order
+      trades.sort((trade1, trade2) => {
+        return trade1[header] < trade2[header]
+          ? -1
+          : trade1[header] > trade2[header]
+          ? 1
+          : 0;
+      });
+    }
+  }
 
   res.status(StatusCodes.OK).json({ trades });
 };

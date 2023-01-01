@@ -17,7 +17,7 @@ const Trades = styled.div`
     display: flex;
     justify-content: flex-start;
     column-gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem !important;
     margin-right: 1rem;
     margin-left: 1rem;
   }
