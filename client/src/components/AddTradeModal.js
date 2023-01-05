@@ -31,7 +31,11 @@ const initialState = {
   ],
 };
 
-function AddTradeModal() {
+function AddTradeModal({
+  initialFilterState,
+  setFilterStates,
+  setCurrentPage,
+}) {
   // global state variables and functions
   const {
     createTrade,
@@ -113,6 +117,12 @@ function AddTradeModal() {
     e.preventDefault();
 
     const submitData = async () => {
+      // reset filter state when trade is added
+      setFilterStates({ ...initialFilterState });
+
+      // set the currentPage to 1
+      setCurrentPage(1);
+
       // create trade, update global trades state, then toggle modal
       await createTrade(state, selectedTags);
     };

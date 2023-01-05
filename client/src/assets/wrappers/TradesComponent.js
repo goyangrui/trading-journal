@@ -193,6 +193,18 @@ const Trades = styled.div`
   .hide-options {
     display: none;
   }
+
+  /* page button styles */
+  .page-btn-container {
+    display: flex;
+    justify-content: center;
+    column-gap: 0.25rem;
+  }
+
+  .set-page-btn {
+    color: var(--primary-500);
+    background: var(--white);
+  }
 `;
 
 export default Trades;

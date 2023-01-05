@@ -186,7 +186,6 @@ function TradesList({ filterStates }) {
   // handle header click (for sorting trades on backend, and fetching them)
   const handleSort = async (e, header) => {
     setProcess(true);
-    console.log(filterStates);
 
     // if the passed in header is the same as the header that is set
     if (header === headerSet.header) {

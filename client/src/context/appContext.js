@@ -110,6 +110,7 @@ const initialState = {
     commissions: "",
     fees: "",
   },
+  numPages: 1,
 };
 
 // try and parse the user object in the local storage and set the initial state user object to the user object in local storage
@@ -442,18 +443,18 @@ function AppContextProvider({ children }) {
   // -- TRADES FUNCTIONS --
 
   // get all trades
-  const getTrades = async (header, reverse, filters) => {
+  const getTrades = async (header, reverse, filters, page) => {
     try {
       dispatch({ type: FETCH_TRADES_BEGIN });
 
       // try and send request to get trades
       const { data } = await authFetch.get(`trades`, {
-        params: { header, reverse, filters },
+        params: { header, reverse, filters, page },
       });
-      const { trades } = data;
+      const { trades, numPages } = data;
 
       // set trades global state variable to the trades array from the response
-      dispatch({ type: FETCH_TRADES_SUCCESS, payload: { trades } });
+      dispatch({ type: FETCH_TRADES_SUCCESS, payload: { trades, numPages } });
     } catch (error) {
       dispatch({ type: FETCH_TRADES_ERROR });
       console.log(error);
@@ -489,7 +490,7 @@ function AppContextProvider({ children }) {
       // update global state trades array variable (cause trades page to update and re-render)
       dispatch({
         type: CREATE_TRADE_SUCCESS,
-        payload: { trades: data.trades },
+        payload: { trades: data.trades, numPages: data.numPages },
       });
 
       // clear alerts
@@ -533,11 +534,11 @@ function AppContextProvider({ children }) {
 
         // fetch all of the trades
         const { data: tradesData } = await authFetch.get("/trades");
-        const { trades } = tradesData;
+        const { trades, numPages } = tradesData;
 
         dispatch({
           type: UPDATE_TRADE_SUCCESS,
-          payload: { trades, editTrade },
+          payload: { trades, numPages, editTrade },
         });
       } else if (
         value === undefined &&
@@ -558,11 +559,11 @@ function AppContextProvider({ children }) {
 
         // fetch all of the trades
         const { data: tradesData } = await authFetch.get("/trades");
-        const { trades } = tradesData;
+        const { trades, numPages } = tradesData;
 
         dispatch({
           type: UPDATE_TRADE_SUCCESS,
-          payload: { trades, editTrade },
+          payload: { trades, numPages, editTrade },
         });
       } else if (
         value === undefined &&
@@ -576,11 +577,11 @@ function AppContextProvider({ children }) {
 
         // fetch all of the trades
         const { data: tradesData } = await authFetch.get("/trades");
-        const { trades } = tradesData;
+        const { trades, numPages } = tradesData;
 
         dispatch({
           type: UPDATE_TRADE_SUCCESS,
-          payload: { trades, editTrade },
+          payload: { trades, numPages, editTrade },
         });
       } else {
         // otherwise if both value and executionInfo are provided
@@ -595,11 +596,11 @@ function AppContextProvider({ children }) {
 
         // fetch all of the trades
         const { data: tradesData } = await authFetch.get("/trades");
-        const { trades } = tradesData;
+        const { trades, numPages } = tradesData;
 
         dispatch({
           type: UPDATE_TRADE_SUCCESS,
-          payload: { trades, editTrade, executions },
+          payload: { trades, numPages, editTrade, executions },
         });
       }
     } catch (error) {
@@ -629,7 +630,7 @@ function AppContextProvider({ children }) {
       // if the trade deletion process is successful, update the global state trades array (causing a re-render on the front end)
       dispatch({
         type: DELETE_TRADE_SUCCESS,
-        payload: { trades: data.trades },
+        payload: { trades: data.trades, numPages: data.numPages },
       });
       // // reload the page after trades have been deleted so that changes are reflected on the tradelist
       // document.location.reload(true);
@@ -673,7 +674,7 @@ function AppContextProvider({ children }) {
 
       // fetch all of the trades
       const { data: tradesData } = await authFetch.get("/trades");
-      const { trades } = tradesData;
+      const { trades, numPages } = tradesData;
 
       // if the msg returned from backend is "trade removed" (meaning the execution that was deleted was the last execution for the trade)
       if (msg === "trade removed") {
@@ -684,6 +685,7 @@ function AppContextProvider({ children }) {
             executions: [],
             editTrade: {},
             trades,
+            numPages,
             showEditTradeModal: false,
           },
         });
@@ -692,7 +694,13 @@ function AppContextProvider({ children }) {
         // update global state trades, executions, and editTrade variables
         dispatch({
           type: DELETE_EXECUTION_SUCCESS,
-          payload: { executions, editTrade, trades, showEditTradeModal: true },
+          payload: {
+            executions,
+            editTrade,
+            trades,
+            numPages,
+            showEditTradeModal: true,
+          },
         });
       }
     } catch (error) {
@@ -905,7 +913,11 @@ function AppContextProvider({ children }) {
       // update global tags property
       dispatch({
         type: DELETE_TAG_SUCCESS,
-        payload: { tags: tagsData.tags, trades: tradesData.trades },
+        payload: {
+          tags: tagsData.tags,
+          trades: tradesData.trades,
+          numPages: tradesData.numPages,
+        },
       });
     } catch (error) {
       console.log(error);

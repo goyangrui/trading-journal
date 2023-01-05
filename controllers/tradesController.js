@@ -372,7 +372,7 @@ const getAllTrades = async (req, res) => {
   const { userId } = req.user;
 
   // get url parameters
-  const { header, reverse, filters } = req.query;
+  let { header, reverse, filters, page } = req.query;
 
   let trades = undefined;
 
@@ -567,7 +567,23 @@ const getAllTrades = async (req, res) => {
     }
   }
 
-  res.status(StatusCodes.OK).json({ trades });
+  const tradesPerPage = 3;
+
+  // compute the number of pages (for pagination)
+  const numPages = Math.ceil(trades.length / tradesPerPage);
+
+  // if the user did not pass in a page value
+  if (!page) {
+    // set page to 1 by default
+    page = 1;
+  }
+
+  console.log(page);
+
+  // slice the trades array to only get the trades for the given page
+  trades = trades.slice((page - 1) * tradesPerPage, page * tradesPerPage);
+
+  return res.status(StatusCodes.OK).json({ trades, numPages });
 };
 
 const updateTrade = async (req, res) => {

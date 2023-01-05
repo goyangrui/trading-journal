@@ -42,6 +42,9 @@ function TradesComponent() {
   // local state for keeping track of the filter variables
   const [filterStates, setFilterStates] = useState({ ...initialFilterState });
 
+  // local state variable for keeping track of the current page
+  const [currentPage, setCurrentPage] = useState(1);
+
   // global state functions and variables
   const {
     selectedTrades,
@@ -59,7 +62,13 @@ function TradesComponent() {
     deleteTag,
     showEditTradeModal,
     editTrade,
+    numPages,
   } = useAppContext();
+
+  // variable for keeping track of the pages (depending on numPages global state variable)
+  const pages = Array.from({ length: numPages }, (_, index) => {
+    return index + 1;
+  });
 
   // useEffect
   // on initial render, fetch the tags and retrieve the updated global state tags variable to be displayed to the user
@@ -95,6 +104,12 @@ function TradesComponent() {
 
       // delete the trade(s)
       deleteTrade(tradesToDelete);
+
+      // reset filter state
+      setFilterStates({ ...initialFilterState });
+
+      // reset currentPage to 1
+      setCurrentPage(1);
     }
     // otherwise don't do anything
   };
@@ -129,6 +144,12 @@ function TradesComponent() {
   // delete tag button handler
   const deleteTagHandler = (tagId) => {
     deleteTag(tagId);
+
+    // reset filter state
+    setFilterStates({ ...initialFilterState });
+
+    // reset currentPage to 1
+    setCurrentPage(1);
   };
 
   // handle click of side/status/tag overselect
@@ -153,6 +174,9 @@ function TradesComponent() {
 
   // handle apply filter and clear filter button clicks
   const handleFilterClick = async (e, clear) => {
+    // reset the currentPage to the first page
+    setCurrentPage(1);
+
     // if the user clicks the clear filters button
     if (clear) {
       // set filtersState to the initial filters state
@@ -162,6 +186,18 @@ function TradesComponent() {
     } else {
       // send request to get trades with current filter state
       await getTrades(undefined, undefined, filterStates);
+    }
+  };
+
+  // handle page button click
+  const handlePageClick = async (e, page) => {
+    // only if the current page is not the same as the given page
+    if (page !== currentPage) {
+      // set the currentPage to the passed in page
+      setCurrentPage(page);
+
+      // send a request to get trades with filter states, and page number
+      await getTrades(undefined, undefined, filterStates, page);
     }
   };
 
@@ -609,11 +645,45 @@ function TradesComponent() {
       {/* Pass the filterStates state variable to TradesList component so that the filters are maintained when user sorts the trades */}
       <TradesList filterStates={filterStates} />
 
+      {/* Page switching bar */}
+      {/* only show page switching bar if there are more than 1 pages */}
+      {numPages > 1 && (
+        <div className="page-btn-container">
+          {/* show a button for every page */}
+          {pages.map((page, index) => {
+            return (
+              <button
+                className={page === currentPage ? "btn set-page-btn" : "btn"}
+                type="button"
+                key={index}
+                onClick={(e) => {
+                  handlePageClick(e, page);
+                }}
+              >
+                {page}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Add Trade Modal (show if toggleModal state is true) */}
-      {showMainModal && <AddTradeModal />}
+      {showMainModal && (
+        <AddTradeModal
+          initialFilterState={initialFilterState}
+          setFilterStates={setFilterStates}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
 
       {/* If the showEditTradeModal flag is set to true, show the EditTradeModal component */}
-      {showEditTradeModal && <EditTradeModal />}
+      {showEditTradeModal && (
+        <EditTradeModal
+          initialFilterState={initialFilterState}
+          setFilterStates={setFilterStates}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </Wrapper>
   );
 }

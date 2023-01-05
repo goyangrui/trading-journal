@@ -363,6 +363,7 @@ const reducer = (state, action) => {
         executions: action.payload.executions,
         editTrade: action.payload.editTrade,
         trades: action.payload.trades,
+        numPages: action.payload.numPages,
       };
     } else {
       // otherwise, just update the executions, editTrade, and trades global variables
@@ -371,6 +372,7 @@ const reducer = (state, action) => {
         executions: action.payload.executions,
         editTrade: action.payload.editTrade,
         trades: action.payload.trades,
+        numPages: action.payload.numPages,
       };
     }
   }
@@ -393,6 +395,7 @@ const reducer = (state, action) => {
     return {
       ...state,
       trades: action.payload.trades,
+      numPages: action.payload.numPages,
     };
   }
 
@@ -414,6 +417,7 @@ const reducer = (state, action) => {
     return {
       ...state,
       trades: action.payload.trades,
+      numPages: action.payload.numPages,
       showMainModal: !state.showMainModal,
     };
   }
@@ -441,6 +445,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         trades: action.payload.trades,
+        numPages: action.payload.numPages,
         editTrade: action.payload.editTrade,
         showAlert: false,
         alertType: "",
@@ -450,6 +455,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         trades: action.payload.trades,
+        numPages: action.payload.numPages,
         editTrade: action.payload.editTrade,
         showAlert: false,
         alertType: "",
@@ -477,7 +483,11 @@ const reducer = (state, action) => {
 
   if (action.type === DELETE_TRADE_SUCCESS) {
     console.log("delete trade success");
-    return { ...state, trades: action.payload.trades };
+    return {
+      ...state,
+      trades: action.payload.trades,
+      numPages: action.payload.numPages,
+    };
   }
 
   if (action.type === DELETE_TRADE_ERROR) {
@@ -653,6 +663,7 @@ const reducer = (state, action) => {
       ...state,
       tags: action.payload.tags,
       trades: action.payload.trades,
+      numPages: action.payload.numPages,
     };
   }
 

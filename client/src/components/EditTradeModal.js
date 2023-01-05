@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import moment from "moment";
 
 import { FaTimes } from "react-icons/fa";
@@ -11,7 +11,11 @@ import Wrapper from "../assets/wrappers/EditTradeModal";
 
 import { useAppContext } from "../context/appContext";
 
-function EditTradeModal() {
+function EditTradeModal({
+  initialFilterState,
+  setFilterStates,
+  setCurrentPage,
+}) {
   // local state variables
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,6 +63,9 @@ function EditTradeModal() {
 
   // local state for the height of the notes textarea
   const [height, setHeight] = useState(trade.height);
+
+  // reference the notes text area element
+  const textAreaEl = useRef();
 
   // handle edittable cell click
   const handleCellClick = (e) => {
@@ -119,6 +126,12 @@ function EditTradeModal() {
     // send a request to delete the execution that was clicked
 
     const processData = async (executionId) => {
+      // reset the filter state
+      setFilterStates({ ...initialFilterState });
+
+      // reset the currentPage to 1
+      setCurrentPage(1);
+
       await deleteExecution(executionId);
     };
 
@@ -129,6 +142,12 @@ function EditTradeModal() {
   const handleExecAdd = (e) => {
     // send request to backend to add new execution
     const processData = async () => {
+      // reset the filter state
+      setFilterStates({ ...initialFilterState });
+
+      // reset the currentPage to 1
+      setCurrentPage(1);
+
       await createExecution(addExecCellState, trade._id);
     };
 
@@ -143,6 +162,12 @@ function EditTradeModal() {
   // handle tag select
   const handleTagSelect = (tagId, tradeId) => {
     const processData = async () => {
+      // reset the filter state
+      setFilterStates({ ...initialFilterState });
+
+      // reset the currentPage to 1
+      setCurrentPage(1);
+
       // set trade process state to true (prevent user from sending request when these update trade requests are still being processed)
       setTradeProcess(true);
 
@@ -175,6 +200,12 @@ function EditTradeModal() {
   }) => {
     setTradeProcess(true);
 
+    // reset the filter state
+    setFilterStates({ ...initialFilterState });
+
+    // reset the currentPage to 1
+    setCurrentPage(1);
+
     // call updateTrade function with tradeId, the screenshot doc key, and the screenshot link
     await updateTrade({ tradeId, screenshotDocKey, screenshotLink });
 
@@ -196,6 +227,12 @@ function EditTradeModal() {
     if (e.target.className === "file-input") {
       // set trade process state to true (prevent user from sending request when these update trade requests are still being processed)
       setTradeProcess(true);
+
+      // reset the filter state
+      setFilterStates({ ...initialFilterState });
+
+      // reset the currentPage to 1
+      setCurrentPage(1);
 
       // call updateTrade function with tradeId, the screenshot file, and the action type (create)
       await updateTrade({ tradeId, screenshotFile: e.target.files[0] });
@@ -228,7 +265,7 @@ function EditTradeModal() {
 
     // get the scroll height from the event target (text area)
     const scrollHeight = e.target.scrollHeight;
-    console.log(scrollHeight);
+    // console.log(scrollHeight);
 
     // set the height property of the text area element to the scrollheight
     textAreaEl.current.style.height = `${scrollHeight}px`;
@@ -242,6 +279,12 @@ function EditTradeModal() {
     const processData = async () => {
       // set trade process state to true (prevent user from sending request when these update trade requests are still being processed)
       setTradeProcess(true);
+
+      // reset the filter state
+      setFilterStates({ ...initialFilterState });
+
+      // reset the currentPage to 1
+      setCurrentPage(1);
 
       // call updateTrade function with tradeId, and notes
       await updateTrade({ tradeId, notes });
@@ -290,8 +333,11 @@ function EditTradeModal() {
     loadData();
   }, []);
 
-  // useRef hook to reference text area DOM element
-  const textAreaEl = useRef(null);
+  // on the initial render, set the trade notes textarea to the stored value
+  useEffect(() => {
+    // textAreaEl.current.style.height = `${height}px`;
+    console.log(textAreaEl);
+  }, []);
 
   return (
     <Wrapper>
