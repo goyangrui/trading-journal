@@ -9,7 +9,7 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 import Wrapper from "../assets/wrappers/TradesList";
 
-function TradesList() {
+function TradesList({ filterStates }) {
   // global state variables
   const {
     getTrades,
@@ -186,6 +186,7 @@ function TradesList() {
   // handle header click (for sorting trades on backend, and fetching them)
   const handleSort = async (e, header) => {
     setProcess(true);
+    console.log(filterStates);
 
     // if the passed in header is the same as the header that is set
     if (header === headerSet.header) {
@@ -193,7 +194,7 @@ function TradesList() {
       const reverse = headerSet.reverse;
 
       // send request to backend to sort the trades according to header, and reverse state
-      await getTrades(header, reverse);
+      await getTrades(header, reverse, filterStates);
 
       // reverse the headerSet reverse state variable
       setHeaderSet({ ...headerSet, reverse: !headerSet.reverse });
@@ -203,7 +204,7 @@ function TradesList() {
       const reverse = false;
 
       // send request to backend to sort the trades according to header, and reverse state
-      await getTrades(header, reverse);
+      await getTrades(header, reverse, filterStates);
 
       // set the headerSet header to the passed in header, and set reverse to true
       setHeaderSet({ ...headerSet, header, reverse: true });

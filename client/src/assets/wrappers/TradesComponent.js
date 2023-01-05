@@ -126,6 +126,73 @@ const Trades = styled.div`
   .btn {
     white-space: nowrap;
   }
+
+  /* Filter input styles */
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    column-gap: 0.25rem;
+    row-gap: 0.25rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .filter-container input,
+  select {
+    outline: none;
+    border-radius: var(--borderRadius-1);
+    border: 2px solid var(--gray-500);
+  }
+
+  /* overselect styles */
+  .dropdown-button {
+    position: relative;
+  }
+
+  .overselect {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+  /* filter buttons container */
+  .filter-buttons-container {
+    display: flex;
+    column-gap: 0.25rem;
+    justify-content: flex-end;
+  }
+
+  .filter-btn {
+    font-size: 0.75rem;
+  }
+
+  /* dropdown options styles */
+  .dropdown-options {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    padding: 0.25rem;
+    z-index: 10;
+    background-color: var(--gray-800);
+    border-radius: var(--borderRadius-1);
+    border: 1px solid var(--gray-300);
+    box-shadow: var(--shadow-4);
+  }
+
+  .dropdown-options label {
+    display: flex;
+    column-gap: 0.25rem;
+    text-transform: uppercase;
+    color: var(--gray-200);
+  }
+
+  .hide-options {
+    display: none;
+  }
 `;
 
 export default Trades;

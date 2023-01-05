@@ -16,9 +16,12 @@ const createTrade = async (req, res) => {
   // -- PARSE REQUEST BODY (make sure all necessary values are provided) --
 
   // destructure request body
-  const { market, symbol, executions, option, strikePrice, lotSize, expDate } =
+  let { market, symbol, executions, option, strikePrice, lotSize, expDate } =
     req.body.tradeInfo;
   const { selectedTagsId } = req.body;
+
+  // convert symbol to uppercase
+  symbol = symbol.toUpperCase();
 
   // if the user did not provide a market, symbol, or execution
   if (!market) {
@@ -369,10 +372,166 @@ const getAllTrades = async (req, res) => {
   const { userId } = req.user;
 
   // get url parameters
-  const { header, reverse } = req.query;
+  const { header, reverse, filters } = req.query;
 
-  // get all trades with the userId
-  let trades = await Trade.find({ createdBy: userId });
+  let trades = undefined;
+
+  // if filters exists
+  if (filters !== undefined) {
+    // get the filters object
+    const filtersObj = JSON.parse(filters);
+    console.log(filtersObj);
+
+    // initialize query object
+    const queryObj = { createdBy: userId };
+
+    // -- SYMBOL FILTER --
+    const symbol = filtersObj.symbol.trim().toUpperCase();
+    // add symbol to query object
+    queryObj.symbol = { $regex: symbol, $options: "i" };
+
+    // -- SIDES FILTER --
+    const sides = filtersObj.sides;
+
+    // initialize sidesArr to query from
+    const sidesArr = [];
+    // if sides long or short is true, add them to the sidesArr query array
+    if (sides.long) {
+      sidesArr.push("LONG");
+    }
+    if (sides.short) {
+      sidesArr.push("SHORT");
+    }
+
+    // if the sidesArr is not empty, add it to the query object
+    if (sidesArr.length !== 0) {
+      queryObj.side = { $in: sidesArr };
+    }
+
+    // -- STATUS FILTER --
+    const status = filtersObj.status;
+
+    // initialize statusArr to query from
+    const statusArr = [];
+    // if status open, win, or loss are true, add them to the statusArr query array
+    if (status.open) {
+      statusArr.push("OPEN");
+    }
+    if (status.win) {
+      statusArr.push("WIN");
+    }
+    if (status.loss) {
+      statusArr.push("LOSS");
+    }
+    if (status.breakeven) {
+      statusArr.push("BREAKEVEN");
+    }
+
+    // if the statusArr is not empty, add it to the query object
+    if (statusArr.length !== 0) {
+      queryObj.status = { $in: statusArr };
+    }
+
+    // -- MARKET FILTER --
+    const markets = filtersObj.markets;
+
+    // initialize marketsArr to query
+    const marketsArr = [];
+    // if market is stock, options, or futures, add them to the marketQuery array
+    if (markets.stock) {
+      marketsArr.push("STOCK");
+    }
+    if (markets.futures) {
+      marketsArr.push("FUTURES");
+    }
+    if (markets.options) {
+      marketsArr.push("OPTIONS");
+    }
+
+    // if the statusArr is not empty, add it to the query object
+    if (marketsArr.length !== 0) {
+      queryObj.market = { $in: marketsArr };
+    }
+
+    // -- DATE FILTER --
+    const date1 = filtersObj.date1;
+    const date2 = filtersObj.date2;
+
+    let date1Obj = undefined;
+    let date2Obj = undefined;
+
+    // if both dates exist
+    if (date1 && date2) {
+      date1Obj = new Date(date1);
+      date2Obj = new Date(date2);
+    } else if (date1) {
+      // otherwise if only date1 exists
+      date1Obj = new Date(date1);
+      date2Obj = new Date();
+      date2Obj.setUTCHours(0, 0, 0, 0);
+    } else if (date2) {
+      // otherwise if only date2 exists
+      date2Obj = new Date(date2);
+      date1Obj = new Date();
+      date1Obj.setUTCHours(0, 0, 0, 0);
+    } else {
+      // don't add anything to query parameters
+    }
+
+    // if either date exists
+    if (date1 || date2) {
+      // if date1 is less than date2
+      if (date1Obj < date2Obj) {
+        console.log("date1 is smaller");
+        // add query to find trades that have dates greater than date1, and less than date2
+        queryObj.openDate = { $gte: date1Obj, $lte: date2Obj };
+      } else if (date2Obj < date1Obj) {
+        console.log("date2 is smaller");
+        queryObj.openDate = { $lte: date1Obj, $gte: date2Obj };
+      } else {
+        console.log("they are the same date");
+        queryObj.openDate = date1Obj;
+      }
+    }
+
+    // -- TAG FILTER --
+    const tags = filtersObj.tags;
+    // filter for only an array of tags that have a value of true
+    const tagsArr = Object.entries(tags)
+      .filter((tag) => {
+        return tag[1];
+      })
+      .map((tag) => {
+        return tag[0];
+      });
+
+    // if tags array is not empty
+    if (tagsArr.length !== 0) {
+      // initialize $and array
+      const andArr = [];
+
+      // loop through each tag id in tagsArr
+      tagsArr.forEach((tagId) => {
+        // for each tagId, push query for trades that have this tagId
+        andArr.push({
+          [`tags.${tagId}`]: {
+            $exists: true,
+          },
+        });
+      });
+
+      // $and query -> filter for trades that have all of the given tagIds in the andArr
+      queryObj["$and"] = andArr;
+    }
+
+    console.log(queryObj);
+
+    // find trades based on query object
+    trades = await Trade.find(queryObj);
+  } else {
+    // get all trades with the userId
+    trades = await Trade.find({ createdBy: userId });
+  }
 
   // sort the trades in chronological order by their open date (default) if the url query parameters don't exist
   if (!header || !reverse) {

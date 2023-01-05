@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaTimes } from "react-icons/fa";
 
 import Wrapper from "../assets/wrappers/TradesComponent";
@@ -7,6 +7,28 @@ import { TradesList, AddTradeModal, Alert, EditTradeModal } from ".";
 
 import { useAppContext } from "../context/appContext";
 
+const initialFilterState = {
+  symbol: "",
+  sides: {
+    long: false,
+    short: false,
+  },
+  status: {
+    open: false,
+    win: false,
+    loss: false,
+    breakeven: false,
+  },
+  markets: {
+    stock: false,
+    options: false,
+    futures: false,
+  },
+  date1: "",
+  date2: "",
+  tags: {},
+};
+
 function TradesComponent() {
   // tag text local state variable
   const [tag, setTag] = useState("");
@@ -14,9 +36,16 @@ function TradesComponent() {
   // local isLoading variable for loading the tags in the tag modal
   const [isLoading, setIsLoading] = useState(true);
 
+  // local state variable for keeping track of the state of the dropdown overselect that is active
+  const [activeDropdown, setActiveDropdown] = useState("");
+
+  // local state for keeping track of the filter variables
+  const [filterStates, setFilterStates] = useState({ ...initialFilterState });
+
   // global state functions and variables
   const {
     selectedTrades,
+    getTrades,
     deleteTrade,
     createTag,
     showMainModal,
@@ -102,6 +131,43 @@ function TradesComponent() {
     deleteTag(tagId);
   };
 
+  // handle click of side/status/tag overselect
+  const handleOverselectClick = (e, index) => {
+    // if the activeDropdown that is set is the same as the one that is clicked
+    if (activeDropdown === e.target.id) {
+      setActiveDropdown("");
+    } else {
+      // set the active drop down overselect to be the id of the selected overselect
+      setActiveDropdown(e.target.id);
+
+      // get location of target element
+      const targetDim = e.target.getBoundingClientRect();
+
+      // set the position of the ref (dropdown options) to be right below the target that was clicked on
+      dropdownElements.current[index].style.top = `${
+        targetDim.height + targetDim.y
+      }px`;
+      dropdownElements.current[index].style.left = `${targetDim.x}px`;
+    }
+  };
+
+  // handle apply filter and clear filter button clicks
+  const handleFilterClick = async (e, clear) => {
+    // if the user clicks the clear filters button
+    if (clear) {
+      // set filtersState to the initial filters state
+      setFilterStates({ ...initialFilterState });
+      // send request to get trades with initial filters state
+      await getTrades(undefined, undefined, initialFilterState);
+    } else {
+      // send request to get trades with current filter state
+      await getTrades(undefined, undefined, filterStates);
+    }
+  };
+
+  // references to dropdown elements
+  const dropdownElements = useRef([]);
+
   return (
     <Wrapper>
       {/* Button container with add trade, and delete trades buttons */}
@@ -126,6 +192,350 @@ function TradesComponent() {
           {/* add tag button */}
           <button className="btn" onClick={addTagHandler}>
             Manage Tags
+          </button>
+        </div>
+      </div>
+
+      {/* Filter container */}
+      <div className="filter-container">
+        {/* Filter by symbol (text box) */}
+        <div>
+          <input
+            type="text"
+            id="symbol-filter"
+            placeholder="Symbol"
+            value={filterStates.symbol}
+            onChange={(e) => {
+              setFilterStates({ ...filterStates, symbol: e.target.value });
+            }}
+          />
+        </div>
+
+        {/* Filter by side (multi checkbox select) */}
+        <div className="dropdown-button">
+          <select>
+            <option>Side</option>
+          </select>
+          <div
+            className="overselect"
+            id="side-filter-overselect"
+            onClick={(e) => {
+              handleOverselectClick(e, 0);
+            }}
+          ></div>
+        </div>
+        {/* only show the dropdown options for side if this dropdown is active */}
+        {
+          <div
+            className={
+              activeDropdown === "side-filter-overselect"
+                ? "dropdown-options side-options"
+                : "dropdown-options side-options hide-options"
+            }
+            ref={(el) => (dropdownElements.current[0] = el)}
+          >
+            <label htmlFor="long-checkbox">
+              <input
+                type="checkbox"
+                id="long-checkbox"
+                value="LONG"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    sides: {
+                      ...filterStates.sides,
+                      long: !filterStates.sides.long,
+                    },
+                  });
+                }}
+                checked={!!filterStates.sides.long}
+              />
+              LONG
+            </label>
+            <label htmlFor="short-checkbox">
+              <input
+                type="checkbox"
+                id="short-checkbox"
+                value="SHORT"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    sides: {
+                      ...filterStates.sides,
+                      short: !filterStates.sides.short,
+                    },
+                  });
+                }}
+                checked={!!filterStates.sides.short}
+              />
+              SHORT
+            </label>
+          </div>
+        }
+
+        {/* Filter by status (multi checkbox select) */}
+        <div className="dropdown-button">
+          <select>
+            <option>Status</option>
+          </select>
+          <div
+            className="overselect"
+            id="status-filter-overselect"
+            onClick={(e) => {
+              handleOverselectClick(e, 1);
+            }}
+          ></div>
+        </div>
+        {
+          <div
+            className={
+              activeDropdown === "status-filter-overselect"
+                ? "dropdown-options status-options"
+                : "dropdown-options status-options hide-options"
+            }
+            ref={(el) => (dropdownElements.current[1] = el)}
+          >
+            <label htmlFor="open-checkbox">
+              <input
+                type="checkbox"
+                id="open-checkbox"
+                value="OPEN"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    status: {
+                      ...filterStates.status,
+                      open: !filterStates.status.open,
+                    },
+                  });
+                }}
+                checked={!!filterStates.status.open}
+              />
+              OPEN
+            </label>
+            <label htmlFor="win-checkbox">
+              <input
+                type="checkbox"
+                id="win-checkbox"
+                value="WIN"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    status: {
+                      ...filterStates.status,
+                      win: !filterStates.status.win,
+                    },
+                  });
+                }}
+                checked={!!filterStates.status.win}
+              />
+              WIN
+            </label>
+            <label htmlFor="loss-checkbox">
+              <input
+                type="checkbox"
+                id="loss-checkbox"
+                value="LOSS"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    status: {
+                      ...filterStates.status,
+                      loss: !filterStates.status.loss,
+                    },
+                  });
+                }}
+                checked={!!filterStates.status.loss}
+              />
+              LOSS
+            </label>
+            <label htmlFor="breakeven-checkbox">
+              <input
+                type="checkbox"
+                id="breakeven-checkbox"
+                value="BREAKEVEN"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    status: {
+                      ...filterStates.status,
+                      breakeven: !filterStates.status.breakeven,
+                    },
+                  });
+                }}
+                checked={!!filterStates.status.breakeven}
+              />
+              BREAKEVEN
+            </label>
+          </div>
+        }
+
+        {/* Filter by market (multi checkbox select) */}
+        <div className="dropdown-button">
+          <select>
+            <option>Market</option>
+          </select>
+          <div
+            className="overselect"
+            id="market-filter-overselect"
+            onClick={(e) => {
+              handleOverselectClick(e, 2);
+            }}
+          ></div>
+        </div>
+        {
+          <div
+            className={
+              activeDropdown === "market-filter-overselect"
+                ? "dropdown-options market-options"
+                : "dropdown-options market-options hide-options"
+            }
+            ref={(el) => (dropdownElements.current[2] = el)}
+          >
+            <label htmlFor="stock-checkbox">
+              <input
+                type="checkbox"
+                id="stock-checkbox"
+                value="STOCK"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    markets: {
+                      ...filterStates.markets,
+                      stock: !filterStates.markets.stock,
+                    },
+                  });
+                }}
+                checked={!!filterStates.markets.stock}
+              />
+              STOCK
+            </label>
+            <label htmlFor="options-checkbox">
+              <input
+                type="checkbox"
+                id="options-checkbox"
+                value="OPTIONS"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    markets: {
+                      ...filterStates.markets,
+                      options: !filterStates.markets.options,
+                    },
+                  });
+                }}
+                checked={!!filterStates.markets.options}
+              />
+              OPTIONS
+            </label>
+            <label htmlFor="futures-checkbox">
+              <input
+                type="checkbox"
+                id="futures-checkbox"
+                value="FUTURES"
+                onChange={(e) => {
+                  setFilterStates({
+                    ...filterStates,
+                    markets: {
+                      ...filterStates.markets,
+                      futures: !filterStates.markets.futures,
+                    },
+                  });
+                }}
+                checked={!!filterStates.markets.futures}
+              />
+              FUTURES
+            </label>
+          </div>
+        }
+
+        {/* Filter by date (select start and end date) */}
+        <div>
+          <input
+            type="date"
+            id="date-filter1"
+            onChange={(e) => {
+              setFilterStates({ ...filterStates, date1: e.target.value });
+            }}
+            value={filterStates.date1}
+          />
+        </div>
+        <div>
+          <input
+            type="date"
+            id="date-filter2"
+            onChange={(e) => {
+              setFilterStates({ ...filterStates, date2: e.target.value });
+            }}
+            value={filterStates.date2}
+          />
+        </div>
+
+        {/* Filter by tag (multi checkbox select) */}
+        <div className="dropdown-button">
+          <select>
+            <option>Tag</option>
+          </select>
+          <div
+            className="overselect"
+            id="tag-filter-overselect"
+            onClick={(e) => {
+              handleOverselectClick(e, 3);
+            }}
+          ></div>
+        </div>
+        {
+          <div
+            className={
+              activeDropdown === "tag-filter-overselect"
+                ? "dropdown-options tag-options"
+                : "dropdown-options tag-options hide-options"
+            }
+            ref={(el) => (dropdownElements.current[3] = el)}
+          >
+            {/* for every tag */}
+            {tags.map((tag, index) => {
+              return (
+                <label htmlFor={`tag${index}-checkbox`} key={`tag${index}`}>
+                  <input
+                    type="checkbox"
+                    id={`tag${index}-checkbox`}
+                    value={tag._id}
+                    onChange={(e) => {
+                      setFilterStates({
+                        ...filterStates,
+                        tags: {
+                          ...filterStates.tags,
+                          [tag._id]: !filterStates.tags[tag._id],
+                        },
+                      });
+                    }}
+                    checked={!!filterStates.tags[tag._id]}
+                  />
+                  {tag.text}
+                </label>
+              );
+            })}
+          </div>
+        }
+
+        {/* Filter management buttons */}
+        <div className="filter-buttons-container">
+          <button
+            className="btn filter-btn"
+            onClick={(e) => {
+              handleFilterClick(e, false);
+            }}
+          >
+            Apply Filters
+          </button>
+          <button
+            className="btn btn-reverse filter-btn"
+            onClick={(e) => {
+              handleFilterClick(e, true);
+            }}
+          >
+            Clear Filters
           </button>
         </div>
       </div>
@@ -196,7 +606,8 @@ function TradesComponent() {
       )}
 
       {/* Main list to show all trades */}
-      <TradesList />
+      {/* Pass the filterStates state variable to TradesList component so that the filters are maintained when user sorts the trades */}
+      <TradesList filterStates={filterStates} />
 
       {/* Add Trade Modal (show if toggleModal state is true) */}
       {showMainModal && <AddTradeModal />}

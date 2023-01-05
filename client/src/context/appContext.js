@@ -442,12 +442,13 @@ function AppContextProvider({ children }) {
   // -- TRADES FUNCTIONS --
 
   // get all trades
-  const getTrades = async (header, reverse) => {
+  const getTrades = async (header, reverse, filters) => {
     try {
       dispatch({ type: FETCH_TRADES_BEGIN });
+
       // try and send request to get trades
       const { data } = await authFetch.get(`trades`, {
-        params: { header, reverse },
+        params: { header, reverse, filters },
       });
       const { trades } = data;
 
