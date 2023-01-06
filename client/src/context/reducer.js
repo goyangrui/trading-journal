@@ -28,6 +28,7 @@ import {
   TOGGLE_TAGMODAL_SUCCESS,
   TOGGLE_EDIT_TRADEMODAL_SUCCESS,
   DELETE_EXECUTION_ERROR,
+  SET_HEADER_SUCCESS,
   FETCH_TRADES_BEGIN,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
@@ -381,6 +382,16 @@ const reducer = (state, action) => {
     console.log("delete execution error");
     return {
       ...state,
+    };
+  }
+
+  // -- GET TRADES SORT HEADER AND REVERSE --
+  if (action.type === SET_HEADER_SUCCESS) {
+    console.log("set header success");
+    return {
+      ...state,
+      header: action.payload.header,
+      reverse: action.payload.reverse,
     };
   }
 

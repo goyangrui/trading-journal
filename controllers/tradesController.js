@@ -376,6 +376,8 @@ const getAllTrades = async (req, res) => {
 
   let trades = undefined;
 
+  console.log(header, reverse);
+
   // if filters exists
   if (filters !== undefined) {
     // get the filters object
@@ -534,7 +536,7 @@ const getAllTrades = async (req, res) => {
   }
 
   // sort the trades in chronological order by their open date (default) if the url query parameters don't exist
-  if (!header || !reverse) {
+  if (header === "" || reverse === undefined) {
     trades.sort((trade1, trade2) => {
       return trade1.openDate > trade2.openDate
         ? -1

@@ -32,6 +32,7 @@ import {
   TOGGLE_MODAL_SUCCESS,
   TOGGLE_TAGMODAL_SUCCESS,
   TOGGLE_EDIT_TRADEMODAL_SUCCESS,
+  SET_HEADER_SUCCESS,
   FETCH_TRADES_BEGIN,
   FETCH_TRADES_SUCCESS,
   FETCH_TRADES_ERROR,
@@ -110,6 +111,8 @@ const initialState = {
     commissions: "",
     fees: "",
   },
+  header: "",
+  reverse: false,
   numPages: 1,
 };
 
@@ -441,6 +444,11 @@ function AppContextProvider({ children }) {
   };
 
   // -- TRADES FUNCTIONS --
+
+  // set header and reverse for trade sort
+  const setHeaderSet = async (header, reverse) => {
+    dispatch({ type: SET_HEADER_SUCCESS, payload: { header, reverse } });
+  };
 
   // get all trades
   const getTrades = async (header, reverse, filters, page) => {
@@ -992,6 +1000,7 @@ function AppContextProvider({ children }) {
         toggleMainModal,
         toggleTagModal,
         toggleEditTradeModal,
+        setHeaderSet,
         getTrades,
         createTrade,
         updateTrade,

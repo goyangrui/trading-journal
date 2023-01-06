@@ -63,6 +63,8 @@ function TradesComponent() {
     showEditTradeModal,
     editTrade,
     numPages,
+    header,
+    reverse,
   } = useAppContext();
 
   // variable for keeping track of the pages (depending on numPages global state variable)
@@ -182,10 +184,10 @@ function TradesComponent() {
       // set filtersState to the initial filters state
       setFilterStates({ ...initialFilterState });
       // send request to get trades with initial filters state
-      await getTrades(undefined, undefined, initialFilterState);
+      await getTrades(header, reverse, initialFilterState);
     } else {
       // send request to get trades with current filter state
-      await getTrades(undefined, undefined, filterStates);
+      await getTrades(header, reverse, filterStates);
     }
   };
 
@@ -197,7 +199,7 @@ function TradesComponent() {
       setCurrentPage(page);
 
       // send a request to get trades with filter states, and page number
-      await getTrades(undefined, undefined, filterStates, page);
+      await getTrades(header, reverse, filterStates, page);
     }
   };
 
@@ -643,7 +645,7 @@ function TradesComponent() {
 
       {/* Main list to show all trades */}
       {/* Pass the filterStates state variable to TradesList component so that the filters are maintained when user sorts the trades */}
-      <TradesList filterStates={filterStates} />
+      <TradesList filterStates={filterStates} setCurrentPage={setCurrentPage} />
 
       {/* Page switching bar */}
       {/* only show page switching bar if there are more than 1 pages */}

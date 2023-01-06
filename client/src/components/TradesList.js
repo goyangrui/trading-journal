@@ -9,7 +9,7 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 import Wrapper from "../assets/wrappers/TradesList";
 
-function TradesList({ filterStates }) {
+function TradesList({ filterStates, setCurrentPage }) {
   // global state variables
   const {
     getTrades,
@@ -17,6 +17,9 @@ function TradesList({ filterStates }) {
     setSelectedTrades,
     selectedTrades,
     toggleEditTradeModal,
+    setHeaderSet,
+    header,
+    reverse,
   } = useAppContext();
 
   // local state variables
@@ -31,12 +34,6 @@ function TradesList({ filterStates }) {
     display: false,
     tags: undefined,
     tradeId: undefined,
-  });
-
-  // local state variable to determine which header has been set, and whether it should be sorted in reverse order or not
-  const [headerSet, setHeaderSet] = useState({
-    header: "",
-    reverse: false,
   });
 
   // local state variable for determining if a request is still being processed
@@ -184,29 +181,32 @@ function TradesList({ filterStates }) {
   };
 
   // handle header click (for sorting trades on backend, and fetching them)
-  const handleSort = async (e, header) => {
+  const handleSort = async (e, headerNew) => {
     setProcess(true);
 
+    // reset the page to the first page
+    setCurrentPage(1);
+
     // if the passed in header is the same as the header that is set
-    if (header === headerSet.header) {
-      // preserve the reverse value for the set header
-      const reverse = headerSet.reverse;
+    if (headerNew === header) {
+      // set reverse value to the opposite of the current reverse value
+      const reverseNew = !reverse;
 
       // send request to backend to sort the trades according to header, and reverse state
-      await getTrades(header, reverse, filterStates);
+      await getTrades(headerNew, reverseNew, filterStates);
 
       // reverse the headerSet reverse state variable
-      setHeaderSet({ ...headerSet, reverse: !headerSet.reverse });
+      setHeaderSet(header, reverseNew);
     } else {
       // otherwise, if the passed in header is different
       // set reverse back to false (default)
-      const reverse = false;
+      const reverseNew = false;
 
       // send request to backend to sort the trades according to header, and reverse state
-      await getTrades(header, reverse, filterStates);
+      await getTrades(headerNew, reverseNew, filterStates);
 
       // set the headerSet header to the passed in header, and set reverse to true
-      setHeaderSet({ ...headerSet, header, reverse: true });
+      setHeaderSet(headerNew, reverseNew);
     }
 
     setTimeout(() => {
@@ -255,10 +255,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Status
-                {headerSet.reverse === true && headerSet.header === "status" ? (
+                {reverse === true && header === "status" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "status" ? (
+                ) : reverse === false && header === "status" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -271,11 +270,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Open Date
-                {headerSet.reverse === true &&
-                headerSet.header === "openDate" ? (
+                {reverse === true && header === "openDate" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "openDate" ? (
+                ) : reverse === false && header === "openDate" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -288,10 +285,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Market
-                {headerSet.reverse === true && headerSet.header === "market" ? (
+                {reverse === true && header === "market" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "market" ? (
+                ) : reverse === false && header === "market" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -304,10 +300,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Symbol
-                {headerSet.reverse === true && headerSet.header === "symbol" ? (
+                {reverse === true && header === "symbol" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "symbol" ? (
+                ) : reverse === false && header === "symbol" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -320,11 +315,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Entry
-                {headerSet.reverse === true &&
-                headerSet.header === "averageEntry" ? (
+                {reverse === true && header === "averageEntry" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "averageEntry" ? (
+                ) : reverse === false && header === "averageEntry" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -337,11 +330,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Exit
-                {headerSet.reverse === true &&
-                headerSet.header === "averageExit" ? (
+                {reverse === true && header === "averageExit" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "averageExit" ? (
+                ) : reverse === false && header === "averageExit" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -354,11 +345,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Position Size
-                {headerSet.reverse === true &&
-                headerSet.header === "positionSize" ? (
+                {reverse === true && header === "positionSize" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "positionSize" ? (
+                ) : reverse === false && header === "positionSize" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -371,11 +360,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 $ Return
-                {headerSet.reverse === true &&
-                headerSet.header === "dollarReturn" ? (
+                {reverse === true && header === "dollarReturn" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "dollarReturn" ? (
+                ) : reverse === false && header === "dollarReturn" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -388,11 +375,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 % Return
-                {headerSet.reverse === true &&
-                headerSet.header === "percentReturn" ? (
+                {reverse === true && header === "percentReturn" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "percentReturn" ? (
+                ) : reverse === false && header === "percentReturn" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -405,11 +390,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Net Return
-                {headerSet.reverse === true &&
-                headerSet.header === "netReturn" ? (
+                {reverse === true && header === "netReturn" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "netReturn" ? (
+                ) : reverse === false && header === "netReturn" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
@@ -422,10 +405,9 @@ function TradesList({ filterStates }) {
                 className={process ? "table-header disabled" : "table-header"}
               >
                 Side
-                {headerSet.reverse === true && headerSet.header === "side" ? (
+                {reverse === true && header === "side" ? (
                   <IoMdArrowDropdown />
-                ) : headerSet.reverse === false &&
-                  headerSet.header === "side" ? (
+                ) : reverse === false && header === "side" ? (
                   <IoMdArrowDropup />
                 ) : (
                   ""
