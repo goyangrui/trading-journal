@@ -13,13 +13,9 @@ function Landing() {
           <h1>
             a clean and effective <span>trading journal</span>
           </h1>
-          <p>
-            I'm baby fingerstache fam cloud bread chillwave praxis pork belly.
-            Pitchfork church-key echo park, post-ironic kale chips unicorn plaid
-            mustache tilde ascot offal cronut 90's. Occupy pork belly selfies,
-            gluten-free jean shorts praxis four loko vegan intelligentsia
-            pour-over YOLO. Fashion axe aesthetic waistcoat celiac deep v.
-            Gluten-free same XOXO, farm-to-table +1 chartreuse neutra direct
+          <p className="hero-paragraph">
+            Enter and visualize your trades with minimal friction with this
+            simple and intuitive trading journal web application!
           </p>
           <Link to="/pricing" className="btn">
             Get started

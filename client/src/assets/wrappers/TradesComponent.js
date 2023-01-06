@@ -16,18 +16,20 @@ const Trades = styled.div`
   .btn-container {
     display: flex;
     justify-content: flex-start;
+    flex-wrap: wrap;
     column-gap: 1rem;
+    row-gap: 1rem;
     margin-bottom: 1.5rem !important;
     margin-right: 1rem;
     margin-left: 1rem;
   }
 
   /* add tag container */
-  .add-tag-container {
+  /* .add-tag-container {
     display: flex;
     justify-content: flex-end;
     width: 100%;
-  }
+  } */
 
   /* add tag modal */
   .add-tag-modal {
@@ -51,11 +53,10 @@ const Trades = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 2rem auto;
+    /* margin: 2rem auto; */
     padding: 1rem;
-    width: 50%;
-    min-width: 30rem;
-    max-width: 20rem;
+    width: 25rem;
+    max-width: 90%;
     background-color: var(--gray-100);
   }
 
@@ -118,7 +119,8 @@ const Trades = styled.div`
     padding: 0.5rem;
   }
 
-  .btn-container {
+  .tag-btn-container {
+    display: flex;
     column-gap: 0.5rem;
     margin-bottom: 0.5rem;
   }

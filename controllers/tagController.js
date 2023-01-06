@@ -7,8 +7,10 @@ const getTags = async (req, res) => {
   // get userId from the req.user object
   const { userId } = req.user;
 
+  console.log(userId);
+
   // find tags with the given userId
-  const tags = await Tag.find({ userId });
+  const tags = await Tag.find({ createdBy: userId });
 
   res.status(StatusCodes.OK).json({ tags });
 };

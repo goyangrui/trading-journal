@@ -36,6 +36,10 @@ const Landing = styled.div`
       max-width: 600px;
     }
   }
+
+  .hero-paragraph {
+    font-size: 1.25rem;
+  }
 `;
 
 export default Landing;

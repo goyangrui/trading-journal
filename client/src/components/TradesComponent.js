@@ -226,12 +226,10 @@ function TradesComponent() {
         </button>
 
         {/* add tag button container*/}
-        <div className="add-tag-container">
-          {/* add tag button */}
-          <button className="btn" onClick={addTagHandler}>
-            Manage Tags
-          </button>
-        </div>
+        {/* add tag button */}
+        <button className="btn" onClick={addTagHandler}>
+          Manage Tags
+        </button>
       </div>
 
       {/* Filter container */}
@@ -624,7 +622,7 @@ function TradesComponent() {
               />
 
               {/* save and cancel button container */}
-              <div className="btn-container">
+              <div className="tag-btn-container">
                 {/* button to save tag */}
                 <button type="submit" className="btn">
                   add

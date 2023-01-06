@@ -377,8 +377,6 @@ const getAllTrades = async (req, res) => {
 
   let trades = undefined;
 
-  console.log(header, reverse);
-
   // if filters exists
   if (filters !== undefined) {
     // get the filters object
@@ -570,7 +568,7 @@ const getAllTrades = async (req, res) => {
     }
   }
 
-  const tradesPerPage = 3;
+  const tradesPerPage = 6;
 
   // compute the number of pages (for pagination)
   const numPages = Math.ceil(trades.length / tradesPerPage);

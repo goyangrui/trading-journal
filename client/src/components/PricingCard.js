@@ -27,12 +27,9 @@ function PricingCard({ product, type }) {
 
         {/* Product details */}
         <div>Detailed performance statistics</div>
-        <div>Extract insights from your journaling</div>
-        <div>Advanced features for trade reflection</div>
-        <div>
-          Advanced "find your edge" feature to help you discover what works for
-          you, and what doesn't
-        </div>
+        <div>Swiftly add trades to your journal</div>
+        <div>Clean, dynamic view of your trades</div>
+        <div>Add screenshots to your journals to gain insights</div>
 
         {/* conditional button */}
         {type === "pricing" ? (
