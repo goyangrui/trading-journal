@@ -638,7 +638,11 @@ function AppContextProvider({ children }) {
       // if the trade deletion process is successful, update the global state trades array (causing a re-render on the front end)
       dispatch({
         type: DELETE_TRADE_SUCCESS,
-        payload: { trades: data.trades, numPages: data.numPages },
+        payload: {
+          trades: data.trades,
+          numPages: data.numPages,
+          selectedTrades: {},
+        },
       });
       // // reload the page after trades have been deleted so that changes are reflected on the tradelist
       // document.location.reload(true);

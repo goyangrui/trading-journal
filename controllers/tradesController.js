@@ -1,6 +1,7 @@
 import Trade from "../models/Trade.js";
 import Execution from "../models/Execution.js";
 import Tag from "../models/Tag.js";
+import Journal from "../models/Journal.js";
 
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../errors/index.js";
@@ -1107,8 +1108,8 @@ const updateTrade = async (req, res) => {
 const deleteTrade = async (req, res) => {
   // get array of trade id(s) from request body
   const tradeIdList = req.body;
-  console.log(tradeIdList);
 
+  // -- DELETE GIVEN TRADES, THEIR SCREENSHOTS, AND EXECUTIONS --
   // delete all executions correlated to the given trade ids in request body
   const executions = await Execution.deleteMany({
     tradeId: {
@@ -1132,8 +1133,6 @@ const deleteTrade = async (req, res) => {
       }
     );
   });
-
-  console.log(screenshotsArr);
 
   // delete all screenshots from S3 in parallel
   await Promise.all(
@@ -1159,7 +1158,55 @@ const deleteTrade = async (req, res) => {
     },
   });
 
-  res.status(StatusCodes.OK).json({ executions, trades });
+  // get all open dates for each trade (after selected trades have been deleted)
+  const tradesDeleteJournals = await Trade.find();
+  const openDates = tradesDeleteJournals.map((trade) => {
+    return trade.openDate;
+  });
+
+  // -- DELETE ALL JOURNALS THAT DON'T HAVE ANY TRADES LEFT, AND THEIR SCREENSHOTS FROM AWS S3 --
+  // find all journals where the journal's date is NOT in the openDates array (journals to delete)
+  const journalsToDelete = await Journal.find({
+    date: {
+      $nin: openDates,
+    },
+  });
+
+  // get all of the screenshots from the journals as array pairs (first index is dockey, second index is link)
+  const screenshotsArrJournal = [];
+  journalsToDelete.forEach((journal) => {
+    Object.entries(Object.fromEntries(journal.screenshots)).forEach(
+      (screenshot) => {
+        screenshotsArrJournal.push(screenshot);
+      }
+    );
+  });
+
+  // delete all journal screenshots from S3 in parallel
+  await Promise.all(
+    // get an array of delete screenshot promises for each screenshot
+    screenshotsArrJournal.map(async (screenshot) => {
+      // get the screenshotLink from screenshots
+      const screenshotLink = screenshot[1];
+
+      // get the screenshotKey from the screenshots link for S3 bucket
+      const screenshotKey = screenshotLink.split(
+        process.env.AWS_SCREENSHOT_URL
+      )[1];
+
+      // return promise to delete the screenshot from S3
+      return s3DeleteScreenshot(screenshotKey);
+    })
+  );
+
+  // delete all journals that don't have trades left (where the journal's date is not in the openDates for the remaining trades)
+  const journals = await Journal.deleteMany({
+    date: {
+      $nin: openDates,
+    },
+  });
+
+  res.status(StatusCodes.OK).json({ executions, trades, journals });
 };
 
 // get trades in format that can easily be viewed using chartjs

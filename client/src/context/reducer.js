@@ -498,6 +498,7 @@ const reducer = (state, action) => {
       ...state,
       trades: action.payload.trades,
       numPages: action.payload.numPages,
+      selectedTrades: action.payload.selectedTrades,
     };
   }
 

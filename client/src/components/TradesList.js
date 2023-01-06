@@ -93,8 +93,10 @@ function TradesList({ filterStates, setCurrentPage }) {
         // otherwise set the state of allChecked to false
         setAllChecked(false);
       }
+    } else {
+      // otherwise, set all checked state variable to false (since selectedTrades is empty)
+      setAllChecked(false);
     }
-    // otherwise do nothing
   }, [selectedTrades]);
 
   // function for handling the checkbox which has been clicked
