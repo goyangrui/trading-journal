@@ -373,7 +373,7 @@ const getAllTrades = async (req, res) => {
   const { userId } = req.user;
 
   // get url parameters
-  let { header, reverse, filters, page } = req.query;
+  let { header, reverse, filters, page, isJournal } = req.query;
 
   let trades = undefined;
 
@@ -570,21 +570,22 @@ const getAllTrades = async (req, res) => {
     }
   }
 
-  const tradesPerPage = 10;
+  const tradesPerPage = 3;
 
   // compute the number of pages (for pagination)
   const numPages = Math.ceil(trades.length / tradesPerPage);
 
-  // if the user did not pass in a page value
-  if (!page) {
-    // set page to 1 by default
-    page = 1;
+  // Only paginate if the trades are not for the journal (i.e. isJournal is false)
+  if (!isJournal) {
+    // if the user did not pass in a page value
+    if (!page) {
+      // set page to 1 by default
+      page = 1;
+    }
+
+    // slice the trades array to only get the trades for the given page
+    trades = trades.slice((page - 1) * tradesPerPage, page * tradesPerPage);
   }
-
-  console.log(page);
-
-  // slice the trades array to only get the trades for the given page
-  trades = trades.slice((page - 1) * tradesPerPage, page * tradesPerPage);
 
   return res.status(StatusCodes.OK).json({ trades, numPages });
 };

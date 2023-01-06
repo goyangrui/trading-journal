@@ -8,7 +8,8 @@ import Wrapper from "../assets/wrappers/JournalsList";
 
 function JournalsList() {
   // global state variables and functions
-  const { trades, getTrades, getJournals, journals } = useAppContext();
+  const { trades, getTrades, getJournals, journals, header, reverse } =
+    useAppContext();
 
   // local state variables and functions
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +24,7 @@ function JournalsList() {
   // on initial render, load all journals and corresponding trades
   useEffect(() => {
     const loadData = async () => {
-      await getTrades();
+      await getTrades(header, reverse, undefined, undefined, true);
       await getJournals();
 
       // set local isLoading state variable to false once data has been fetched
