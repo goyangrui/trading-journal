@@ -569,7 +569,7 @@ const getAllTrades = async (req, res) => {
     }
   }
 
-  const tradesPerPage = 3;
+  const tradesPerPage = 10;
 
   // compute the number of pages (for pagination)
   const numPages = Math.ceil(trades.length / tradesPerPage);
@@ -1094,7 +1094,7 @@ const updateTrade = async (req, res) => {
         // delete the screenshot from S3
         await s3DeleteScreenshot(screenshotKey);
 
-        // remove the screenshot from the journal list of screenshots
+        // remove the screenshot from the trade list of screenshots
         trade.screenshots.delete(screenshotDocKey);
       }
     }
@@ -1116,7 +1116,43 @@ const deleteTrade = async (req, res) => {
     },
   });
 
-  // // delete all trades correlated to the following trade ids in request body
+  // find all trades that are in the tradeIdList
+  const tradesDeleteScreenshot = await Trade.find({
+    _id: {
+      $in: tradeIdList,
+    },
+  });
+
+  // get all of the screenshots from the trades as array pairs (first index is dockey, second index is link)
+  const screenshotsArr = [];
+  tradesDeleteScreenshot.forEach((trade) => {
+    Object.entries(Object.fromEntries(trade.screenshots)).forEach(
+      (screenshot) => {
+        screenshotsArr.push(screenshot);
+      }
+    );
+  });
+
+  console.log(screenshotsArr);
+
+  // delete all screenshots from S3 in parallel
+  await Promise.all(
+    // get an array of delete screenshot promises for each screenshot
+    screenshotsArr.map(async (screenshot) => {
+      // get the screenshotLink from screenshots
+      const screenshotLink = screenshot[1];
+
+      // get the screenshotKey from the screenshots link for S3 bucket
+      const screenshotKey = screenshotLink.split(
+        process.env.AWS_SCREENSHOT_URL
+      )[1];
+
+      // return promise to delete the screenshot from S3
+      return s3DeleteScreenshot(screenshotKey);
+    })
+  );
+
+  // delete all trades correlated to the following trade ids in request body
   const trades = await Trade.deleteMany({
     _id: {
       $in: tradeIdList,
