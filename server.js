@@ -6,6 +6,11 @@ import express from "express";
 import morgan from "morgan";
 import mongoose from "mongoose";
 
+// security packages
+import helmet from "helmet";
+import xss from "xss-clean";
+import mongoSanitize from "express-mongo-sanitize";
+
 // passes errors to error handler without try-catch block
 import "express-async-errors";
 
@@ -42,6 +47,11 @@ app.use(express.json());
 
 // request body parser for url encoded requests
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// security middleware
+app.use(helmet()); // secure HTTP headers
+app.use(xss()); // sanitize user input from POST body and GET queries and url params (prevent cross site scripting)
+app.use(mongoSanitize()); // prevents MongoDB Operator Injection
 
 // -- ROUTING --
 

@@ -84,7 +84,7 @@ const reducer = (state, action) => {
     return { ...state, isLoading: true };
   }
   if (action.type === REGISTER_USER_SUCCESS) {
-    console.log("register");
+    // console.log("register");
     return {
       ...state,
       isLoading: false,
@@ -94,7 +94,7 @@ const reducer = (state, action) => {
     };
   }
   if (action.type === REGISTER_USER_ERROR) {
-    console.log("register error");
+    // console.log("register error");
     return {
       ...state,
       isLoading: false,
@@ -108,8 +108,9 @@ const reducer = (state, action) => {
   if (action.type === LOGIN_USER_BEGIN) {
     return { ...state, isLoading: true };
   }
+
   if (action.type === LOGIN_USER_SUCCESS) {
-    console.log("login");
+    // console.log("login");
     return {
       ...state,
       isLoading: false,
@@ -117,8 +118,9 @@ const reducer = (state, action) => {
       token: action.payload.token,
     };
   }
+
   if (action.type === LOGIN_USER_ERROR) {
-    console.log("login error");
+    // console.log("login error");
     return {
       ...state,
       isLoading: false,
@@ -130,7 +132,7 @@ const reducer = (state, action) => {
 
   // -- FETCH USER --
   if (action.type === FETCH_USER_BEGIN) {
-    console.log("fetch user begin");
+    // console.log("fetch user begin");
     return {
       ...state,
       isLoading: true,
@@ -138,7 +140,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === FETCH_USER_SUCCESS) {
-    console.log("fetch user success");
+    // console.log("fetch user success");
     return {
       ...state,
       isLoading: false,
@@ -147,7 +149,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === FETCH_USER_ERROR) {
-    console.log("fetch user error");
+    // console.log("fetch user error");
     return {
       ...state,
       isLoading: false,
@@ -156,7 +158,7 @@ const reducer = (state, action) => {
 
   // -- LOGOUT USER --
   if (action.type === LOGOUT_USER) {
-    console.log("logout user");
+    // console.log("logout user");
     return {
       ...initialState,
       user: null,
@@ -166,14 +168,14 @@ const reducer = (state, action) => {
 
   // -- UPDATE USER --
   if (action.type === UPDATE_USER_BEGIN) {
-    console.log("update user begin");
+    // console.log("update user begin");
     return {
       ...state,
       isLoading: true,
     };
   }
   if (action.type === UPDATE_USER_SUCCESS) {
-    console.log("update user success");
+    // console.log("update user success");
     return {
       ...state,
       isLoading: false,
@@ -185,7 +187,7 @@ const reducer = (state, action) => {
     };
   }
   if (action.type === UPDATE_USER_ERROR) {
-    console.log("update user error");
+    // console.log("update user error");
     return {
       ...state,
       isLoading: false,
@@ -197,14 +199,14 @@ const reducer = (state, action) => {
 
   // -- CHANGE PASSWORD --
   if (action.type === CHANGE_PASSWORD_BEGIN) {
-    console.log("change password begin");
+    // console.log("change password begin");
     return {
       ...state,
       isLoading: true,
     };
   }
   if (action.type === CHANGE_PASSWORD_SUCCESS) {
-    console.log("change password success");
+    // console.log("change password success");
     return {
       ...state,
       isLoading: false,
@@ -214,7 +216,7 @@ const reducer = (state, action) => {
     };
   }
   if (action.type === CHANGE_PASSWORD_ERROR) {
-    console.log("change password error");
+    // console.log("change password error");
     return {
       ...state,
       isLoading: false,
@@ -226,7 +228,7 @@ const reducer = (state, action) => {
 
   // -- FETCH PRODUCTS --
   if (action.type === FETCH_PRODUCTS_BEGIN) {
-    console.log("fetch products begin");
+    // console.log("fetch products begin");
     return {
       ...state,
       isLoading: true,
@@ -234,7 +236,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === FETCH_PRODUCTS_SUCCESS) {
-    console.log("fetch products success");
+    // console.log("fetch products success");
     return {
       ...state,
       isLoading: false,
@@ -243,7 +245,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === FETCH_PRODUCTS_ERROR) {
-    console.log("fetch products error");
+    // console.log("fetch products error");
     return {
       ...state,
       isLoading: false,
@@ -252,7 +254,7 @@ const reducer = (state, action) => {
 
   // -- CLEAR ALERT --
   if (action.type === CLEAR_ALERT) {
-    console.log("clear alert");
+    // console.log("clear alert");
     return {
       ...state,
       showAlert: false,
@@ -263,7 +265,7 @@ const reducer = (state, action) => {
 
   // -- CREATE SESSION --
   if (action.type === CREATE_SESSION_BEGIN) {
-    console.log("create session begin");
+    // console.log("create session begin");
     return {
       ...state,
       isLoading: true,
@@ -271,7 +273,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === CREATE_SESSION_SUCCESS) {
-    console.log("create session success");
+    // console.log("create session success");
     return {
       ...state,
       isLoading: false,
@@ -279,7 +281,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === CREATE_SESSION_ERROR) {
-    console.log("create session error");
+    // console.log("create session error");
     return {
       ...state,
       showAlert: true,
@@ -291,7 +293,7 @@ const reducer = (state, action) => {
 
   // -- SET SUBSCRIPTION STATUS --
   if (action.type === SET_SUBSCRIPTION_BEGIN) {
-    console.log("fetch user and set subscription begin");
+    // console.log("fetch user and set subscription begin");
     return {
       ...state,
       isLoading: true,
@@ -299,7 +301,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === SET_SUBSCRIPTION_SUCCESS) {
-    console.log("fetch user and set subscription success");
+    // console.log("fetch user and set subscription success");
     return {
       ...state,
       isLoading: false,
@@ -309,7 +311,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === SET_SUBSCRIPTION_ERROR) {
-    console.log("fetch user and set subscription error");
+    // console.log("fetch user and set subscription error");
     return {
       ...state,
       isLoading: false,
@@ -320,7 +322,7 @@ const reducer = (state, action) => {
 
   // -- TOGGLE MODAL --
   if (action.type === TOGGLE_MODAL_SUCCESS) {
-    console.log("toggle main modal success");
+    // console.log("toggle main modal success");
     return {
       ...state,
       showMainModal: !state.showMainModal,
@@ -328,7 +330,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === TOGGLE_TAGMODAL_SUCCESS) {
-    console.log("toggle tag modal success");
+    // console.log("toggle tag modal success");
     return {
       ...state,
       showTagModal: !state.showTagModal,
@@ -336,7 +338,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === TOGGLE_EDIT_TRADEMODAL_SUCCESS) {
-    console.log("toggle edit trade modal success");
+    // console.log("toggle edit trade modal success");
     return {
       ...state,
       showEditTradeModal: !state.showEditTradeModal,
@@ -346,14 +348,14 @@ const reducer = (state, action) => {
 
   // -- DELETE EXECUTIONS --
   if (action.type === DELETE_EXECUTION_BEGIN) {
-    console.log("delete execution begin");
+    // console.log("delete execution begin");
     return {
       ...state,
     };
   }
 
   if (action.type === DELETE_EXECUTION_SUCCESS) {
-    console.log("delete execution success");
+    // console.log("delete execution success");
 
     // if showEditTradeModal is false
     if (action.payload.showEditTradeModal === false) {
@@ -379,7 +381,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === DELETE_EXECUTION_ERROR) {
-    console.log("delete execution error");
+    // console.log("delete execution error");
     return {
       ...state,
     };
@@ -387,7 +389,7 @@ const reducer = (state, action) => {
 
   // -- GET TRADES SORT HEADER AND REVERSE --
   if (action.type === SET_HEADER_SUCCESS) {
-    console.log("set header success");
+    // console.log("set header success");
     return {
       ...state,
       header: action.payload.header,
@@ -397,12 +399,12 @@ const reducer = (state, action) => {
 
   // -- GET TRADES --
   if (action.type === FETCH_TRADES_BEGIN) {
-    console.log("fetch trades begin");
+    // console.log("fetch trades begin");
     return { ...state };
   }
 
   if (action.type === FETCH_TRADES_SUCCESS) {
-    console.log("fetch trades success");
+    // console.log("fetch trades success");
     return {
       ...state,
       trades: action.payload.trades,
@@ -411,7 +413,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === FETCH_TRADES_ERROR) {
-    console.log("fetch trades error");
+    // console.log("fetch trades error");
     return {
       ...state,
     };
@@ -419,12 +421,12 @@ const reducer = (state, action) => {
 
   // -- CREATE TRADE --
   if (action.type === CREATE_TRADE_BEGIN) {
-    console.log("create trade begin");
+    // console.log("create trade begin");
     return { ...state };
   }
 
   if (action.type === CREATE_TRADE_SUCCESS) {
-    console.log("create trade success");
+    // console.log("create trade success");
     return {
       ...state,
       trades: action.payload.trades,
@@ -434,7 +436,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === CREATE_TRADE_ERROR) {
-    console.log("create trade error");
+    // console.log("create trade error");
     return {
       ...state,
       showAlert: true,
@@ -445,12 +447,12 @@ const reducer = (state, action) => {
 
   // -- UPDATE TRADE --
   if (action.type === UPDATE_TRADE_BEGIN) {
-    console.log("update trade begin");
+    // console.log("update trade begin");
     return { ...state };
   }
 
   if (action.type === UPDATE_TRADE_SUCCESS) {
-    console.log("update trade success");
+    // console.log("update trade success");
     // if there is no execution in payload
     if (!action.payload.executions) {
       return {
@@ -477,7 +479,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === UPDATE_TRADE_ERROR) {
-    console.log("update trade error");
+    // console.log("update trade error");
     return {
       ...state,
       showAlert: true,
@@ -488,12 +490,12 @@ const reducer = (state, action) => {
 
   // -- DELETE TRADE --
   if (action.type === DELETE_TRADE_BEGIN) {
-    console.log("delete trade begin");
+    // console.log("delete trade begin");
     return { ...state };
   }
 
   if (action.type === DELETE_TRADE_SUCCESS) {
-    console.log("delete trade success");
+    // console.log("delete trade success");
     return {
       ...state,
       trades: action.payload.trades,
@@ -503,13 +505,13 @@ const reducer = (state, action) => {
   }
 
   if (action.type === DELETE_TRADE_ERROR) {
-    console.log("delete trade error");
+    // console.log("delete trade error");
     return { ...state };
   }
 
   // -- SET SELECTED TRADES --
   if (action.type === SET_SELECTED_TRADES) {
-    console.log("set selected trades");
+    // console.log("set selected trades");
     return {
       ...state,
       selectedTrades: action.payload.selectedTrades,
@@ -518,14 +520,14 @@ const reducer = (state, action) => {
 
   // -- GET EXECUTIONS --
   if (action.type === FETCH_EXECUTIONS_BEGIN) {
-    console.log("fetch executions begin");
+    // console.log("fetch executions begin");
     return {
       ...state,
     };
   }
 
   if (action.type === FETCH_EXECUTIONS_SUCCESS) {
-    console.log("fetch executions success");
+    // console.log("fetch executions success");
     return {
       ...state,
       executions: action.payload.executions,
@@ -533,7 +535,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === FETCH_EXECUTIONS_ERROR) {
-    console.log("fetch executions error");
+    // console.log("fetch executions error");
     return {
       ...state,
     };
@@ -541,14 +543,14 @@ const reducer = (state, action) => {
 
   // -- CREATE EXECUTION --
   if (action.type === CREATE_EXECUTION_BEGIN) {
-    console.log("create execution begin");
+    // console.log("create execution begin");
     return {
       ...state,
     };
   }
 
   if (action.type === CREATE_EXECUTION_SUCCESS) {
-    console.log("create execution success");
+    // console.log("create execution success");
     return {
       ...state,
       editTrade: action.payload.editTrade,
@@ -562,7 +564,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === CREATE_EXECUTION_ERROR) {
-    console.log("create execution error");
+    // console.log("create execution error");
     return {
       ...state,
       showAlert: true,
@@ -572,7 +574,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === SET_ADDEXECSTATE_SUCCESS) {
-    console.log("set add execution state success");
+    // console.log("set add execution state success");
     return {
       ...state,
       addExecCellState: action.payload.newAddExecState,
@@ -581,12 +583,12 @@ const reducer = (state, action) => {
 
   // -- GET JOURNALS --
   if (action.type === FETCH_JOURNALS_BEGIN) {
-    console.log("fetch journals begin");
+    // console.log("fetch journals begin");
     return { ...state };
   }
 
   if (action.type === FETCH_JOURNALS_SUCCESS) {
-    console.log("fetch journals success");
+    // console.log("fetch journals success");
     return {
       ...state,
       journals: action.payload.journals,
@@ -594,7 +596,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === FETCH_JOURNALS_ERROR) {
-    console.log("fetch journals error");
+    // console.log("fetch journals error");
     return {
       ...state,
     };
@@ -602,28 +604,28 @@ const reducer = (state, action) => {
 
   // -- EDIT JOURNALS --
   if (action.type === EDIT_JOURNAL_BEGIN) {
-    console.log("edit journal begin");
+    // console.log("edit journal begin");
     return { ...state };
   }
 
   if (action.type === EDIT_JOURNAL_SUCCESS) {
-    console.log("edit journal success");
+    // console.log("edit journal success");
     return { ...state, journals: action.payload.journals };
   }
 
   if (action.type === EDIT_JOURNAL_ERROR) {
-    console.log("edit journal error");
+    // console.log("edit journal error");
     return { ...state };
   }
 
   // -- CREATE JOURNAL --
   if (action.type === CREATE_JOURNAL_BEGIN) {
-    console.log("create journal begin");
+    // console.log("create journal begin");
     return { ...state };
   }
 
   if (action.type === CREATE_JOURNAL_SUCCESS) {
-    console.log("create journal success");
+    // console.log("create journal success");
     return {
       ...state,
       journals: action.payload.journals,
@@ -632,7 +634,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === CREATE_JOURNAL_ERROR) {
-    console.log("create journal error");
+    // console.log("create journal error");
     return {
       ...state,
       showAlert: true,
@@ -643,34 +645,34 @@ const reducer = (state, action) => {
 
   // -- FETCH TAGS --
   if (action.type === FETCH_TAGS_BEGIN) {
-    console.log("fetch tags begin");
+    // console.log("fetch tags begin");
     return { ...state };
   }
 
   if (action.type === FETCH_TAGS_SUCCESS) {
-    console.log("fetch tags success");
+    // console.log("fetch tags success");
     return { ...state, tags: action.payload.tags };
   }
 
   if (action.type === FETCH_TAGS_ERROR) {
-    console.log("fetch tags error");
+    // console.log("fetch tags error");
     return { ...state };
   }
 
   // -- CREATE TAG --
   if (action.type === CREATE_TAG_BEGIN) {
-    console.log("create tag begin");
+    // console.log("create tag begin");
     return { ...state };
   }
 
   // -- DELETE TAG --
   if (action.type === DELETE_TAG_BEGIN) {
-    console.log("delete tag begin");
+    // console.log("delete tag begin");
     return { ...state };
   }
 
   if (action.type === DELETE_TAG_SUCCESS) {
-    console.log("delete tag success");
+    // console.log("delete tag success");
     return {
       ...state,
       tags: action.payload.tags,
@@ -680,12 +682,12 @@ const reducer = (state, action) => {
   }
 
   if (action.type === DELETE_TAG_ERROR) {
-    console.log("delete tag error");
+    // console.log("delete tag error");
     return { ...state };
   }
 
   if (action.type === CREATE_TAG_SUCCESS) {
-    console.log("create tag success");
+    // console.log("create tag success");
     return {
       ...state,
       tags: action.payload.tags,
@@ -694,7 +696,7 @@ const reducer = (state, action) => {
   }
 
   if (action.type === CREATE_TAG_ERROR) {
-    console.log("create tag error");
+    // console.log("create tag error");
     return {
       ...state,
       showAlert: true,
@@ -705,23 +707,23 @@ const reducer = (state, action) => {
 
   // set selected tags
   if (action.type === SET_SELECTED_TAGS) {
-    console.log("tags set");
+    // console.log("tags set");
     return { ...state, selectedTags: action.payload.selectedTags };
   }
 
   // -- FETCH CHART DATA --
   if (action.type === FETCH_CHARTDATA_BEGIN) {
-    console.log("fetch chart data begin");
+    // console.log("fetch chart data begin");
     return { ...state };
   }
 
   if (action.type === FETCH_CHARTDATA_SUCCESS) {
-    console.log("fetch chart data success");
+    // console.log("fetch chart data success");
     return { ...state, chartData: action.payload.chartData };
   }
 
   if (action.type === FETCH_CHARTDATA_ERROR) {
-    console.log("fetch chart data error");
+    // console.log("fetch chart data error");
     return { ...state };
   }
 

@@ -48,7 +48,7 @@ function Profile() {
 
   // anytime the user global state variable changes, update the local state username, email, and image property
   useEffect(() => {
-    console.log("user state variable initially set or changed");
+    // console.log("user state variable initially set or changed");
 
     setValues({
       ...values,

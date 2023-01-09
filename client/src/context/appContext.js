@@ -200,11 +200,19 @@ function AppContextProvider({ children }) {
       // clear any alerts
       clearAlert();
     } catch (error) {
-      // set alert state to true, danger, and display message from response
-      dispatch({
-        type: REGISTER_USER_ERROR,
-        payload: { text: error.response.data.msg, type: "danger" },
-      });
+      // if the error.response.data property is a string (in the case of rateLimit error message)
+      if (typeof error.response.data === "string") {
+        dispatch({
+          type: REGISTER_USER_ERROR,
+          payload: { text: error.response.data, type: "danger" },
+        });
+      } else {
+        // set alert state to true, danger, and display message from response
+        dispatch({
+          type: REGISTER_USER_ERROR,
+          payload: { text: error.response.data.msg, type: "danger" },
+        });
+      }
     }
   };
 
@@ -234,11 +242,20 @@ function AppContextProvider({ children }) {
       // clear any alerts
       clearAlert();
     } catch (error) {
-      // set alert state to true, danger, and display message from response
-      dispatch({
-        type: LOGIN_USER_ERROR,
-        payload: { text: error.response.data.msg, type: "danger" },
-      });
+      // if the error.response.data property is a string (in the case of rateLimit error message)
+      if (typeof error.response.data === "string") {
+        dispatch({
+          type: LOGIN_USER_ERROR,
+          payload: { text: error.response.data, type: "danger" },
+        });
+      } else {
+        // otherwise, for any other type of error
+        // set alert state to true, danger, and display message from response
+        dispatch({
+          type: LOGIN_USER_ERROR,
+          payload: { text: error.response.data.msg, type: "danger" },
+        });
+      }
     }
   };
 

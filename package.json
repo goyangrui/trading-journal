@@ -5,6 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "setup-production": "npm run install-client && npm run build-client && npm install",
+    "build-client": "cd client && npm run build",
+    "install-client": "cd client && npm install",
     "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "server": "nodemon server --ignore client",
     "client": "cd client && npm start"
@@ -30,6 +33,9 @@
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "express-async-errors": "^3.1.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.0.1",
     "http-status-codes": "^2.2.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.2",
@@ -37,6 +43,7 @@
     "multer": "^1.4.5-lts.1",
     "stripe": "^10.6.0",
     "uuid": "^9.0.0",
-    "validator": "^13.7.0"
+    "validator": "^13.7.0",
+    "xss-clean": "^0.1.1"
   }
 }
