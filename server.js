@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import path from "path";
 import morgan from "morgan";
 import mongoose from "mongoose";
 
@@ -54,6 +55,11 @@ app.use(xss()); // sanitize user input from POST body and GET queries and url pa
 app.use(mongoSanitize()); // prevents MongoDB Operator Injection
 
 // -- ROUTING --
+
+// -- USE WHEN READY TO DEPLOY (serve static assets -> react production build) --
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+});
 
 // authentication route
 app.use("/api/v1/auth", authRouter);
