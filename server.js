@@ -88,16 +88,16 @@ app.use("/api/v1/journals", authMiddleware, journalRouter);
 // tag routes
 app.use("/api/v1/tags", authMiddleware, tagRouter);
 
+// -- USE WHEN READY TO DEPLOY (send index.html asset from ./client/build folder when no other path is hit, which by default, no other path above will be hit initially) --
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+});
+
 // -- ROUTE NOT FOUND MIDDLEWARE --
 app.use(notFoundMiddleware);
 
 // -- ERROR HANDLING MIDDLEWARE --
 app.use(errorHandlerMiddleware);
-
-// -- USE WHEN READY TO DEPLOY (send index.html asset from ./client/build folder when no other path is hit, which by default, no other path above will be hit initially) --
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
-});
 
 // -- START SERVER --
 
