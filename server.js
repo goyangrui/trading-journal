@@ -2,8 +2,14 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express from "express";
 import path from "path";
+import { fileURLToPath } from "url";
+
+// get __dirname manually (because we are using ES modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import express from "express";
 import morgan from "morgan";
 import mongoose from "mongoose";
 
@@ -46,6 +52,9 @@ if (process.env.NODE_ENV !== "production") {
 // request body parser middleware for json data
 app.use(express.json());
 
+// -- USE WHEN READY TO DEPLOY (express.static middleware to serve any static assets from client/build folder)
+app.use(express.static(path.resolve(__dirname, "./client/build")));
+
 // request body parser for url encoded requests
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -55,11 +64,6 @@ app.use(xss()); // sanitize user input from POST body and GET queries and url pa
 app.use(mongoSanitize()); // prevents MongoDB Operator Injection
 
 // -- ROUTING --
-
-// -- USE WHEN READY TO DEPLOY (serve static assets -> react production build) --
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
-});
 
 // authentication route
 app.use("/api/v1/auth", authRouter);
@@ -89,6 +93,11 @@ app.use(notFoundMiddleware);
 
 // -- ERROR HANDLING MIDDLEWARE --
 app.use(errorHandlerMiddleware);
+
+// -- USE WHEN READY TO DEPLOY (send index.html asset from ./client/build folder when no other path is hit, which by default, no other path above will be hit initially) --
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+});
 
 // -- START SERVER --
 
